@@ -29,17 +29,23 @@ environment:
 dependencies:
   just_audio: ^0.9.20
   # just_audio_libwinmedia: ^0.0.4
+  just_audio_background: ^0.0.1-beta.5
   # whatever library database on this line
   go_router: ^3.0.5
   #bitsdojo_window: ^0.1.1+1
-
+  material_design_icons_flutter: 5.0.6595
+  file_picker: ^4.5.1 # for picking directories (and files in early versions)
+  freezed_annotation:
+  id3: ^1.0.2
+  flutter_riverpod: ^1.0.3
   flutter:
     sdk: flutter
-  material_design_icons_flutter: 5.0.6595
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  build_runner:
+  freezed:
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
