@@ -1,13 +1,18 @@
+import 'package:bodacious/models/track_data.dart';
+import 'package:bodacious/src/metadata/provider.dart';
 import 'package:bodacious/widgets/now_playing.dart';
 import 'package:bodacious/widgets/now_playing_data.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 //import 'package:bitsdojo_window/bitsdojo_window.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const ProviderScope(
+    child: MyApp()
+  ));
 
   // doWhenWindowReady(() {
   //   const initialSize = Size(600, 450);
@@ -21,6 +26,7 @@ void main() {
 }
 
 final player = AudioPlayer();
+final nowPlayingProvider = StateNotifierProvider<NowPlayingNotifier, TrackMetadata>((ref) => NowPlayingNotifier());
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -36,6 +42,7 @@ class MyApp extends StatelessWidget {
       home: NowPlayingData(
         child: OuterFrame(),
         player: player,
+        //metadataProvider: NowPlayingNotifier(),
       )
     );
   }

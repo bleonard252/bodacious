@@ -1,5 +1,6 @@
-// ignore: unused_import
 import 'package:flutter/foundation.dart';
+
+import 'dart:ui' show ImageDescriptor;
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'track_data.freezed.dart';
@@ -14,8 +15,9 @@ class TrackMetadata with _$TrackMetadata {
     String? artistName,
     /// The album's name. Also used with [artistName] to look up the album in the database.
     String? albumName,
-    /// Not really sure what this will be yet but it'll somehow hold the data for the cover
-    /// but it won't be stored in the database (loaded from tags or a file)
-    dynamic coverData
+    /// Holds the data for a cover image. **DO NOT** STORE THIS IN THE DATABASE!
+    ImageDescriptor? coverData,
+    /// The raw bytes of the cover image.
+    List<int>? coverBytes
   }) = _TrackMetadata;
 }

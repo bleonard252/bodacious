@@ -34,6 +34,7 @@ dependencies:
   go_router: ^3.0.5
   #bitsdojo_window: ^0.1.1+1
   material_design_icons_flutter: 5.0.6595
+  palette_generator: ^0.3.3
   file_picker: ^4.5.1 # for picking directories (and files in early versions)
   freezed_annotation:
   id3: ^1.0.2

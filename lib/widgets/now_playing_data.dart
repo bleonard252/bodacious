@@ -3,11 +3,11 @@ import 'package:just_audio/just_audio.dart';
 
 class NowPlayingData extends InheritedWidget {
   final AudioPlayer? player;
-  // final TrackMetadata? metadata;
+  //final NowPlayingNotifier metadataProvider;
   const NowPlayingData({
     Key? key, 
     this.player,
-    //this.metadata,
+    //required this.metadataProvider,
     required Widget child
   }) : super(key: key, child: child);
 
