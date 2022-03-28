@@ -26,22 +26,26 @@ class _NowPlayingViewState extends ConsumerState<NowPlayingView> {
   @override
   Widget build(BuildContext context) {
     final meta = ref.watch(nowPlayingProvider);
+    final _fallbackColors = [
+      PaletteColor(Theme.of(context).colorScheme.primary, 500),
+      PaletteColor(Theme.of(context).canvasColor, 100),
+    ];
     return Material(
       child: FutureBuilder<PaletteGenerator>(
         future: () async {
-          if (ref.watch(nowPlayingProvider).coverData == null) return PaletteGenerator.fromColors([PaletteColor(Theme.of(context).colorScheme.background, 100)]);
+          if (ref.watch(nowPlayingProvider).coverData == null) return PaletteGenerator.fromColors(_fallbackColors);
           return PaletteGenerator.fromImage(
             (await (await meta.coverData!.instantiateCodec(targetWidth: 128, targetHeight: 128)).getNextFrame()).image
           );
         }(),
-        initialData: PaletteGenerator.fromColors([PaletteColor(Theme.of(context).colorScheme.background, 100)]),
+        initialData: PaletteGenerator.fromColors(_fallbackColors),
         builder: (context, snapshot) {
           final vibrant = Theme.of(context).brightness == Brightness.light ? snapshot.data?.lightVibrantColor : snapshot.data?.darkVibrantColor;
           return DecoratedBox(
             decoration: BoxDecoration(color: 
               vibrant?.color
               //?? snapshot.data?.dominantColor?.color
-              ?? Theme.of(context).colorScheme.background
+              ?? Theme.of(context).canvasColor
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -111,7 +115,10 @@ class _NowPlayingViewState extends ConsumerState<NowPlayingView> {
                       stream: player.playerStateStream,
                       builder: (context, snapshot) {
                         return IconTheme(
-                          data: const IconThemeData(size: 36),
+                          data: IconThemeData(
+                            size: 36,
+                            color: vibrant?.bodyTextColor
+                          ),
                           child: Row(
                             mainAxisSize: MainAxisSize.max,
                             crossAxisAlignment: CrossAxisAlignment.center,
