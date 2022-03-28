@@ -1,6 +1,11 @@
+
+import 'package:audio_service/audio_service.dart';
 import 'package:bodacious/models/track_data.dart';
+import 'package:bodacious/src/library/init_db.dart';
+import 'package:bodacious/src/media/audio_service.dart';
 import 'package:bodacious/src/metadata/provider.dart';
 import 'package:bodacious/src/navigate_observer.dart';
+import 'package:bodacious/views/library/root.dart';
 import 'package:bodacious/views/now_playing.dart';
 import 'package:bodacious/widgets/now_playing.dart';
 import 'package:bodacious/widgets/now_playing_data.dart';
@@ -9,9 +14,31 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:sembast/sembast.dart';
 //import 'package:bitsdojo_window/bitsdojo_window.dart';
 
-void main() {
+late final Database db;
+
+final player = AudioPlayer();
+WidgetRef? playerBackgroundRef;
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  db = await loadDatabase();
+
+  await AudioService.init(
+    builder: () => BodaciousBackgroundService(player),
+    config: const AudioServiceConfig(
+      androidNotificationChannelId: 'xyz.u1024256.bodacious.player',
+      androidNotificationChannelName: 'Audio player',
+      androidNotificationChannelDescription: "Bodacious puts your music in the notifications with this, which also lets it play in the background.",
+      androidNotificationOngoing: true,
+      androidNotificationIcon: "drawable/notification",
+      androidStopForegroundOnPause: true,
+      notificationColor: Colors.amber,
+    )
+  );
+
   runApp(const ProviderScope(
     child: MyApp()
   ));
@@ -27,15 +54,15 @@ void main() {
 
 }
 
-final player = AudioPlayer();
 final nowPlayingProvider = StateNotifierProvider<NowPlayingNotifier, TrackMetadata>((ref) => NowPlayingNotifier());
 
-class MyApp extends StatelessWidget {
+class MyApp extends ConsumerWidget {
   const MyApp({Key? key}) : super(key: key);
 
   // This widget is the root of your application.
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    playerBackgroundRef = ref;
     return MaterialApp(
       title: 'Bodacious',
       theme: ThemeData.light().copyWith(
@@ -178,7 +205,7 @@ class OuterFrame extends StatelessWidget {
   static final goRouter = GoRouter(
     routes: [
       GoRoute(path: "/", builder: (context, state) => const Scaffold(backgroundColor: Colors.red, body: Center(child: Text("HOME")))),
-      GoRoute(path: "/library", builder: (context, state) => const Scaffold(backgroundColor: Colors.green, body: Center(child: Text("LIBRARY")))),
+      GoRoute(path: "/library", builder: (context, state) => const LibraryRootView()),
       GoRoute(path: "/menu", builder: (context, state) => const Scaffold(backgroundColor: Colors.blue, body: Center(child: Text("MAIN MENU")))),
       GoRoute(path: "/now_playing", builder: (context, state) => const NowPlayingView())
     ],

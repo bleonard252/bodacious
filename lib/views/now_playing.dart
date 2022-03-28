@@ -8,7 +8,6 @@ import "package:flutter/material.dart";
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:just_audio_background/just_audio_background.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:palette_generator/palette_generator.dart';
 
@@ -159,19 +158,19 @@ class _NowPlayingViewState extends ConsumerState<NowPlayingView> {
                                 const Spacer(),
                                 Builder(
                                   builder: (context) {
-                                    // the following block was ripped straight from PopupMenuButtonState().showButtonMenu
-                                    final button = context.findRenderObject()! as RenderBox;
-                                    final overlay = Navigator.of(context, rootNavigator: true).overlay!.context.findRenderObject()! as RenderBox;
-                                    final position = RelativeRect.fromRect(
-                                      Rect.fromPoints(
-                                        button.localToGlobal(Offset.zero, ancestor: overlay),
-                                        button.localToGlobal(button.size.bottomRight(Offset.zero), ancestor: overlay),
-                                      ),
-                                      Offset.zero & overlay.size,
-                                    );
                                     return IconButton(
                                       icon: const Icon(MdiIcons.dotsVertical),
                                       onPressed: () {
+                                        // the following block was ripped straight from PopupMenuButtonState().showButtonMenu
+                                        final button = context.findRenderObject()! as RenderBox;
+                                        final overlay = Navigator.of(context, rootNavigator: true).overlay!.context.findRenderObject()! as RenderBox;
+                                        final position = RelativeRect.fromRect(
+                                          Rect.fromPoints(
+                                            button.localToGlobal(Offset.zero, ancestor: overlay),
+                                            button.localToGlobal(button.size.bottomRight(Offset.zero), ancestor: overlay),
+                                          ),
+                                          Offset.zero & overlay.size,
+                                        );
                                         showMenu(context: context, position: position, items: [
                                           const PopupMenuItem(
                                             child: Text("Track info"),
@@ -280,7 +279,7 @@ class _NowPlayingViewState extends ConsumerState<NowPlayingView> {
               player.play();
               player.playbackEventStream.firstWhere((e) => (e.processingState == ProcessingState.completed)).then((event) {
                 player.pause();
-                player.setAudioSource(ProgressiveAudioSource(Uri.file("/")));
+                //player.setAudioSource(ProgressiveAudioSource(Uri.file("/")));
                 ref.read(nowPlayingProvider.notifier).changeTrack(const TrackMetadata());
               });
             });

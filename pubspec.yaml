@@ -16,23 +16,27 @@ dependencies:
   # Audio Player Deps
   just_audio: ^0.9.20
   just_audio_libwinmedia: ^0.0.4
-  just_audio_background: ^0.0.1-beta.5
+  #just_audio_background: ^0.0.1-beta.5
+  audio_service: ^0.18.4
   
   # Widget & Flutter Deps
   go_router: ^3.0.5
   #bitsdojo_window: ^0.1.1+1
-  material_design_icons_flutter: 5.0.6595
+  material_design_icons_flutter: '5.0.6595'
   palette_generator: ^0.3.3
   flutter_riverpod: ^1.0.3
   flutter:
     sdk: flutter
   freezed_annotation:
+  path_provider: ^2.0.9
 
   # Library & Metadata Deps
   file_picker: ^4.5.1 # for picking directories (and files in early versions)
   #whatever library database on this line
   id3: ^1.0.2
   flac_metadata: ^1.0.4
+  sembast: ^3.2.0
+  mime: ^1.0.1
   #on_audio_query: ^2.6.0 # for finding songs from Android and iOS system libraries
 
 dev_dependencies:
@@ -40,16 +44,28 @@ dev_dependencies:
     sdk: flutter
   build_runner:
   freezed:
+  flutter_launcher_icons: ^0.9.2
+  flutter_app_name: ^0.1.1
 
   # See `analysis_options.yaml`
   flutter_lints: ^1.0.0
+
+flutter_app_name:
+  name: "Bodacious"
+flutter_icons:
+  android: true
+  ios: true
+  adaptive_icon_background: "assets/brand/ic_background.png"
+  adaptive_icon_foreground: "assets/brand/ic_foreground.png"
+  image_path: "assets/brand/ic_launcher.png"
 
 flutter:
   uses-material-design: false # turn off `Icons` class.
   # Please use `MdiIcons` instead for consistency.
 
   # To add assets to your application, add an assets section, like this:
-  # assets:
+  assets:
+    - assets/bubblebg.png
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
 
