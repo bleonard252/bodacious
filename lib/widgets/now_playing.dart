@@ -12,8 +12,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
-class NowPlaying extends ConsumerWidget {
-  const NowPlaying({ Key? key }) : super(key: key);
+class NowPlayingBar extends ConsumerWidget {
+  const NowPlayingBar({ Key? key }) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -26,7 +26,7 @@ class NowPlaying extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisSize: MainAxisSize.max,
         children: [
-          buildTrackInfo(data!, context),
+          Expanded(child: buildTrackInfo(data!, context)),
           MediaQuery.of(context).size.width > 480 ? SizedBox(
             width: 240,
             child: Column(

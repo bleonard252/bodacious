@@ -39,11 +39,11 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Bodacious',
       theme: ThemeData.light().copyWith(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.amber),
+        colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.amber),
         useMaterial3: false,
       ),
       darkTheme: ThemeData.dark().copyWith(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.amber, brightness: Brightness.dark),
+        colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.amber, brightness: Brightness.dark),
         useMaterial3: false,
       ),
       home: NowPlayingData(
@@ -109,7 +109,7 @@ class OuterFrame extends StatelessWidget {
               Expanded(child: Builder(builder: (context) => buildNavigator(context)))
             ]),
           ),
-          const SafeArea(top: false, child: NowPlaying())
+          const SafeArea(top: false, child: NowPlayingBar())
         ],
       );
     } else {
@@ -120,21 +120,32 @@ class OuterFrame extends StatelessWidget {
           child: StreamBuilder(
             stream: _observer.stream,
             builder: (context, snapshot) {
+              final shouldBeSelected = goRouter.location == "/menu" || goRouter.location == "/" || goRouter.location.startsWith("/library");
               return Column(children: [
-                if (goRouter.location != "/now_playing") const NowPlaying(),
+                if (goRouter.location != "/now_playing") const NowPlayingBar(),
                 BottomNavigationBar(
                   backgroundColor: Theme.of(context).colorScheme.surface,
                   elevation: 0,
                   currentIndex:
                     goRouter.location == "/" ? 0 :
-                    goRouter.location.startsWith("/library") ? 1 :
-                    2,
-                  selectedItemColor: goRouter.location == "/menu" ? null : Theme.of(context).bottomNavigationBarTheme.unselectedItemColor,
-                  selectedIconTheme: goRouter.location == "/menu" ? null : Theme.of(context).bottomNavigationBarTheme.unselectedIconTheme,
+                    goRouter.location.startsWith("/library") ? 1
+                    : 2,
+                  // all this for a drop of blood?
+                  selectedItemColor: shouldBeSelected
+                  ? Theme.of(context).bottomNavigationBarTheme.selectedItemColor ?? Theme.of(context).colorScheme.primary
+                  : Theme.of(context).bottomNavigationBarTheme.unselectedItemColor ?? Theme.of(context).unselectedWidgetColor,
+                  selectedIconTheme: shouldBeSelected
+                  ? Theme.of(context).bottomNavigationBarTheme.selectedIconTheme
+                  : Theme.of(context).bottomNavigationBarTheme.unselectedIconTheme,
+                  selectedFontSize: shouldBeSelected
+                  ? Theme.of(context).bottomNavigationBarTheme.selectedLabelStyle?.fontSize ?? 14.0
+                  : Theme.of(context).bottomNavigationBarTheme.unselectedLabelStyle?.fontSize ?? 12.0,
+                  type: BottomNavigationBarType.fixed,
                   items: const [
                     BottomNavigationBarItem(icon: Icon(MdiIcons.home), label: "Home"),
                     BottomNavigationBarItem(icon: Icon(MdiIcons.musicBoxMultiple), label: "Library"),
-                    BottomNavigationBarItem(icon: Icon(MdiIcons.menu), label: "Menu")
+                    BottomNavigationBarItem(icon: Icon(MdiIcons.menu), label: "Menu"),
+                    //BottomNavigationBarItem(icon: SizedBox(width: 0), label: "")
                   ],
                   onTap: (i) {
                     if (i == 0) { // Home
