@@ -1,5 +1,7 @@
 import 'package:bodacious/models/track_data.dart';
 import 'package:bodacious/src/metadata/provider.dart';
+import 'package:bodacious/src/navigate_observer.dart';
+import 'package:bodacious/views/now_playing.dart';
 import 'package:bodacious/widgets/now_playing.dart';
 import 'package:bodacious/widgets/now_playing_data.dart';
 import 'package:flutter/material.dart';
@@ -37,7 +39,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Bodacious',
       theme: ThemeData(
-        primarySwatch: Colors.yellow,
+        primarySwatch: Colors.amber,
       ),
       home: NowPlayingData(
         child: OuterFrame(),
@@ -108,34 +110,38 @@ class OuterFrame extends StatelessWidget {
     } else {
       return Column(children: [
         Expanded(child: Builder(builder: (context) => buildNavigator(context))),
-        const NowPlaying(),
         SafeArea(
           top: false,
-          child: StatefulBuilder(
-            builder: (context, setState) {
-              return BottomNavigationBar(
-                backgroundColor: Theme.of(context).colorScheme.surface,
-                elevation: 0,
-                currentIndex:
-                  goRouter.location == "/" ? 0 :
-                  goRouter.location.startsWith("/library") ? 1 :
-                  goRouter.location == "/menu" ? 2 : -1,
-                items: const [
-                  BottomNavigationBarItem(icon: Icon(MdiIcons.home), label: "Home"),
-                  BottomNavigationBarItem(icon: Icon(MdiIcons.musicBoxMultiple), label: "Library"),
-                  BottomNavigationBarItem(icon: Icon(MdiIcons.menu), label: "Menu")
-                ],
-                onTap: (i) {
-                  if (i == 0) { // Home
-                    goRouter.go("/");
-                  } else if (i == 1) { // Library
-                    goRouter.go("/library");
-                  } else if (i == 2) {
-                    goRouter.push("/menu");
-                  }
-                  setState(() {});
-                },
-              );
+          child: StreamBuilder(
+            stream: _observer.stream,
+            builder: (context, snapshot) {
+              return Column(children: [
+                if (goRouter.location != "/now_playing") const NowPlaying(),
+                BottomNavigationBar(
+                  backgroundColor: Theme.of(context).colorScheme.surface,
+                  elevation: 0,
+                  currentIndex:
+                    goRouter.location == "/" ? 0 :
+                    goRouter.location.startsWith("/library") ? 1 :
+                    2,
+                  selectedItemColor: goRouter.location == "/menu" ? null : Theme.of(context).bottomNavigationBarTheme.unselectedItemColor,
+                  selectedIconTheme: goRouter.location == "/menu" ? null : Theme.of(context).bottomNavigationBarTheme.unselectedIconTheme,
+                  items: const [
+                    BottomNavigationBarItem(icon: Icon(MdiIcons.home), label: "Home"),
+                    BottomNavigationBarItem(icon: Icon(MdiIcons.musicBoxMultiple), label: "Library"),
+                    BottomNavigationBarItem(icon: Icon(MdiIcons.menu), label: "Menu")
+                  ],
+                  onTap: (i) {
+                    if (i == 0) { // Home
+                      goRouter.go("/");
+                    } else if (i == 1) { // Library
+                      goRouter.go("/library");
+                    } else if (i == 2) {
+                      goRouter.push("/menu");
+                    }
+                  },
+                )
+              ]);
             }
           ),
         )
@@ -151,11 +157,17 @@ class OuterFrame extends StatelessWidget {
     );
   }
 
+  static final _observer = NavigationNotifier();
+
   static final goRouter = GoRouter(
     routes: [
       GoRoute(path: "/", builder: (context, state) => const Scaffold(backgroundColor: Colors.red, body: Center(child: Text("HOME")))),
       GoRoute(path: "/library", builder: (context, state) => const Scaffold(backgroundColor: Colors.green, body: Center(child: Text("LIBRARY")))),
-      GoRoute(path: "/menu", builder: (context, state) => const Scaffold(backgroundColor: Colors.red, body: Center(child: Text("MAIN MENU"))))
+      GoRoute(path: "/menu", builder: (context, state) => const Scaffold(backgroundColor: Colors.blue, body: Center(child: Text("MAIN MENU")))),
+      GoRoute(path: "/now_playing", builder: (context, state) => const NowPlayingView())
+    ],
+    observers: [
+      _observer
     ]
   );
 }

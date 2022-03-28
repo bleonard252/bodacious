@@ -16,8 +16,12 @@ class TrackMetadata with _$TrackMetadata {
     /// The album's name. Also used with [artistName] to look up the album in the database.
     String? albumName,
     /// Holds the data for a cover image. **DO NOT** STORE THIS IN THE DATABASE!
+    @Deprecated("Don't use this, just use coverBytes or coverFile instead!")
     ImageDescriptor? coverData,
-    /// The raw bytes of the cover image.
+    /// The URI to the track. Used by the library (database) to find the file
+    /// when it's time to play it, and for fallback details.
+    Uri? uri,
+    /// The raw bytes of the cover image. **DO NOT** STORE THIS IN THE DATABASE!
     List<int>? coverBytes
   }) = _TrackMetadata;
 }

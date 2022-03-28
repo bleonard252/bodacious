@@ -1,7 +1,9 @@
+import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:bodacious/main.dart';
+import 'package:bodacious/models/track_data.dart';
 import 'package:bodacious/src/metadata/load.dart';
 import 'package:bodacious/widgets/now_playing_data.dart';
 import 'package:file_picker/file_picker.dart';
@@ -17,7 +19,7 @@ class NowPlaying extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final data = NowPlayingData.of(context);
     return Material(
-      elevation: 8,
+      elevation: 8, 
       color: Theme.of(context).colorScheme.surface,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -30,22 +32,36 @@ class NowPlaying extends ConsumerWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Row(children: [
-                  const Tooltip(
-                    message: "Previous",
-                    child: IconButton(onPressed: null, icon: Icon(MdiIcons.skipBackward))
-                  ),
-                  buildPlayPauseButton(data, ref),
-                  const Tooltip(
-                    message: "Next",
-                    child: IconButton(onPressed: null, icon: Icon(MdiIcons.skipForward))
-                  )
-                ])
+                StreamBuilder(
+                  stream: data.player?.playerStateStream,
+                  builder: (context, snapshot) {
+                    return Row(children: [
+                      Tooltip(
+                        message: "Previous",
+                        child: IconButton(onPressed: player.hasPrevious || player.audioSource != null ? () {
+                          if (player.position > const Duration(seconds: 1) || !player.hasPrevious) {
+                            player.seek(const Duration(seconds: 0));
+                          } else {
+                            player.seekToPrevious();
+                          }
+                        } : null, icon: const Icon(MdiIcons.skipBackward))
+                      ),
+                      buildPlayPauseButton(data, ref),
+                      Tooltip(
+                        message: "Next",
+                        child: IconButton(
+                          onPressed: player.hasNext ? () => player.seekToNext() : null,
+                          icon: const Icon(MdiIcons.skipForward)
+                        )
+                      ),
+                    ]);
+                  }
+                )
               ],
             ),
           ) : buildPlayPauseButton(data, ref),
         ],
-      ),
+      )
     );
   }
 
@@ -65,7 +81,7 @@ class NowPlaying extends ConsumerWidget {
         child: IconButton(onPressed: () {
           assert(data.player != null);
           if (data.player == null) return;
-          if (data.player!.audioSource == null) {
+          if (data.player!.audioSource == null || data.player!.position >= (data.player!.duration ?? const Duration())-(const Duration(milliseconds: 500))) {
             FilePicker.platform.pickFiles(
               type: FileType.audio,
               withData: true,
@@ -74,10 +90,14 @@ class NowPlaying extends ConsumerWidget {
             ).then((file) {
               if (file == null || file.files.isEmpty) return;
               data.player!.setAudioSource(AudioSource.uri(Uri.file(file.files.single.path!)));
-              loadID3FromBytes(file.files.single.bytes!).then((value) => 
+              loadID3FromBytes(file.files.single.bytes!, File(file.files.single.path!)).then((value) => 
                 ref.read(nowPlayingProvider.notifier).changeTrack(value)
               );
               data.player!.play();
+              data.player!.playbackEventStream.firstWhere((e) => (e.processingState == ProcessingState.completed)).then((event) {
+                data.player!.pause();
+                ref.read(nowPlayingProvider.notifier).changeTrack(const TrackMetadata());
+              });
             });
           } else {
             data.player!.play();
@@ -89,53 +109,56 @@ class NowPlaying extends ConsumerWidget {
 
   Widget buildTrackInfo(NowPlayingData npdata, BuildContext context) {
     final data = npdata.player;
-    return Consumer(
-      builder: (context, ref, child) {
-        final meta = ref.watch(nowPlayingProvider);
-        var secondRow = [
-          if (meta.artistName?.isNotEmpty == true) TextSpan(text: meta.artistName ?? "Artist"),
-          // WidgetSpan(child: SizedBox(width: 12)),
-          // TextSpan(text: "Album"),
-        ];
-        return Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Image.memory(
-                Uint8List.fromList(meta.coverBytes ?? []),
-                width: 64, 
-                height: 64,
-                fit: BoxFit.cover,
-                errorBuilder: (context, e, s) => Container(
-                  height: 64,
+    return InkWell(
+      onTap: () => OuterFrame.goRouter.go("/now_playing"),
+      child: Consumer(
+        builder: (context, ref, child) {
+          final meta = ref.watch(nowPlayingProvider);
+          var secondRow = [
+            if (meta.artistName?.isNotEmpty == true) TextSpan(text: meta.artistName ?? "Artist"),
+            // WidgetSpan(child: SizedBox(width: 12)),
+            // TextSpan(text: "Album"),
+          ];
+          return Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Image(
+                  image: MemoryImage(Uint8List.fromList(meta.coverBytes ?? [])),
                   width: 64,
-                  child: Center(
-                    child: Icon(MdiIcons.musicBoxOutline, color: Colors.grey[700], size: 36)
+                  height: 64,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, e, s) => Container(
+                    height: 64,
+                    width: 64,
+                    child: Center(
+                      child: Icon(MdiIcons.musicBoxOutline, color: Colors.grey[700], size: 36)
+                    ),
+                    color: Colors.grey,
                   ),
-                  color: Colors.grey,
                 ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(meta.title ?? (data?.audioSource is UriAudioSource ? (data?.audioSource as UriAudioSource).uri.pathSegments.last : "Untitled track")),
-                  if (secondRow.isNotEmpty) Text.rich(TextSpan(children: secondRow), 
-                    style: Theme.of(context).textTheme.caption
-                  )
-                ],
-              ),
-            )
-          ],
-        );
-      }
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(meta.title ?? (data?.audioSource is UriAudioSource ? (data?.audioSource as UriAudioSource).uri.pathSegments.last : "Untitled track")),
+                    if (secondRow.isNotEmpty) Text.rich(TextSpan(children: secondRow), 
+                      style: Theme.of(context).textTheme.caption
+                    )
+                  ],
+                ),
+              )
+            ],
+          );
+        }
+      ),
     );
   }
 }

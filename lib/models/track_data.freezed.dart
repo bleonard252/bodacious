@@ -22,13 +22,16 @@ class _$TrackMetadataTearOff {
       {String? title,
       String? artistName,
       String? albumName,
-      ImageDescriptor? coverData,
+      @Deprecated("Don't use this, just use coverBytes or coverFile instead!")
+          ImageDescriptor? coverData,
+      Uri? uri,
       List<int>? coverBytes}) {
     return _TrackMetadata(
       title: title,
       artistName: artistName,
       albumName: albumName,
       coverData: coverData,
+      uri: uri,
       coverBytes: coverBytes,
     );
   }
@@ -49,9 +52,14 @@ mixin _$TrackMetadata {
   String? get albumName => throw _privateConstructorUsedError;
 
   /// Holds the data for a cover image. **DO NOT** STORE THIS IN THE DATABASE!
+  @Deprecated("Don't use this, just use coverBytes or coverFile instead!")
   ImageDescriptor? get coverData => throw _privateConstructorUsedError;
 
-  /// The raw bytes of the cover image.
+  /// The URI to the track. Used by the library (database) to find the file
+  /// when it's time to play it, and for fallback details.
+  Uri? get uri => throw _privateConstructorUsedError;
+
+  /// The raw bytes of the cover image. **DO NOT** STORE THIS IN THE DATABASE!
   List<int>? get coverBytes => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
@@ -68,7 +76,9 @@ abstract class $TrackMetadataCopyWith<$Res> {
       {String? title,
       String? artistName,
       String? albumName,
-      ImageDescriptor? coverData,
+      @Deprecated("Don't use this, just use coverBytes or coverFile instead!")
+          ImageDescriptor? coverData,
+      Uri? uri,
       List<int>? coverBytes});
 }
 
@@ -87,6 +97,7 @@ class _$TrackMetadataCopyWithImpl<$Res>
     Object? artistName = freezed,
     Object? albumName = freezed,
     Object? coverData = freezed,
+    Object? uri = freezed,
     Object? coverBytes = freezed,
   }) {
     return _then(_value.copyWith(
@@ -106,6 +117,10 @@ class _$TrackMetadataCopyWithImpl<$Res>
           ? _value.coverData
           : coverData // ignore: cast_nullable_to_non_nullable
               as ImageDescriptor?,
+      uri: uri == freezed
+          ? _value.uri
+          : uri // ignore: cast_nullable_to_non_nullable
+              as Uri?,
       coverBytes: coverBytes == freezed
           ? _value.coverBytes
           : coverBytes // ignore: cast_nullable_to_non_nullable
@@ -125,7 +140,9 @@ abstract class _$TrackMetadataCopyWith<$Res>
       {String? title,
       String? artistName,
       String? albumName,
-      ImageDescriptor? coverData,
+      @Deprecated("Don't use this, just use coverBytes or coverFile instead!")
+          ImageDescriptor? coverData,
+      Uri? uri,
       List<int>? coverBytes});
 }
 
@@ -146,6 +163,7 @@ class __$TrackMetadataCopyWithImpl<$Res>
     Object? artistName = freezed,
     Object? albumName = freezed,
     Object? coverData = freezed,
+    Object? uri = freezed,
     Object? coverBytes = freezed,
   }) {
     return _then(_TrackMetadata(
@@ -165,6 +183,10 @@ class __$TrackMetadataCopyWithImpl<$Res>
           ? _value.coverData
           : coverData // ignore: cast_nullable_to_non_nullable
               as ImageDescriptor?,
+      uri: uri == freezed
+          ? _value.uri
+          : uri // ignore: cast_nullable_to_non_nullable
+              as Uri?,
       coverBytes: coverBytes == freezed
           ? _value.coverBytes
           : coverBytes // ignore: cast_nullable_to_non_nullable
@@ -180,7 +202,9 @@ class _$_TrackMetadata extends _TrackMetadata with DiagnosticableTreeMixin {
       {this.title,
       this.artistName,
       this.albumName,
-      this.coverData,
+      @Deprecated("Don't use this, just use coverBytes or coverFile instead!")
+          this.coverData,
+      this.uri,
       this.coverBytes})
       : super._();
 
@@ -199,15 +223,21 @@ class _$_TrackMetadata extends _TrackMetadata with DiagnosticableTreeMixin {
   @override
 
   /// Holds the data for a cover image. **DO NOT** STORE THIS IN THE DATABASE!
+  @Deprecated("Don't use this, just use coverBytes or coverFile instead!")
   final ImageDescriptor? coverData;
   @override
 
-  /// The raw bytes of the cover image.
+  /// The URI to the track. Used by the library (database) to find the file
+  /// when it's time to play it, and for fallback details.
+  final Uri? uri;
+  @override
+
+  /// The raw bytes of the cover image. **DO NOT** STORE THIS IN THE DATABASE!
   final List<int>? coverBytes;
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'TrackMetadata(title: $title, artistName: $artistName, albumName: $albumName, coverData: $coverData, coverBytes: $coverBytes)';
+    return 'TrackMetadata(title: $title, artistName: $artistName, albumName: $albumName, coverData: $coverData, uri: $uri, coverBytes: $coverBytes)';
   }
 
   @override
@@ -219,6 +249,7 @@ class _$_TrackMetadata extends _TrackMetadata with DiagnosticableTreeMixin {
       ..add(DiagnosticsProperty('artistName', artistName))
       ..add(DiagnosticsProperty('albumName', albumName))
       ..add(DiagnosticsProperty('coverData', coverData))
+      ..add(DiagnosticsProperty('uri', uri))
       ..add(DiagnosticsProperty('coverBytes', coverBytes));
   }
 
@@ -232,6 +263,7 @@ class _$_TrackMetadata extends _TrackMetadata with DiagnosticableTreeMixin {
                 .equals(other.artistName, artistName) &&
             const DeepCollectionEquality().equals(other.albumName, albumName) &&
             const DeepCollectionEquality().equals(other.coverData, coverData) &&
+            const DeepCollectionEquality().equals(other.uri, uri) &&
             const DeepCollectionEquality()
                 .equals(other.coverBytes, coverBytes));
   }
@@ -243,6 +275,7 @@ class _$_TrackMetadata extends _TrackMetadata with DiagnosticableTreeMixin {
       const DeepCollectionEquality().hash(artistName),
       const DeepCollectionEquality().hash(albumName),
       const DeepCollectionEquality().hash(coverData),
+      const DeepCollectionEquality().hash(uri),
       const DeepCollectionEquality().hash(coverBytes));
 
   @JsonKey(ignore: true)
@@ -256,7 +289,9 @@ abstract class _TrackMetadata extends TrackMetadata {
       {String? title,
       String? artistName,
       String? albumName,
-      ImageDescriptor? coverData,
+      @Deprecated("Don't use this, just use coverBytes or coverFile instead!")
+          ImageDescriptor? coverData,
+      Uri? uri,
       List<int>? coverBytes}) = _$_TrackMetadata;
   const _TrackMetadata._() : super._();
 
@@ -275,10 +310,16 @@ abstract class _TrackMetadata extends TrackMetadata {
   @override
 
   /// Holds the data for a cover image. **DO NOT** STORE THIS IN THE DATABASE!
+  @Deprecated("Don't use this, just use coverBytes or coverFile instead!")
   ImageDescriptor? get coverData;
   @override
 
-  /// The raw bytes of the cover image.
+  /// The URI to the track. Used by the library (database) to find the file
+  /// when it's time to play it, and for fallback details.
+  Uri? get uri;
+  @override
+
+  /// The raw bytes of the cover image. **DO NOT** STORE THIS IN THE DATABASE!
   List<int>? get coverBytes;
   @override
   @JsonKey(ignore: true)

@@ -38,6 +38,7 @@ dependencies:
   file_picker: ^4.5.1 # for picking directories (and files in early versions)
   freezed_annotation:
   id3: ^1.0.2
+  flac_metadata: ^1.0.4
   flutter_riverpod: ^1.0.3
   flutter:
     sdk: flutter
