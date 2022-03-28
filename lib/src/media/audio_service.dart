@@ -19,8 +19,7 @@ class BodaciousBackgroundService extends BaseAudioHandler with SeekHandler {
           : "Untitled track"),
         artist: now.artistName,
         album: now.albumName,
-        // Temporary; this will use coverUri
-        artUri: now.coverBytes != null ? (player.audioSource as UriAudioSource).uri.resolve("cover.jpg") : null,
+        artUri: now.coverUri, // ?? (now.coverBytes != null ? (player.audioSource as UriAudioSource).uri.resolve("cover.jpg") : null),
         duration: player.duration,
         playable: true
       ));

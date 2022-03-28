@@ -11,35 +11,38 @@ class LibraryRootView extends StatefulWidget {
 }
 
 class _LibraryRootViewState extends State<LibraryRootView> {
-  double _cPos = 0;
-  ScrollController scrollController = ScrollController();
-  double screenWidth = 0;
+  //double _cPos = 0;
+  //ScrollController scrollController = ScrollController();
+  //double screenWidth = 0;
+  //int page = 0;
+  //bool registeredListener = false;
 
   @override
   Widget build(BuildContext context) {
-    screenWidth = MediaQuery.of(context).size.width;
     return Stack(
       children: [
         const Positioned.fill(child: Material()),
-        Positioned(
+        AnimatedPositioned(
+          duration: const Duration(milliseconds: 25),
+          curve: Curves.easeInOut,
           left: 0,
           right: 0,
-          top: -_cPos,
+          top: 0,
           child: Image.asset("assets/bubblebg.png",
             fit: BoxFit.fill,
-            width: (context.findRenderObject() as RenderBox?)?.size.width ?? MediaQuery.of(context).size.width,
+            //width: (context.findRenderObject() as RenderBox?)?.size.width ?? MediaQuery.of(context).size.width,
             alignment: Alignment.bottomCenter,
             //errorBuilder: (context, error, trace) => Container(color: Colors.red),
           ),
         ),
-        const Positioned.fill(child: DecoratedBox(
+        Positioned.fill(child: DecoratedBox(
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                Color(0x7f000000),
-                Color(0x00000000)
+                Theme.of(context).brightness == Brightness.light ? const Color(0x7fffffff) : const Color(0x7f000000),
+                const Color(0x00000000)
               ]
             )
           ),
@@ -103,11 +106,7 @@ class _LibraryRootViewState extends State<LibraryRootView> {
                           ],
                         ),
                       ),
-                    ],
-                    onTap: (_) {
-                      // Reset the scroll position.
-                      scrollController.animateTo(0.0, duration: const Duration(milliseconds: 250), curve: Curves.elasticIn);
-                    },
+                    ]
                   ),
                   body: const TabBarView(children: [
                     Center(child: Icon(MdiIcons.alphaA)),
@@ -123,22 +122,5 @@ class _LibraryRootViewState extends State<LibraryRootView> {
         )
       ],
     );
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    scrollController.addListener(onScroll);
-  }
-
-  onScroll() {
-    setState(() {
-      _cPos = scrollController.offset;
-    });
-  }
-  @override
-  void dispose() {
-    scrollController.removeListener(onScroll);
-    super.dispose();
   }
 }

@@ -148,7 +148,7 @@ class NowPlayingBar extends ConsumerWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(meta.title ?? (data?.audioSource is UriAudioSource ? (data?.audioSource as UriAudioSource).uri.pathSegments.last : "Untitled track")),
+                    Text(meta.title ?? meta.uri?.pathSegments.last ?? ""),
                     if (secondRow.isNotEmpty) Text.rich(TextSpan(children: secondRow), 
                       style: Theme.of(context).textTheme.caption
                     )

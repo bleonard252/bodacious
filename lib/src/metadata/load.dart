@@ -6,12 +6,15 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:bodacious/models/track_data.dart';
+import 'package:bodacious/src/library/cache_dir.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flac_metadata/flacstream.dart';
 import 'package:flac_metadata/metadata.dart';
 import 'package:flutter/foundation.dart';
 import 'package:id3/id3.dart';
 import 'dart:ui' as ui;
+
+import 'package:mime/mime.dart';
 
 Future<TrackMetadata> loadID3FromBytes(List<int> bytes, File file) async {
   final mp3 = MP3Instance(bytes);
@@ -54,12 +57,38 @@ Future<TrackMetadata> loadID3FromBytes(List<int> bytes, File file) async {
     }
   }
 
+  // cache the image if there isn't an adjacent one
+  FileSystemEntity? coverFile;
+  try {
+    coverFile = await file.parent.list().timeout(const Duration(seconds: 2), onTimeout: (stream) => stream.close())
+    .firstWhere((element) =>
+      (
+        element.uri.pathSegments.last.toLowerCase().startsWith("cover.")
+        || element.uri.pathSegments.last.toLowerCase().startsWith("folder.")
+        || element.uri.pathSegments.last.toLowerCase().startsWith("album.")
+        || element.uri.pathSegments.last.toLowerCase().startsWith("front.")
+      ) && (MimeTypeResolver().lookup(element.uri.pathSegments.last)?.startsWith("image/") ?? false)
+    );
+  } catch(_) {}
+  if (coverFile == null && ((coverBytes2 ?? coverBytes) != null)) {
+    //If there isn't a file but there is a cover...
+    //...cache it!
+    final _dir = await getCacheDirectory("album_covers");
+    await Directory(_dir).create();
+    final _b = coverBytes2 ?? coverBytes!.buffer.asUint8List();
+    final _x = extensionFromMime(MimeTypeResolver().lookup("cover", headerBytes: _b.sublist(0,20)) ?? "bmp");
+    coverFile = File(_dir+"/"+base64Encode(flacdata["album"] ?? rawTags["Album"])+"."+_x);
+    (coverFile as File).writeAsBytes(_b);
+  }
+
   // Output
   return TrackMetadata(
     title: flacdata["title"] ?? rawTags["Title"],
     artistName: flacdata["artist"] ?? rawTags["Artist"],
     albumName: flacdata["album"] ?? rawTags["Album"],
     coverData: descriptor,
-    coverBytes: coverBytes2 ?? coverBytes?.buffer.asUint8List()
+    uri: file.absolute.uri,
+    coverBytes: coverBytes2 ?? coverBytes?.buffer.asUint8List(),
+    coverUri: coverFile?.absolute.uri
   );
 }

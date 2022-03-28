@@ -25,7 +25,8 @@ class _$TrackMetadataTearOff {
       @Deprecated("Don't use this, just use coverBytes or coverFile instead!")
           ImageDescriptor? coverData,
       Uri? uri,
-      List<int>? coverBytes}) {
+      List<int>? coverBytes,
+      Uri? coverUri}) {
     return _TrackMetadata(
       title: title,
       artistName: artistName,
@@ -33,6 +34,7 @@ class _$TrackMetadataTearOff {
       coverData: coverData,
       uri: uri,
       coverBytes: coverBytes,
+      coverUri: coverUri,
     );
   }
 }
@@ -62,6 +64,9 @@ mixin _$TrackMetadata {
   /// The raw bytes of the cover image. **DO NOT** STORE THIS IN THE DATABASE!
   List<int>? get coverBytes => throw _privateConstructorUsedError;
 
+  /// The URI to the cover.
+  Uri? get coverUri => throw _privateConstructorUsedError;
+
   @JsonKey(ignore: true)
   $TrackMetadataCopyWith<TrackMetadata> get copyWith =>
       throw _privateConstructorUsedError;
@@ -79,7 +84,8 @@ abstract class $TrackMetadataCopyWith<$Res> {
       @Deprecated("Don't use this, just use coverBytes or coverFile instead!")
           ImageDescriptor? coverData,
       Uri? uri,
-      List<int>? coverBytes});
+      List<int>? coverBytes,
+      Uri? coverUri});
 }
 
 /// @nodoc
@@ -99,6 +105,7 @@ class _$TrackMetadataCopyWithImpl<$Res>
     Object? coverData = freezed,
     Object? uri = freezed,
     Object? coverBytes = freezed,
+    Object? coverUri = freezed,
   }) {
     return _then(_value.copyWith(
       title: title == freezed
@@ -125,6 +132,10 @@ class _$TrackMetadataCopyWithImpl<$Res>
           ? _value.coverBytes
           : coverBytes // ignore: cast_nullable_to_non_nullable
               as List<int>?,
+      coverUri: coverUri == freezed
+          ? _value.coverUri
+          : coverUri // ignore: cast_nullable_to_non_nullable
+              as Uri?,
     ));
   }
 }
@@ -143,7 +154,8 @@ abstract class _$TrackMetadataCopyWith<$Res>
       @Deprecated("Don't use this, just use coverBytes or coverFile instead!")
           ImageDescriptor? coverData,
       Uri? uri,
-      List<int>? coverBytes});
+      List<int>? coverBytes,
+      Uri? coverUri});
 }
 
 /// @nodoc
@@ -165,6 +177,7 @@ class __$TrackMetadataCopyWithImpl<$Res>
     Object? coverData = freezed,
     Object? uri = freezed,
     Object? coverBytes = freezed,
+    Object? coverUri = freezed,
   }) {
     return _then(_TrackMetadata(
       title: title == freezed
@@ -191,6 +204,10 @@ class __$TrackMetadataCopyWithImpl<$Res>
           ? _value.coverBytes
           : coverBytes // ignore: cast_nullable_to_non_nullable
               as List<int>?,
+      coverUri: coverUri == freezed
+          ? _value.coverUri
+          : coverUri // ignore: cast_nullable_to_non_nullable
+              as Uri?,
     ));
   }
 }
@@ -205,7 +222,8 @@ class _$_TrackMetadata extends _TrackMetadata with DiagnosticableTreeMixin {
       @Deprecated("Don't use this, just use coverBytes or coverFile instead!")
           this.coverData,
       this.uri,
-      this.coverBytes})
+      this.coverBytes,
+      this.coverUri})
       : super._();
 
   @override
@@ -234,10 +252,14 @@ class _$_TrackMetadata extends _TrackMetadata with DiagnosticableTreeMixin {
 
   /// The raw bytes of the cover image. **DO NOT** STORE THIS IN THE DATABASE!
   final List<int>? coverBytes;
+  @override
+
+  /// The URI to the cover.
+  final Uri? coverUri;
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'TrackMetadata(title: $title, artistName: $artistName, albumName: $albumName, coverData: $coverData, uri: $uri, coverBytes: $coverBytes)';
+    return 'TrackMetadata(title: $title, artistName: $artistName, albumName: $albumName, coverData: $coverData, uri: $uri, coverBytes: $coverBytes, coverUri: $coverUri)';
   }
 
   @override
@@ -250,7 +272,8 @@ class _$_TrackMetadata extends _TrackMetadata with DiagnosticableTreeMixin {
       ..add(DiagnosticsProperty('albumName', albumName))
       ..add(DiagnosticsProperty('coverData', coverData))
       ..add(DiagnosticsProperty('uri', uri))
-      ..add(DiagnosticsProperty('coverBytes', coverBytes));
+      ..add(DiagnosticsProperty('coverBytes', coverBytes))
+      ..add(DiagnosticsProperty('coverUri', coverUri));
   }
 
   @override
@@ -265,7 +288,8 @@ class _$_TrackMetadata extends _TrackMetadata with DiagnosticableTreeMixin {
             const DeepCollectionEquality().equals(other.coverData, coverData) &&
             const DeepCollectionEquality().equals(other.uri, uri) &&
             const DeepCollectionEquality()
-                .equals(other.coverBytes, coverBytes));
+                .equals(other.coverBytes, coverBytes) &&
+            const DeepCollectionEquality().equals(other.coverUri, coverUri));
   }
 
   @override
@@ -276,7 +300,8 @@ class _$_TrackMetadata extends _TrackMetadata with DiagnosticableTreeMixin {
       const DeepCollectionEquality().hash(albumName),
       const DeepCollectionEquality().hash(coverData),
       const DeepCollectionEquality().hash(uri),
-      const DeepCollectionEquality().hash(coverBytes));
+      const DeepCollectionEquality().hash(coverBytes),
+      const DeepCollectionEquality().hash(coverUri));
 
   @JsonKey(ignore: true)
   @override
@@ -292,7 +317,8 @@ abstract class _TrackMetadata extends TrackMetadata {
       @Deprecated("Don't use this, just use coverBytes or coverFile instead!")
           ImageDescriptor? coverData,
       Uri? uri,
-      List<int>? coverBytes}) = _$_TrackMetadata;
+      List<int>? coverBytes,
+      Uri? coverUri}) = _$_TrackMetadata;
   const _TrackMetadata._() : super._();
 
   @override
@@ -321,6 +347,10 @@ abstract class _TrackMetadata extends TrackMetadata {
 
   /// The raw bytes of the cover image. **DO NOT** STORE THIS IN THE DATABASE!
   List<int>? get coverBytes;
+  @override
+
+  /// The URI to the cover.
+  Uri? get coverUri;
   @override
   @JsonKey(ignore: true)
   _$TrackMetadataCopyWith<_TrackMetadata> get copyWith =>

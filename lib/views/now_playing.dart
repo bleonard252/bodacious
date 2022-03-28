@@ -82,9 +82,7 @@ class _NowPlayingViewState extends ConsumerState<NowPlayingView> {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Text(meta.title ?? 
-                        (player.audioSource is UriAudioSource ? (player.audioSource as UriAudioSource).uri.pathSegments.last
-                        : "No track name given"),
+                      Text(meta.title ?? meta.uri?.pathSegments.last ?? "",
                         style: Theme.of(context).textTheme.headline6?.copyWith(
                           color: vtheme.onPrimary
                         ),

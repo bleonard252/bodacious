@@ -22,6 +22,8 @@ class TrackMetadata with _$TrackMetadata {
     /// when it's time to play it, and for fallback details.
     Uri? uri,
     /// The raw bytes of the cover image. **DO NOT** STORE THIS IN THE DATABASE!
-    List<int>? coverBytes
+    List<int>? coverBytes,
+    /// The URI to the cover.
+    Uri? coverUri
   }) = _TrackMetadata;
 }
