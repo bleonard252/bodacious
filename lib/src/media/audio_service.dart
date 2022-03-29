@@ -21,7 +21,6 @@ class BodaciousBackgroundService extends BaseAudioHandler with SeekHandler {
         album: now.albumName,
         artUri: now.coverUri, // ?? (now.coverBytes != null ? (player.audioSource as UriAudioSource).uri.resolve("cover.jpg") : null),
         duration: player.duration,
-        playable: true
       ));
       playbackState.add(PlaybackState(
         playing: player.playing,
@@ -35,7 +34,10 @@ class BodaciousBackgroundService extends BaseAudioHandler with SeekHandler {
         updateTime: event.updateTime,
         systemActions: {
           MediaAction.setShuffleMode,
-          MediaAction.seek
+          MediaAction.seek,
+          MediaAction.skipToPrevious,
+          MediaAction.playPause,
+          MediaAction.skipToNext,
         }
       ));
     });

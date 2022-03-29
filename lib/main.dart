@@ -6,6 +6,7 @@ import 'package:bodacious/src/media/audio_service.dart';
 import 'package:bodacious/src/metadata/provider.dart';
 import 'package:bodacious/src/navigate_observer.dart';
 import 'package:bodacious/views/library/root.dart';
+import 'package:bodacious/views/main_menu.dart';
 import 'package:bodacious/views/now_playing.dart';
 import 'package:bodacious/widgets/now_playing.dart';
 import 'package:bodacious/widgets/now_playing_data.dart';
@@ -206,7 +207,7 @@ class OuterFrame extends StatelessWidget {
     routes: [
       GoRoute(path: "/", builder: (context, state) => const Scaffold(backgroundColor: Colors.red, body: Center(child: Text("HOME")))),
       GoRoute(path: "/library", builder: (context, state) => const LibraryRootView()),
-      GoRoute(path: "/menu", builder: (context, state) => const Scaffold(backgroundColor: Colors.blue, body: Center(child: Text("MAIN MENU")))),
+      GoRoute(path: "/menu", builder: (context, state) => const MobileMainMenu()),
       GoRoute(path: "/now_playing", builder: (context, state) => const NowPlayingView())
     ],
     observers: [

@@ -73,11 +73,14 @@ Future<TrackMetadata> loadID3FromBytes(List<int> bytes, File file) async {
   if (coverFile == null && ((coverBytes2 ?? coverBytes) != null)) {
     //If there isn't a file but there is a cover...
     //...cache it!
+    if (kDebugMode) {
+      print("Caching non-adjacent cover!");
+    }
     final _dir = await getCacheDirectory("album_covers");
     await Directory(_dir).create();
     final _b = coverBytes2 ?? coverBytes!.buffer.asUint8List();
     final _x = extensionFromMime(MimeTypeResolver().lookup("cover", headerBytes: _b.sublist(0,20)) ?? "bmp");
-    coverFile = File(_dir+"/"+base64Encode(flacdata["album"] ?? rawTags["Album"])+"."+_x);
+    coverFile = File(_dir+"/"+base64Encode(((flacdata["album"] ?? rawTags["Album"]) as String).codeUnits)+"."+_x);
     (coverFile as File).writeAsBytes(_b);
   }
 

@@ -14,6 +14,10 @@ T _$identity<T>(T value) => value;
 final _privateConstructorUsedError = UnsupportedError(
     'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more informations: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
 
+TrackMetadata _$TrackMetadataFromJson(Map<String, dynamic> json) {
+  return _TrackMetadata.fromJson(json);
+}
+
 /// @nodoc
 class _$TrackMetadataTearOff {
   const _$TrackMetadataTearOff();
@@ -23,9 +27,11 @@ class _$TrackMetadataTearOff {
       String? artistName,
       String? albumName,
       @Deprecated("Don't use this, just use coverBytes or coverFile instead!")
+      @JsonKey(ignore: true)
           ImageDescriptor? coverData,
       Uri? uri,
-      List<int>? coverBytes,
+      @JsonKey(ignore: true)
+          List<int>? coverBytes,
       Uri? coverUri}) {
     return _TrackMetadata(
       title: title,
@@ -36,6 +42,10 @@ class _$TrackMetadataTearOff {
       coverBytes: coverBytes,
       coverUri: coverUri,
     );
+  }
+
+  TrackMetadata fromJson(Map<String, Object?> json) {
+    return TrackMetadata.fromJson(json);
   }
 }
 
@@ -55,6 +65,7 @@ mixin _$TrackMetadata {
 
   /// Holds the data for a cover image. **DO NOT** STORE THIS IN THE DATABASE!
   @Deprecated("Don't use this, just use coverBytes or coverFile instead!")
+  @JsonKey(ignore: true)
   ImageDescriptor? get coverData => throw _privateConstructorUsedError;
 
   /// The URI to the track. Used by the library (database) to find the file
@@ -62,11 +73,13 @@ mixin _$TrackMetadata {
   Uri? get uri => throw _privateConstructorUsedError;
 
   /// The raw bytes of the cover image. **DO NOT** STORE THIS IN THE DATABASE!
+  @JsonKey(ignore: true)
   List<int>? get coverBytes => throw _privateConstructorUsedError;
 
   /// The URI to the cover.
   Uri? get coverUri => throw _privateConstructorUsedError;
 
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
   $TrackMetadataCopyWith<TrackMetadata> get copyWith =>
       throw _privateConstructorUsedError;
@@ -82,9 +95,11 @@ abstract class $TrackMetadataCopyWith<$Res> {
       String? artistName,
       String? albumName,
       @Deprecated("Don't use this, just use coverBytes or coverFile instead!")
+      @JsonKey(ignore: true)
           ImageDescriptor? coverData,
       Uri? uri,
-      List<int>? coverBytes,
+      @JsonKey(ignore: true)
+          List<int>? coverBytes,
       Uri? coverUri});
 }
 
@@ -152,9 +167,11 @@ abstract class _$TrackMetadataCopyWith<$Res>
       String? artistName,
       String? albumName,
       @Deprecated("Don't use this, just use coverBytes or coverFile instead!")
+      @JsonKey(ignore: true)
           ImageDescriptor? coverData,
       Uri? uri,
-      List<int>? coverBytes,
+      @JsonKey(ignore: true)
+          List<int>? coverBytes,
       Uri? coverUri});
 }
 
@@ -213,18 +230,23 @@ class __$TrackMetadataCopyWithImpl<$Res>
 }
 
 /// @nodoc
-
+@JsonSerializable()
 class _$_TrackMetadata extends _TrackMetadata with DiagnosticableTreeMixin {
   const _$_TrackMetadata(
       {this.title,
       this.artistName,
       this.albumName,
       @Deprecated("Don't use this, just use coverBytes or coverFile instead!")
+      @JsonKey(ignore: true)
           this.coverData,
       this.uri,
-      this.coverBytes,
+      @JsonKey(ignore: true)
+          this.coverBytes,
       this.coverUri})
       : super._();
+
+  factory _$_TrackMetadata.fromJson(Map<String, dynamic> json) =>
+      _$$_TrackMetadataFromJson(json);
 
   @override
 
@@ -242,6 +264,7 @@ class _$_TrackMetadata extends _TrackMetadata with DiagnosticableTreeMixin {
 
   /// Holds the data for a cover image. **DO NOT** STORE THIS IN THE DATABASE!
   @Deprecated("Don't use this, just use coverBytes or coverFile instead!")
+  @JsonKey(ignore: true)
   final ImageDescriptor? coverData;
   @override
 
@@ -251,6 +274,7 @@ class _$_TrackMetadata extends _TrackMetadata with DiagnosticableTreeMixin {
   @override
 
   /// The raw bytes of the cover image. **DO NOT** STORE THIS IN THE DATABASE!
+  @JsonKey(ignore: true)
   final List<int>? coverBytes;
   @override
 
@@ -307,6 +331,11 @@ class _$_TrackMetadata extends _TrackMetadata with DiagnosticableTreeMixin {
   @override
   _$TrackMetadataCopyWith<_TrackMetadata> get copyWith =>
       __$TrackMetadataCopyWithImpl<_TrackMetadata>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$_TrackMetadataToJson(this);
+  }
 }
 
 abstract class _TrackMetadata extends TrackMetadata {
@@ -315,11 +344,16 @@ abstract class _TrackMetadata extends TrackMetadata {
       String? artistName,
       String? albumName,
       @Deprecated("Don't use this, just use coverBytes or coverFile instead!")
+      @JsonKey(ignore: true)
           ImageDescriptor? coverData,
       Uri? uri,
-      List<int>? coverBytes,
+      @JsonKey(ignore: true)
+          List<int>? coverBytes,
       Uri? coverUri}) = _$_TrackMetadata;
   const _TrackMetadata._() : super._();
+
+  factory _TrackMetadata.fromJson(Map<String, dynamic> json) =
+      _$_TrackMetadata.fromJson;
 
   @override
 
@@ -337,6 +371,7 @@ abstract class _TrackMetadata extends TrackMetadata {
 
   /// Holds the data for a cover image. **DO NOT** STORE THIS IN THE DATABASE!
   @Deprecated("Don't use this, just use coverBytes or coverFile instead!")
+  @JsonKey(ignore: true)
   ImageDescriptor? get coverData;
   @override
 
@@ -346,6 +381,7 @@ abstract class _TrackMetadata extends TrackMetadata {
   @override
 
   /// The raw bytes of the cover image. **DO NOT** STORE THIS IN THE DATABASE!
+  @JsonKey(ignore: true)
   List<int>? get coverBytes;
   @override
 
