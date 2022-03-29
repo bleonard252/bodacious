@@ -9,7 +9,7 @@ class IndexerProgressWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
-      stream: TheIndexer.progressReceiver,
+      stream: TheIndexer.progress,
       builder: (context, state) {
         final IndexerProgressReport? report = (state.data is IndexerProgressReport? ? state.data : null) as IndexerProgressReport?;
         return Column(children: [
@@ -43,7 +43,7 @@ class IndexerProgressWidget extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              if (report?.max != null) Text(report!.value.toString() + " / " + report.max.toString())
+              if (report?.max != null && report!.max > 0) Text(report.value.toString() + " / " + report.max.toString())
             ],
           ),
           LinearProgressIndicator(

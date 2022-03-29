@@ -12,6 +12,19 @@ import '../../models/track_data.dart';
 abstract class TheIndexer {
   // Isolate main logic
   static final ReceivePort progressReceiver = ReceivePort("The Indexer's Progress Receiver");
+  static Stream<IndexerProgressReport>? _progress;
+  static Stream<IndexerProgressReport> get progress => _progress ??=
+  progressReceiver.asBroadcastStream(
+    onCancel: (controller) {
+      controller.pause();
+    },
+    onListen: (controller) async {
+      if (controller.isPaused) {
+        controller.resume();
+      }
+    },
+  ) as Stream<IndexerProgressReport>;
+
   static late final Isolate indexerIsolate;
   
   /// Don't try to touch the isolate before this aight
