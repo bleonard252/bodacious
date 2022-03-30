@@ -4,7 +4,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:sembast/sembast.dart';
 import 'package:sembast/sembast_io.dart';
 
-Future<Database> loadDatabase() async {
+Future<Database> loadDatabase({String? boLibraryPath}) async {
   late final DatabaseFactory factory;
   late final String dbPath;
   if (kIsWeb) {
@@ -12,25 +12,27 @@ Future<Database> loadDatabase() async {
   } else {
     factory = databaseFactoryIo;
   }
-  try {
-    dbPath = (await getLibraryDirectory()).absolute.path+"/_boLibrary";
-  } catch(_) {
+  if (boLibraryPath == null) {
     try {
-      dbPath = (await getApplicationSupportDirectory()).absolute.path+"/_boLibrary";
+      dbPath = (await getLibraryDirectory()).absolute.path+"/_boLibrary";
     } catch(_) {
-      dbPath = (await getApplicationDocumentsDirectory()).absolute.path+"/_boLibrary";
+      try {
+        dbPath = (await getApplicationSupportDirectory()).absolute.path+"/_boLibrary";
+      } catch(_) {
+        dbPath = (await getApplicationDocumentsDirectory()).absolute.path+"/_boLibrary";
+      }
     }
   }
-  return await factory.openDatabase(dbPath);
+  return await factory.openDatabase(boLibraryPath ?? dbPath);
 }
 
 /// The [Store] that will contain settings and the library root list.
-final configStore = StoreRef<String, Map<String, dynamic>>.main();
+final configStore = StoreRef<String, dynamic>.main();
 /// Maps normalized artist names to (partial) ArtistMetadata objects.
 final artistStore = StoreRef<String, dynamic>("artists");
 /// Maps normalized artist name ` - ` normalized album name to (partial) AlbumMetadata objects.
 final albumStore = StoreRef<String, dynamic>("albums");
 /// Maps normalized artist name ` - ` normalized track name to (partial) TrackMetadata objects.
-final songStore = StoreRef<String, TrackMetadata>("songs");
+final songStore = StoreRef<String, dynamic>("songs");
 /// Maps playlist names to lists of tracks.
-final playlistStore = StoreRef<String, List<TrackMetadata>>("playlists");
+final playlistStore = StoreRef<String, List<dynamic>>("playlists");

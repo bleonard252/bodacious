@@ -4,7 +4,8 @@ import 'dart:ui' as ui;
 
 import 'package:bodacious/main.dart';
 import 'package:bodacious/models/track_data.dart';
-import 'package:bodacious/src/metadata/load.dart';
+import 'package:bodacious/src/metadata/id3.dart';
+import 'package:bodacious/widgets/cover_placeholder.dart';
 import 'package:bodacious/widgets/now_playing_data.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -33,7 +34,7 @@ class NowPlayingBar extends ConsumerWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 StreamBuilder(
-                  stream: data.player?.playerStateStream,
+                  stream: player.playerStateStream,
                   builder: (context, snapshot) {
                     return Row(children: [
                       Tooltip(
@@ -68,20 +69,18 @@ class NowPlayingBar extends ConsumerWidget {
   // [mdi:play Play button] and [mdi:pause Pause button]
   Widget buildPlayPauseButton(NowPlayingData data, WidgetRef ref) {
     return StreamBuilder(
-      stream: data.player!.playingStream,
+      stream: player.playingStream,
       builder: (context, snap) => snap.data == true ? Tooltip(
         message: "Pause",
         child: IconButton(onPressed: () {
-          assert(data.player != null && data.player?.audioSource != null);
-          if (data.player == null || data.player?.audioSource == null) return;
-          data.player!.pause();
+          assert(player.audioSource != null);
+          if (player.audioSource == null) return;
+          player.pause();
         }, icon: const Icon(MdiIcons.pause))
       ) : Tooltip(
         message: "Play",
         child: IconButton(onPressed: () {
-          assert(data.player != null);
-          if (data.player == null) return;
-          if (data.player!.audioSource == null || data.player!.position >= (data.player!.duration ?? const Duration())-(const Duration(milliseconds: 500))) {
+          if (player.audioSource == null || player.position >= (player.duration ?? const Duration())-(const Duration(milliseconds: 500))) {
             FilePicker.platform.pickFiles(
               type: FileType.audio,
               withData: true,
@@ -89,18 +88,18 @@ class NowPlayingBar extends ConsumerWidget {
               allowMultiple: false
             ).then((file) {
               if (file == null || file.files.isEmpty) return;
-              data.player!.setAudioSource(AudioSource.uri(Uri.file(file.files.single.path!)));
+              player.setAudioSource(AudioSource.uri(Uri.file(file.files.single.path!)));
               loadID3FromBytes(file.files.single.bytes!, File(file.files.single.path!)).then((value) => 
                 ref.read(nowPlayingProvider.notifier).changeTrack(value)
               );
-              data.player!.play();
-              data.player!.playbackEventStream.firstWhere((e) => (e.processingState == ProcessingState.completed)).then((event) {
-                data.player!.pause();
+              player.play();
+              player.playbackEventStream.firstWhere((e) => (e.processingState == ProcessingState.completed)).then((event) {
+                player.pause();
                 ref.read(nowPlayingProvider.notifier).changeTrack(const TrackMetadata());
               });
             });
           } else {
-            data.player!.play();
+            player.play();
           }
         }, icon: const Icon(MdiIcons.play))
       ),
@@ -108,7 +107,6 @@ class NowPlayingBar extends ConsumerWidget {
   }
 
   Widget buildTrackInfo(NowPlayingData npdata, BuildContext context) {
-    final data = npdata.player;
     return InkWell(
       onTap: () => OuterFrame.goRouter.go("/now_playing"),
       child: Consumer(
@@ -126,20 +124,15 @@ class NowPlayingBar extends ConsumerWidget {
             children: [
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Image(
-                  image: MemoryImage(Uint8List.fromList(meta.coverBytes ?? [])),
+                child: meta.coverBytes != null || meta.coverUri?.scheme == "file" ? Image(
+                  image: (meta.coverBytes != null ? MemoryImage(Uint8List.fromList(meta.coverBytes!))
+                    : meta.coverUri?.scheme == "file" ? FileImage(File.fromUri(meta.coverUri!))
+                    : NetworkImage(meta.coverUri.toString())) as ImageProvider,
                   width: 64,
                   height: 64,
                   fit: BoxFit.cover,
-                  errorBuilder: (context, e, s) => Container(
-                    height: 64,
-                    width: 64,
-                    child: Center(
-                      child: Icon(MdiIcons.musicBoxOutline, color: Colors.grey[700], size: 36)
-                    ),
-                    color: Colors.grey,
-                  ),
-                ),
+                  errorBuilder: (context, e, s) => const CoverPlaceholder(size: 64, iconSize: 36),
+                ) : const CoverPlaceholder(size: 64, iconSize: 36),
               ),
               Padding(
                 padding: const EdgeInsets.all(8.0),

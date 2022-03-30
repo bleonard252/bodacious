@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:bodacious/main.dart';
 import 'package:bodacious/models/track_data.dart';
+import 'package:bodacious/widgets/cover_placeholder.dart';
 import 'package:file_picker/file_picker.dart';
 import "package:flutter/material.dart";
 import 'package:flutter/services.dart';
@@ -11,7 +12,7 @@ import 'package:just_audio/just_audio.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:palette_generator/palette_generator.dart';
 
-import '../src/metadata/load.dart';
+import '../src/metadata/id3.dart';
 import '../widgets/now_playing.dart';
 
 class NowPlayingView extends ConsumerStatefulWidget {
@@ -69,16 +70,13 @@ class _NowPlayingViewState extends ConsumerState<NowPlayingView> {
                         borderRadius: const BorderRadius.all(Radius.circular(12)),
                         child: AspectRatio(
                           aspectRatio: 1/1,
-                          child: Image(
-                            image: MemoryImage(Uint8List.fromList(meta.coverBytes ?? [])),
+                          child: meta.coverBytes != null || meta.coverUri?.scheme == "file" ? Image(
+                            image: (meta.coverBytes != null ? MemoryImage(Uint8List.fromList(meta.coverBytes!))
+                              : meta.coverUri?.scheme == "file" ? FileImage(File.fromUri(meta.coverUri!))
+                              : NetworkImage(meta.coverUri.toString())) as ImageProvider,
                             fit: BoxFit.cover,
-                            errorBuilder: (context, e, s) => Container(
-                              child: Center(
-                                child: Icon(MdiIcons.musicBoxOutline, color: Colors.grey[700], size: 64)
-                              ),
-                              color: Colors.grey,
-                            ),
-                          ),
+                            errorBuilder: (context, e, s) => const CoverPlaceholder(size: null, iconSize: 64)
+                          ) : const CoverPlaceholder(size: null, iconSize: 64),
                         ),
                       ),
                     ),

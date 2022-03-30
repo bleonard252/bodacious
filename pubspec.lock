@@ -228,9 +228,9 @@ packages:
   flac_metadata:
     dependency: "direct main"
     description:
-      name: flac_metadata
-      url: "https://pub.dartlang.org"
-    source: hosted
+      path: "../flac_metadata"
+      relative: true
+    source: path
     version: "1.0.4"
   flutter:
     dependency: "direct main"
@@ -373,6 +373,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "3.1.3"
+  integer:
+    dependency: "direct main"
+    description:
+      name: integer
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.1"
   io:
     dependency: transitive
     description:
@@ -388,7 +395,7 @@ packages:
     source: hosted
     version: "0.6.4"
   json_annotation:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: json_annotation
       url: "https://pub.dartlang.org"

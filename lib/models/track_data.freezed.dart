@@ -26,17 +26,18 @@ class _$TrackMetadataTearOff {
       {String? title,
       String? artistName,
       String? albumName,
-      @Deprecated("Don't use this, just use coverBytes or coverFile instead!")
-      @JsonKey(ignore: true)
-          ImageDescriptor? coverData,
+      int? trackNo,
+      int discNo = 0,
+      @JsonKey(ignore: true) ImageDescriptor? coverData,
       Uri? uri,
-      @JsonKey(ignore: true)
-          List<int>? coverBytes,
+      @JsonKey(ignore: true) List<int>? coverBytes,
       Uri? coverUri}) {
     return _TrackMetadata(
       title: title,
       artistName: artistName,
       albumName: albumName,
+      trackNo: trackNo,
+      discNo: discNo,
       coverData: coverData,
       uri: uri,
       coverBytes: coverBytes,
@@ -63,8 +64,12 @@ mixin _$TrackMetadata {
   /// The album's name. Also used with [artistName] to look up the album in the database.
   String? get albumName => throw _privateConstructorUsedError;
 
+  /// The position of the track on the named album.
+  int? get trackNo => throw _privateConstructorUsedError;
+  int get discNo => throw _privateConstructorUsedError;
+
   /// Holds the data for a cover image. **DO NOT** STORE THIS IN THE DATABASE!
-  @Deprecated("Don't use this, just use coverBytes or coverFile instead!")
+//@Deprecated("Don't use this, just use coverBytes or coverFile instead!")
   @JsonKey(ignore: true)
   ImageDescriptor? get coverData => throw _privateConstructorUsedError;
 
@@ -94,12 +99,11 @@ abstract class $TrackMetadataCopyWith<$Res> {
       {String? title,
       String? artistName,
       String? albumName,
-      @Deprecated("Don't use this, just use coverBytes or coverFile instead!")
-      @JsonKey(ignore: true)
-          ImageDescriptor? coverData,
+      int? trackNo,
+      int discNo,
+      @JsonKey(ignore: true) ImageDescriptor? coverData,
       Uri? uri,
-      @JsonKey(ignore: true)
-          List<int>? coverBytes,
+      @JsonKey(ignore: true) List<int>? coverBytes,
       Uri? coverUri});
 }
 
@@ -117,6 +121,8 @@ class _$TrackMetadataCopyWithImpl<$Res>
     Object? title = freezed,
     Object? artistName = freezed,
     Object? albumName = freezed,
+    Object? trackNo = freezed,
+    Object? discNo = freezed,
     Object? coverData = freezed,
     Object? uri = freezed,
     Object? coverBytes = freezed,
@@ -135,6 +141,14 @@ class _$TrackMetadataCopyWithImpl<$Res>
           ? _value.albumName
           : albumName // ignore: cast_nullable_to_non_nullable
               as String?,
+      trackNo: trackNo == freezed
+          ? _value.trackNo
+          : trackNo // ignore: cast_nullable_to_non_nullable
+              as int?,
+      discNo: discNo == freezed
+          ? _value.discNo
+          : discNo // ignore: cast_nullable_to_non_nullable
+              as int,
       coverData: coverData == freezed
           ? _value.coverData
           : coverData // ignore: cast_nullable_to_non_nullable
@@ -166,12 +180,11 @@ abstract class _$TrackMetadataCopyWith<$Res>
       {String? title,
       String? artistName,
       String? albumName,
-      @Deprecated("Don't use this, just use coverBytes or coverFile instead!")
-      @JsonKey(ignore: true)
-          ImageDescriptor? coverData,
+      int? trackNo,
+      int discNo,
+      @JsonKey(ignore: true) ImageDescriptor? coverData,
       Uri? uri,
-      @JsonKey(ignore: true)
-          List<int>? coverBytes,
+      @JsonKey(ignore: true) List<int>? coverBytes,
       Uri? coverUri});
 }
 
@@ -191,6 +204,8 @@ class __$TrackMetadataCopyWithImpl<$Res>
     Object? title = freezed,
     Object? artistName = freezed,
     Object? albumName = freezed,
+    Object? trackNo = freezed,
+    Object? discNo = freezed,
     Object? coverData = freezed,
     Object? uri = freezed,
     Object? coverBytes = freezed,
@@ -209,6 +224,14 @@ class __$TrackMetadataCopyWithImpl<$Res>
           ? _value.albumName
           : albumName // ignore: cast_nullable_to_non_nullable
               as String?,
+      trackNo: trackNo == freezed
+          ? _value.trackNo
+          : trackNo // ignore: cast_nullable_to_non_nullable
+              as int?,
+      discNo: discNo == freezed
+          ? _value.discNo
+          : discNo // ignore: cast_nullable_to_non_nullable
+              as int,
       coverData: coverData == freezed
           ? _value.coverData
           : coverData // ignore: cast_nullable_to_non_nullable
@@ -236,12 +259,11 @@ class _$_TrackMetadata extends _TrackMetadata with DiagnosticableTreeMixin {
       {this.title,
       this.artistName,
       this.albumName,
-      @Deprecated("Don't use this, just use coverBytes or coverFile instead!")
-      @JsonKey(ignore: true)
-          this.coverData,
+      this.trackNo,
+      this.discNo = 0,
+      @JsonKey(ignore: true) this.coverData,
       this.uri,
-      @JsonKey(ignore: true)
-          this.coverBytes,
+      @JsonKey(ignore: true) this.coverBytes,
       this.coverUri})
       : super._();
 
@@ -262,8 +284,15 @@ class _$_TrackMetadata extends _TrackMetadata with DiagnosticableTreeMixin {
   final String? albumName;
   @override
 
+  /// The position of the track on the named album.
+  final int? trackNo;
+  @JsonKey()
+  @override
+  final int discNo;
+  @override
+
   /// Holds the data for a cover image. **DO NOT** STORE THIS IN THE DATABASE!
-  @Deprecated("Don't use this, just use coverBytes or coverFile instead!")
+//@Deprecated("Don't use this, just use coverBytes or coverFile instead!")
   @JsonKey(ignore: true)
   final ImageDescriptor? coverData;
   @override
@@ -283,7 +312,7 @@ class _$_TrackMetadata extends _TrackMetadata with DiagnosticableTreeMixin {
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'TrackMetadata(title: $title, artistName: $artistName, albumName: $albumName, coverData: $coverData, uri: $uri, coverBytes: $coverBytes, coverUri: $coverUri)';
+    return 'TrackMetadata(title: $title, artistName: $artistName, albumName: $albumName, trackNo: $trackNo, discNo: $discNo, coverData: $coverData, uri: $uri, coverBytes: $coverBytes, coverUri: $coverUri)';
   }
 
   @override
@@ -294,6 +323,8 @@ class _$_TrackMetadata extends _TrackMetadata with DiagnosticableTreeMixin {
       ..add(DiagnosticsProperty('title', title))
       ..add(DiagnosticsProperty('artistName', artistName))
       ..add(DiagnosticsProperty('albumName', albumName))
+      ..add(DiagnosticsProperty('trackNo', trackNo))
+      ..add(DiagnosticsProperty('discNo', discNo))
       ..add(DiagnosticsProperty('coverData', coverData))
       ..add(DiagnosticsProperty('uri', uri))
       ..add(DiagnosticsProperty('coverBytes', coverBytes))
@@ -309,6 +340,8 @@ class _$_TrackMetadata extends _TrackMetadata with DiagnosticableTreeMixin {
             const DeepCollectionEquality()
                 .equals(other.artistName, artistName) &&
             const DeepCollectionEquality().equals(other.albumName, albumName) &&
+            const DeepCollectionEquality().equals(other.trackNo, trackNo) &&
+            const DeepCollectionEquality().equals(other.discNo, discNo) &&
             const DeepCollectionEquality().equals(other.coverData, coverData) &&
             const DeepCollectionEquality().equals(other.uri, uri) &&
             const DeepCollectionEquality()
@@ -322,6 +355,8 @@ class _$_TrackMetadata extends _TrackMetadata with DiagnosticableTreeMixin {
       const DeepCollectionEquality().hash(title),
       const DeepCollectionEquality().hash(artistName),
       const DeepCollectionEquality().hash(albumName),
+      const DeepCollectionEquality().hash(trackNo),
+      const DeepCollectionEquality().hash(discNo),
       const DeepCollectionEquality().hash(coverData),
       const DeepCollectionEquality().hash(uri),
       const DeepCollectionEquality().hash(coverBytes),
@@ -343,12 +378,11 @@ abstract class _TrackMetadata extends TrackMetadata {
       {String? title,
       String? artistName,
       String? albumName,
-      @Deprecated("Don't use this, just use coverBytes or coverFile instead!")
-      @JsonKey(ignore: true)
-          ImageDescriptor? coverData,
+      int? trackNo,
+      int discNo,
+      @JsonKey(ignore: true) ImageDescriptor? coverData,
       Uri? uri,
-      @JsonKey(ignore: true)
-          List<int>? coverBytes,
+      @JsonKey(ignore: true) List<int>? coverBytes,
       Uri? coverUri}) = _$_TrackMetadata;
   const _TrackMetadata._() : super._();
 
@@ -369,8 +403,14 @@ abstract class _TrackMetadata extends TrackMetadata {
   String? get albumName;
   @override
 
+  /// The position of the track on the named album.
+  int? get trackNo;
+  @override
+  int get discNo;
+  @override
+
   /// Holds the data for a cover image. **DO NOT** STORE THIS IN THE DATABASE!
-  @Deprecated("Don't use this, just use coverBytes or coverFile instead!")
+//@Deprecated("Don't use this, just use coverBytes or coverFile instead!")
   @JsonKey(ignore: true)
   ImageDescriptor? get coverData;
   @override

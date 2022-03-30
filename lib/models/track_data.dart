@@ -16,6 +16,9 @@ class TrackMetadata with _$TrackMetadata {
     String? artistName,
     /// The album's name. Also used with [artistName] to look up the album in the database.
     String? albumName,
+    /// The position of the track on the named album.
+    int? trackNo,
+    @Default(0) int discNo,
     /// Holds the data for a cover image. **DO NOT** STORE THIS IN THE DATABASE!
     //@Deprecated("Don't use this, just use coverBytes or coverFile instead!")
     @JsonKey(ignore: true) ImageDescriptor? coverData,

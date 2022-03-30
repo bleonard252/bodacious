@@ -7,6 +7,7 @@ import 'dart:typed_data';
 
 import 'package:bodacious/models/track_data.dart';
 import 'package:bodacious/src/library/cache_dir.dart';
+import 'package:bodacious/src/metadata/infer.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flac_metadata/flacstream.dart';
 import 'package:flac_metadata/metadata.dart';
@@ -59,17 +60,7 @@ Future<TrackMetadata> loadID3FromBytes(List<int> bytes, File file) async {
 
   // cache the image if there isn't an adjacent one
   FileSystemEntity? coverFile;
-  try {
-    coverFile = await file.parent.list().timeout(const Duration(seconds: 2), onTimeout: (stream) => stream.close())
-    .firstWhere((element) =>
-      (
-        element.uri.pathSegments.last.toLowerCase().startsWith("cover.")
-        || element.uri.pathSegments.last.toLowerCase().startsWith("folder.")
-        || element.uri.pathSegments.last.toLowerCase().startsWith("album.")
-        || element.uri.pathSegments.last.toLowerCase().startsWith("front.")
-      ) && (MimeTypeResolver().lookup(element.uri.pathSegments.last)?.startsWith("image/") ?? false)
-    );
-  } catch(_) {}
+  coverFile = await inferCoverFile(file);
   if (coverFile == null && ((coverBytes2 ?? coverBytes) != null)) {
     //If there isn't a file but there is a cover...
     //...cache it!

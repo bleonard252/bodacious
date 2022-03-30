@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:bodacious/views/library/overview/songs.dart';
 import "package:flutter/material.dart";
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
@@ -111,7 +112,7 @@ class _LibraryRootViewState extends State<LibraryRootView> {
                   body: const TabBarView(children: [
                     Center(child: Icon(MdiIcons.alphaA)),
                     Center(child: Icon(MdiIcons.alphaB)),
-                    Center(child: Icon(MdiIcons.alphaC)),
+                    SongLibraryList(),
                     Center(child: Icon(MdiIcons.alphaD)),
                     //Center(child: Icon(MdiIcons.alphaE))
                   ])

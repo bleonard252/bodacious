@@ -11,6 +11,8 @@ _$_TrackMetadata _$$_TrackMetadataFromJson(Map<String, dynamic> json) =>
       title: json['title'] as String?,
       artistName: json['artistName'] as String?,
       albumName: json['albumName'] as String?,
+      trackNo: json['trackNo'] as int?,
+      discNo: json['discNo'] as int? ?? 0,
       uri: json['uri'] == null ? null : Uri.parse(json['uri'] as String),
       coverUri: json['coverUri'] == null
           ? null
@@ -22,6 +24,8 @@ Map<String, dynamic> _$$_TrackMetadataToJson(_$_TrackMetadata instance) =>
       'title': instance.title,
       'artistName': instance.artistName,
       'albumName': instance.albumName,
+      'trackNo': instance.trackNo,
+      'discNo': instance.discNo,
       'uri': instance.uri?.toString(),
       'coverUri': instance.coverUri?.toString(),
     };

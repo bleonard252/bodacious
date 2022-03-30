@@ -35,10 +35,16 @@ dependencies:
   file_picker: ^4.5.1 # for picking directories (and files in early versions)
   #whatever library database on this line
   id3: ^1.0.2
-  flac_metadata: ^1.0.4
+  integer: ^2.0.1
+  flac_metadata: #^1.0.4
+    git: https://github.com/bleonard252/flac_metadata
   sembast: ^3.2.0
   mime: ^1.0.1
   #on_audio_query: ^2.6.0 # for finding songs from Android and iOS system libraries
+
+dependency_overrides:
+  flac_metadata:
+    path: ../flac_metadata
 
 dev_dependencies:
   flutter_test:
@@ -62,7 +68,7 @@ flutter_icons:
   image_path: "assets/brand/ic_launcher.png"
 
 flutter:
-  uses-material-design: false # turn off `Icons` class.
+  uses-material-design: true
   # Please use `MdiIcons` instead for consistency.
 
   # To add assets to your application, add an assets section, like this:

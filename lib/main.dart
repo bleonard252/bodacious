@@ -1,6 +1,7 @@
 
 import 'package:audio_service/audio_service.dart';
 import 'package:bodacious/models/track_data.dart';
+import 'package:bodacious/src/library/indexer.dart';
 import 'package:bodacious/src/library/init_db.dart';
 import 'package:bodacious/src/media/audio_service.dart';
 import 'package:bodacious/src/metadata/provider.dart';
@@ -8,6 +9,8 @@ import 'package:bodacious/src/navigate_observer.dart';
 import 'package:bodacious/views/library/root.dart';
 import 'package:bodacious/views/main_menu.dart';
 import 'package:bodacious/views/now_playing.dart';
+import 'package:bodacious/views/settings/library.dart';
+import 'package:bodacious/views/settings/root.dart';
 import 'package:bodacious/widgets/now_playing.dart';
 import 'package:bodacious/widgets/now_playing_data.dart';
 import 'package:flutter/material.dart';
@@ -20,12 +23,13 @@ import 'package:sembast/sembast.dart';
 
 late final Database db;
 
-final player = AudioPlayer();
+late final AudioPlayer player;
 WidgetRef? playerBackgroundRef;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   db = await loadDatabase();
+  player = AudioPlayer();
 
   await AudioService.init(
     builder: () => BodaciousBackgroundService(player),
@@ -43,6 +47,8 @@ void main() async {
   runApp(const ProviderScope(
     child: MyApp()
   ));
+
+  TheIndexer.spawn();
 
   // doWhenWindowReady(() {
   //   const initialSize = Size(600, 450);
@@ -68,11 +74,11 @@ class MyApp extends ConsumerWidget {
       title: 'Bodacious',
       theme: ThemeData.light().copyWith(
         colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.amber),
-        useMaterial3: false,
+        //useMaterial3: false,
       ),
       darkTheme: ThemeData.dark().copyWith(
         colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.amber, brightness: Brightness.dark),
-        useMaterial3: false,
+        //useMaterial3: false,
       ),
       home: NowPlayingData(
         child: OuterFrame(),
@@ -208,7 +214,10 @@ class OuterFrame extends StatelessWidget {
       GoRoute(path: "/", builder: (context, state) => const Scaffold(backgroundColor: Colors.red, body: Center(child: Text("HOME")))),
       GoRoute(path: "/library", builder: (context, state) => const LibraryRootView()),
       GoRoute(path: "/menu", builder: (context, state) => const MobileMainMenu()),
-      GoRoute(path: "/now_playing", builder: (context, state) => const NowPlayingView())
+      GoRoute(path: "/now_playing", builder: (context, state) => const NowPlayingView()),
+      GoRoute(path: "/settings", builder: (context, state) => const SettingsHome(), routes: [
+        GoRoute(path: "library", builder: (context, state) => const LibrarySettingsView()),
+      ])
     ],
     observers: [
       _observer
