@@ -12,7 +12,7 @@ TrackMetadata inferMetadataFromContext(Uri uri) {
   // == Last path segment
   var isOk = pathIterator.moveNext();
   assert(isOk, "There is no case where this should be called on an empty path.");
-  var split = pathIterator.current.split(" - ");
+  var split = pathIterator.current.replaceFirst(fileExtensionRegex, "").split(" - ");
   expectingTitle = pathIterator.current.replaceFirst(fileExtensionRegex, "");
   if (split.length > 4) {
     return TrackMetadata(
@@ -29,9 +29,8 @@ TrackMetadata inferMetadataFromContext(Uri uri) {
       albumName: split[1],
       artistName: split[0],
     );
-  } else {
-    if (split.length == 3) {
-      final _title = RegExp(r'^([0-9]{1,})[- :]?[ ]?').matchAsPrefix(split[2]);
+  } else if (split.length == 3) {
+      final _title = RegExp(r'^([0-9]{1,})[- .]?[ ]?').matchAsPrefix(split[2]);
       expectingTitle = _title == null ? split[2] : split[2].substring(_title.end);
       expectingTrackNo = int.tryParse(_title?.group(1) ?? "");
       return TrackMetadata(
@@ -41,18 +40,26 @@ TrackMetadata inferMetadataFromContext(Uri uri) {
         albumName: split[1],
         artistName: split[0]
       );
-    } else if (split.length == 2) {
-      final _title = RegExp(r'^([0-9]{1,})[ ]?[- :]?[ ]?').matchAsPrefix(split[1]);
-      expectingTitle = _title == null ? split[1] : split[1].substring(_title.end);
-      expectingTrackNo = int.tryParse(_title?.group(1) ?? "");
-      if (expectingTrackNo == null) {
-        return TrackMetadata(
-          uri: uri,
-          title: split[1],
-          artistName: split[0]
-        );
-      }
+  } else if (split.length == 2) {
+    // final _title = RegExp(r'^([0-9]{1,})[ ]?[- .]?[ ]?').matchAsPrefix(split[1]);
+    // expectingTitle = _title == null ? split[1] : split[1].substring(_title.end).replaceFirst(fileExtensionRegex, "");
+    // expectingTrackNo = int.tryParse(_title?.group(1) ?? "");
+    if (RegExp(r'^([0-9]{1,})$').hasMatch(split[0])) {
+      expectingTrackNo = int.tryParse(split[0]);
+      expectingTitle = split[1];
     }
+    if (expectingTrackNo == null) {
+      return TrackMetadata(
+        uri: uri,
+        title: expectingTitle,
+        trackNo: expectingTrackNo,
+        artistName: split[0]
+      );
+    }
+  } else {
+    final _title = RegExp(r'^([0-9]{1,})[ ]?[- .]?[ ]?').matchAsPrefix(split[0]);
+    expectingTitle = _title == null ? split[0] : split[0].substring(_title.end).replaceFirst(fileExtensionRegex, "");
+    expectingTrackNo = int.tryParse(_title?.group(1) ?? "");
   }
   // == Second-to-last path segment
   isOk = pathIterator.moveNext();

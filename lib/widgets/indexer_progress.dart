@@ -15,6 +15,8 @@ class IndexerProgressWidget extends StatelessWidget {
         return Column(children: [
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
             children: [
               Padding(
                 padding: const EdgeInsets.all(18),
@@ -22,33 +24,35 @@ class IndexerProgressWidget extends StatelessWidget {
                 state.hasError || report?.state == IndexerState.STOPPED ? const Icon(MdiIcons.alertCircle, color: Colors.red)
                 : const Icon(MdiIcons.check, color: Colors.green) : const Icon(MdiIcons.magnify, color: Colors.blue)
               ),
-              Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    report == null || report.state == IndexerState.FINISHED ? 
-                    state.hasError ? Text("An error occurred", style: Theme.of(context).textTheme.subtitle1?.copyWith(color: Colors.red))
-                    : Text("Library is up to date", style: Theme.of(context).textTheme.subtitle1?.copyWith(color: Colors.green))
-                    : report.state == IndexerState.STARTING ? Text("Finding your music", style: Theme.of(context).textTheme.subtitle1?.copyWith(color: Colors.blue))
-                    : report.state == IndexerState.FETCHING ? Text("Googling your music", style: Theme.of(context).textTheme.subtitle1?.copyWith(color: Colors.blue))
-                                                              /* May I note that, especially here,
-                                                                  the term "googling" is inaccurate?
-                                                                  That's because I'm not using Google
-                                                                  at all for these searches. */
-                    : report.state == IndexerState.SCANNING ? Text("Scanning your music", style: Theme.of(context).textTheme.subtitle1?.copyWith(color: Colors.blue))
-                    : report.state == IndexerState.FINISHING ? Text("Almost done", style: Theme.of(context).textTheme.subtitle1?.copyWith(color: Colors.blue))
-                    : report.state == IndexerState.CLEANING ? Text("Cleaning up", style: Theme.of(context).textTheme.subtitle1?.copyWith(color: Colors.blue))
-                    : Text("Almost done", style: Theme.of(context).textTheme.subtitle1?.copyWith(color: Colors.blue)),
-                    if (state.hasError) Text(state.error!.toString(), style: Theme.of(context).textTheme.bodyText2)
-                    else if (report?.currentFilename != null) Text(report!.currentFilename!, style: Theme.of(context).textTheme.bodyText2)
-                  ],
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      report == null || report.state == IndexerState.FINISHED ? 
+                      state.hasError ? Text("An error occurred", style: Theme.of(context).textTheme.subtitle1?.copyWith(color: Colors.red))
+                      : Text("Library is up to date", style: Theme.of(context).textTheme.subtitle1?.copyWith(color: Colors.green))
+                      : report.state == IndexerState.STARTING ? Text("Finding your music", style: Theme.of(context).textTheme.subtitle1?.copyWith(color: Colors.blue))
+                      : report.state == IndexerState.FETCHING ? Text("Googling your music", style: Theme.of(context).textTheme.subtitle1?.copyWith(color: Colors.blue))
+                                                                /* May I note that, especially here,
+                                                                    the term "googling" is inaccurate?
+                                                                    That's because I'm not using Google
+                                                                    at all for these searches. */
+                      : report.state == IndexerState.SCANNING ? Text("Scanning your music", style: Theme.of(context).textTheme.subtitle1?.copyWith(color: Colors.blue))
+                      : report.state == IndexerState.FINISHING ? Text("Almost done", style: Theme.of(context).textTheme.subtitle1?.copyWith(color: Colors.blue))
+                      : report.state == IndexerState.CLEANING ? Text("Cleaning up", style: Theme.of(context).textTheme.subtitle1?.copyWith(color: Colors.blue))
+                      : Text("Almost done", style: Theme.of(context).textTheme.subtitle1?.copyWith(color: Colors.blue)),
+                      if (state.hasError) Text(state.error!.toString(), style: Theme.of(context).textTheme.bodyText2)
+                      else if (report?.currentFilename != null) Text(report!.currentFilename!, style: Theme.of(context).textTheme.bodyText2)
+                    ],
+                  ),
                 ),
               )
             ],
           ),
-          Row(
+          if (report?.state != IndexerState.FINISHED) Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               if (report?.max != null && report!.max > 0) Text(report.value.toString() + " / " + report.max.toString())

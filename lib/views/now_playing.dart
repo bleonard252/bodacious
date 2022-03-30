@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:typed_data';
+import 'dart:ui';
 
 import 'package:bodacious/main.dart';
 import 'package:bodacious/models/track_data.dart';
@@ -33,10 +34,33 @@ class _NowPlayingViewState extends ConsumerState<NowPlayingView> {
     ];
     return FutureBuilder<PaletteGenerator>(
       future: () async {
-        if (ref.watch(nowPlayingProvider).coverData == null) return PaletteGenerator.fromColors(_fallbackColors);
-        return PaletteGenerator.fromImage(
-          (await (await meta.coverData!.instantiateCodec(targetWidth: 128, targetHeight: 128)).getNextFrame()).image
-        );
+        if (ref.watch(nowPlayingProvider).coverBytes != null) {
+          return PaletteGenerator.fromImage(
+            (await 
+              (await 
+                (await ImageDescriptor.encoded(
+                  await ImmutableBuffer.fromUint8List(
+                    Uint8List.fromList(meta.coverBytes ?? [])
+                  )
+                )).instantiateCodec(targetHeight: 64)
+              ).getNextFrame()
+            ).image
+          );
+        } else if (ref.watch(nowPlayingProvider).coverUri != null) {
+          return PaletteGenerator.fromImage(
+            (await 
+              (await 
+                (await ImageDescriptor.encoded(
+                  await ImmutableBuffer.fromUint8List(
+                    await File.fromUri(meta.coverUri!).readAsBytes()
+                  )
+                )).instantiateCodec(targetHeight: 64)
+              ).getNextFrame()
+            ).image
+          );
+        } else {
+          return PaletteGenerator.fromColors(_fallbackColors);
+        }
       }(),
       initialData: PaletteGenerator.fromColors(_fallbackColors),
       builder: (context, snapshot) {

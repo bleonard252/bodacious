@@ -228,9 +228,11 @@ packages:
   flac_metadata:
     dependency: "direct main"
     description:
-      path: "../flac_metadata"
-      relative: true
-    source: path
+      path: "."
+      ref: HEAD
+      resolved-ref: d207abed759a7a48c8dd3ece9984aab2834e4a2a
+      url: "https://github.com/bleonard252/flac_metadata"
+    source: git
     version: "1.0.4"
   flutter:
     dependency: "direct main"
@@ -278,7 +280,7 @@ packages:
       name: flutter_riverpod
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.0.3"
+    version: "2.0.0-dev.5"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -367,7 +369,7 @@ packages:
     source: hosted
     version: "1.0.2"
   image:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: image
       url: "https://pub.dartlang.org"
@@ -415,13 +417,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.9.20"
-  just_audio_libwinmedia:
-    dependency: "direct main"
-    description:
-      name: just_audio_libwinmedia
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.0.4"
   just_audio_platform_interface:
     dependency: transitive
     description:
@@ -436,13 +431,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.4.4"
-  libwinmedia:
-    dependency: transitive
-    description:
-      name: libwinmedia
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.0.7"
   lints:
     dependency: transitive
     description:
@@ -624,7 +612,7 @@ packages:
       name: riverpod
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.0.3"
+    version: "2.0.0-dev.5"
   rxdart:
     dependency: transitive
     description:

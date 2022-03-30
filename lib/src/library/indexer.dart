@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:isolate';
 import 'dart:typed_data';
 
+import 'package:bodacious/src/library/cache_dir.dart';
 import 'package:bodacious/src/library/init_db.dart';
 import 'package:bodacious/src/metadata/id3.dart';
 import 'package:flutter/foundation.dart';
@@ -32,7 +33,7 @@ abstract class TheIndexer {
     },
   );
 
-  static late final Isolate indexerIsolate;
+  //static late final Isolate indexerIsolate;
   
   /// Don't try to touch the isolate before this aight
   static Future<void> spawn() async {
@@ -49,9 +50,10 @@ abstract class TheIndexer {
       }
       return dbPath;
     }();
-    indexerIsolate = await Isolate.spawn<Map>((message) {
-      _IndexerIsolate(dbPath: message["dbDir"])(message["sendPort"]);
-    }, {"sendPort": progressReceiver.sendPort, "dbDir": _dbPath});
+    final _cacheDir = await getCacheDirectory();
+    await compute<Map, dynamic>((message) {
+      return _IndexerIsolate(dbPath: message["dbDir"], cacheDir: message["cacheDir"])(message["sendPort"]);
+    }, {"sendPort": progressReceiver.sendPort, "dbDir": _dbPath, "cacheDir": _cacheDir});
   }
 }
 
@@ -67,12 +69,14 @@ class _IndexerIsolate {
   /// Scan only this path. It has to be set in the library.
   final String? scanOnlyPath;
   final String dbPath;
+  final String cacheDir;
   _IndexerIsolate({
     this.force = false,
     this.preclean = false,
     this.fetch = false,
     this.scanOnlyPath,
-    required this.dbPath
+    required this.dbPath,
+    required this.cacheDir
   });
 
   late final Database db;
@@ -82,19 +86,22 @@ class _IndexerIsolate {
   final albumStore = StoreRef<String, dynamic>("albums");
   final songStore = StoreRef<String, dynamic>("songs");
 
+  final List<FutureOr Function(DatabaseClient db)> _dbList = [];
+
   /// This makes this class function as a function.
   /// And gee I wonder why I did that.
   Future<void> call(SendPort sendProgressReport) async {
     if (kDebugMode) {
       print("This is not complete and may appear to hang");
-      sendProgressReport.send(const IndexerProgressReport(state: IndexerState.STARTING, max: 1));
-      await Future.delayed(const Duration(seconds: 5)); // just so I can get to this screen
+      //sendProgressReport.send(const IndexerProgressReport(state: IndexerState.STARTING, max));
+      //await Future.delayed(const Duration(seconds: 5)); // just so I can get to this screen
     } else {
       throw UnimplementedError("The Indexer doesn't work yet.");
     }
     db = await loadDatabase(boLibraryPath: dbPath);
     sendProgressReport.send(const IndexerProgressReport(state: IndexerState.STARTING, max: 0));
     // == STARTING PHASE == //
+    StoreRef("songs").drop(db);
     List<File> validFiles = [];
     final List<String> _dbfolders = List.castFrom<dynamic, String>((await configStore.record("libraries").get(db))?.toList() as List<dynamic>? ?? []);
     for (final f in _dbfolders) {
@@ -134,6 +141,12 @@ class _IndexerIsolate {
     // some values, such as artist and album, data
     // for the cover itself, and album tracklists.
     for (final file in validFiles) {
+      sendProgressReport.send(IndexerProgressReport(
+        state: IndexerState.SCANNING,
+        max: validFiles.length,
+        value: validFiles.indexOf(file),
+        currentFilename: file.uri.pathSegments.last
+      ));
       final _matches = await songStore.find(db, finder: Finder(filter: Filter.custom(
         // Find this file in the database.
         (record) => record.value.uri == file.absolute.uri
@@ -143,11 +156,19 @@ class _IndexerIsolate {
       var metaBytes = <int>[], _class = "none";
       final _metaByteReader = file.openRead().listen(null);
       double? targetLength;
+      final c = Completer();
       _metaByteReader.onData((data) {
         metaBytes.addAll(data);
         if (_class == "none") {
           if (metaBytes.length >= 4 && String.fromCharCodes(metaBytes.getRange(0, 4)) == 'fLaC') {_class = "flac";}
-          else if (metaBytes.length >= 3 && metaBytes.getRange(0, 3) == [0x49, 0x44, 0x33]) {_class = "id3";}
+          else if (metaBytes.length >= 3 && listEquals(metaBytes.getRange(0, 3).toList(), [73, 68, 51])) {_class = "id3";}
+        }
+        if (metaBytes.length >= 10*1000000 /* 10MB */) {
+          _metaByteReader.cancel();
+          /* Really I have no idea why you'd need more than 10MB of TAGS in a file... */
+          /* If there is a case I might be able to bump it */
+          metaBytes = metaBytes.take(10*1000000).toList();
+          c.complete();
         }
         if (_class == "flac") {
           _metaByteReader.cancel();
@@ -156,39 +177,52 @@ class _IndexerIsolate {
         } else if (_class == "id3" && metaBytes.length > 10) {
           // Determine the length of the id3 segment
           try {
-            targetLength ??= (i32(4) * i32.parse(metaBytes.sublist(6,10).join(""), radix: 16)).roundToDouble()+10;
-            if (metaBytes.length >= targetLength!) {
-              _metaByteReader.cancel();
-            }
+            //targetLength ??= (i32.parse(metaBytes.sublist(6,10).join(""), radix: 16)).roundToDouble()+10;
+            // if (metaBytes.length >= targetLength!) {
+            //   _metaByteReader.cancel();
+            //   c.complete();
+            // }
           } catch(e) {
             if (kDebugMode) {print(e);}
             _metaByteReader.cancel();
+            c.complete();
             metaBytes.clear();
             _class = "none";
             return;
           }
         }
         if (metaBytes.length > 20 && _class == "none") {
+          c.complete();
           _metaByteReader.cancel();
           metaBytes.clear();
         }
       });
+      _metaByteReader.onDone(() {c.complete();});
+      _metaByteReader.onError((_) {c.complete();});
+      await Future.any([c.future, _metaByteReader.asFuture()]);
 
       final _mseFile = File(file.path.replaceFirst(fileExtensionRegex, ".mse"));
       // final _mse = (await _mseFile.exists()) ? await parseMseFile(_mseFile.openRead()) : null;
-      final TrackMetadata? _id3 = await (/* _mse == null && */ _class == "id3" || _class == "flac" ? loadID3FromBytes(metaBytes, file) : null);
+      final TrackMetadata? _id3 = (/* _mse == null && */ _class == "id3" || _class == "flac") ? await loadID3FromBytes(metaBytes, file, cacheDir: cacheDir) : null;
       final TrackMetadata? _ctxmeta = (/* _mse == null && */ _id3 == null) ? inferMetadataFromContext(file.absolute.uri)
       .copyWith(coverUri: (await inferCoverFile(file))?.absolute.uri) : null;
       final TrackMetadata record = (/*_mse ??*/ _id3 ?? _ctxmeta ?? const TrackMetadata()).copyWith(
         uri: file.absolute.uri
       );
-      final tr_rec = await songStore.record(record.artistName?.isEmpty != false || record.title?.isEmpty != false
+      final tr_rec = songStore.record(record.artistName?.isEmpty != false || record.title?.isEmpty != false
         ? file.uri.pathSegments.last
         : record.artistName! +" - "+ record.title!
       );
-      if (!await tr_rec.exists(db)) tr_rec.put(db, record.toJson());
+      //if (!await tr_rec.exists(db))
+      await tr_rec.put(db, record.toJson());
       // TODO: create artist & album metadata if it isn't there
     }
+    sendProgressReport.send(const IndexerProgressReport(
+      state: IndexerState.FINISHING,
+      max: 0,
+      value: 0
+    ));
+    await db.close();
     sendProgressReport.send(IndexerProgressReport(
       state: IndexerState.FINISHED,
       max: validFiles.length,

@@ -210,6 +210,7 @@ class OuterFrame extends StatelessWidget {
   static final _observer = NavigationNotifier();
 
   static final goRouter = GoRouter(
+    initialLocation: "/menu",
     routes: [
       GoRoute(path: "/", builder: (context, state) => const Scaffold(backgroundColor: Colors.red, body: Center(child: Text("HOME")))),
       GoRoute(path: "/library", builder: (context, state) => const LibraryRootView()),
