@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:isolate';
 import 'dart:typed_data';
 
+import 'package:bodacious/models/album_data.dart';
 import 'package:bodacious/src/library/cache_dir.dart';
 import 'package:bodacious/src/library/init_db.dart';
 import 'package:bodacious/src/metadata/id3.dart';
@@ -14,6 +15,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:sembast/sembast.dart';
 import 'package:sembast/sembast_io.dart';
 
+import '../../models/artist_data.dart';
 import '../../models/track_data.dart';
 import '../metadata/infer.dart';
 
@@ -86,7 +88,8 @@ class _IndexerIsolate {
   final albumStore = StoreRef<String, dynamic>("albums");
   final songStore = StoreRef<String, dynamic>("songs");
 
-  final List<FutureOr Function(DatabaseClient db)> _dbList = [];
+  final List<String> newArtists = [];
+  final List<String> newAlbums = [];
 
   /// This makes this class function as a function.
   /// And gee I wonder why I did that.
@@ -215,8 +218,45 @@ class _IndexerIsolate {
       );
       //if (!await tr_rec.exists(db))
       await tr_rec.put(db, record.toJson());
-      // TODO: create artist & album metadata if it isn't there
+      await registerAlbumMetadata(record);
+      await registerArtistMetadata(record);
     }
+
+    if (newArtists.isNotEmpty) {
+      for (final artist in newArtists) {
+        sendProgressReport.send(IndexerProgressReport(
+          state: IndexerState.ANALYZING,
+          max: newArtists.length,
+          value: newArtists.indexOf(artist),
+          currentFilename: artist
+        ));
+        final albumCount = await albumStore.count(db, filter: Filter.matches('artistName', artist));
+        final trackCount = await songStore.count(db, filter: Filter.matches('artistName', artist));
+        await artistStore.record(artist).put(db, {
+          "trackCount": trackCount,
+          "albumCount": albumCount
+        }, merge: true);
+      }
+    }
+    if (newAlbums.isNotEmpty) {
+      for (final album in newAlbums) {
+        sendProgressReport.send(IndexerProgressReport(
+          state: IndexerState.ANALYZING,
+          max: newAlbums.length,
+          value: newAlbums.indexOf(album),
+          currentFilename: album
+        ));
+        final _record = AlbumMetadata.fromJson(await albumStore.record(album).get(db));
+        final trackCount = await songStore.count(db, filter: Filter.and([
+          Filter.matches('artistName', _record.artistName),
+          Filter.matches('albumName', _record.name)
+        ]));
+        await albumStore.record(album).put(db, _record.copyWith(
+          trackCount: trackCount
+        ).toJson());
+      }
+    }
+
     sendProgressReport.send(const IndexerProgressReport(
       state: IndexerState.FINISHING,
       max: 0,
@@ -229,6 +269,31 @@ class _IndexerIsolate {
       value: validFiles.length
     ));
   }
+
+  Future<void> registerAlbumMetadata(TrackMetadata track) async {
+    if (track.artistName == null || track.albumName == null) return;
+    final record = albumStore.record(track.artistName!+" - "+track.albumName!);
+    if (newArtists.contains(record.key) || await record.exists(db)) return;
+    newAlbums.add(record.key);
+    var _record = AlbumMetadata(
+      artistName: track.artistName!,
+      name: track.albumName!,
+      coverUri: track.coverUri
+    );
+    await record.put(db, _record.toJson());
+  }
+
+  Future<void> registerArtistMetadata(TrackMetadata track) async {
+    if (track.artistName == null) return;
+    final record = artistStore.record(track.artistName!);
+    if (newArtists.contains(record.key) || await record.exists(db)) return;
+    newArtists.add(record.key);
+    var _record = ArtistMetadata(
+      name: track.artistName!
+    );
+    await record.put(db, _record.toJson());
+  }
+
 }
 
 class IndexerProgressReport {
@@ -251,6 +316,9 @@ enum IndexerState {
   /// Fetching data about artists, albums, and some
   /// tracks from the Internet.
   FETCHING,
+  /// Determining data about newly added artists and albums,
+  /// such as calculating track count and total duration.
+  ANALYZING,
   /// Cleaning up metadata for removed library entries
   /// (or missing files in certain circumstances).
   CLEANING,

@@ -41,6 +41,7 @@ class IndexerProgressWidget extends StatelessWidget {
                                                                     That's because I'm not using Google
                                                                     at all for these searches. */
                       : report.state == IndexerState.SCANNING ? Text("Scanning your music", style: Theme.of(context).textTheme.subtitle1?.copyWith(color: Colors.blue))
+                      : report.state == IndexerState.ANALYZING ? Text("Grouping your music", style: Theme.of(context).textTheme.subtitle1?.copyWith(color: Colors.blue))
                       : report.state == IndexerState.FINISHING ? Text("Almost done", style: Theme.of(context).textTheme.subtitle1?.copyWith(color: Colors.blue))
                       : report.state == IndexerState.CLEANING ? Text("Cleaning up", style: Theme.of(context).textTheme.subtitle1?.copyWith(color: Colors.blue))
                       : Text("Almost done", style: Theme.of(context).textTheme.subtitle1?.copyWith(color: Colors.blue)),
