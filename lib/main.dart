@@ -21,7 +21,7 @@ import 'package:material_design_icons_flutter/material_design_icons_flutter.dart
 import 'package:sembast/sembast.dart';
 //import 'package:bitsdojo_window/bitsdojo_window.dart';
 
-late final Database db;
+late Database db;
 
 late final AudioPlayer player;
 WidgetRef? playerBackgroundRef;
@@ -48,7 +48,10 @@ void main() async {
     child: MyApp()
   ));
 
-  TheIndexer.spawn();
+  TheIndexer.spawn().then((_) async {
+    await db.close();
+    db = await loadDatabase();
+  });
 
   // doWhenWindowReady(() {
   //   const initialSize = Size(600, 450);

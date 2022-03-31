@@ -30,7 +30,7 @@ class SongLibraryList extends ConsumerWidget {
               itemBuilder: (context, index) => FutureBuilder<Map<String, dynamic>?>(
                 future: songStore.findFirst(db, finder: Finder(offset: index, limit: 1, sortOrders: [SortOrder('title')])).then((value) => value?.value),
                 builder: (context, snapshot) {
-                  final track = TrackMetadata.fromJson(snapshot.data ?? {});
+                  final track = TrackMetadata.fromJson(snapshot.data ?? {"uri": ""});
                   return SizedBox(
                     height: 72.0,
                     child: ListTile(
@@ -42,10 +42,10 @@ class SongLibraryList extends ConsumerWidget {
                         fit: BoxFit.cover,
                         errorBuilder: (context, e, s) => const CoverPlaceholder(size: 48, iconSize: 24),
                       ) : const CoverPlaceholder(size: 48, iconSize: 24),
-                      title: Text(track.title ?? track.uri?.pathSegments.last ?? "Unknown track"),
+                      title: Text(track.title ?? (track.uri.pathSegments.isEmpty ? "Unknown track" : track.uri.pathSegments.last)),
                       subtitle: track.artistName?.isEmpty == false ? Text(track.artistName!) : null,
                       onTap: () {
-                        player.setFilePath(track.uri!.toFilePath());
+                        player.setFilePath(track.uri.toFilePath());
                         ref.read(nowPlayingProvider.notifier).changeTrack(track);
                         player.play();
                       },

@@ -13,10 +13,13 @@ _$_TrackMetadata _$$_TrackMetadataFromJson(Map<String, dynamic> json) =>
       albumName: json['albumName'] as String?,
       trackNo: json['trackNo'] as int?,
       discNo: json['discNo'] as int? ?? 0,
-      uri: json['uri'] == null ? null : Uri.parse(json['uri'] as String),
+      uri: Uri.parse(json['uri'] as String),
       coverUri: json['coverUri'] == null
           ? null
           : Uri.parse(json['coverUri'] as String),
+      duration: json['duration'] == null
+          ? null
+          : Duration(microseconds: json['duration'] as int),
     );
 
 Map<String, dynamic> _$$_TrackMetadataToJson(_$_TrackMetadata instance) =>
@@ -26,6 +29,7 @@ Map<String, dynamic> _$$_TrackMetadataToJson(_$_TrackMetadata instance) =>
       'albumName': instance.albumName,
       'trackNo': instance.trackNo,
       'discNo': instance.discNo,
-      'uri': instance.uri?.toString(),
+      'uri': instance.uri.toString(),
       'coverUri': instance.coverUri?.toString(),
+      'duration': instance.duration?.inMicroseconds,
     };

@@ -95,7 +95,7 @@ class NowPlayingBar extends ConsumerWidget {
               player.play();
               player.playbackEventStream.firstWhere((e) => (e.processingState == ProcessingState.completed)).then((event) {
                 player.pause();
-                ref.read(nowPlayingProvider.notifier).changeTrack(const TrackMetadata());
+                ref.read(nowPlayingProvider.notifier).changeTrack(TrackMetadata.empty());
               });
             });
           } else {
@@ -141,7 +141,7 @@ class NowPlayingBar extends ConsumerWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(meta.title ?? meta.uri?.pathSegments.last ?? ""),
+                    Text(meta.title ?? (meta.uri.pathSegments.isEmpty ? "" : meta.uri.pathSegments.last)),
                     if (secondRow.isNotEmpty) Text.rich(TextSpan(children: secondRow), 
                       style: Theme.of(context).textTheme.caption
                     )

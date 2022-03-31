@@ -206,7 +206,7 @@ class _IndexerIsolate {
       final TrackMetadata? _id3 = (/* _mse == null && */ _class == "id3" || _class == "flac") ? await loadID3FromBytes(metaBytes, file, cacheDir: cacheDir) : null;
       final TrackMetadata? _ctxmeta = (/* _mse == null && */ _id3 == null) ? inferMetadataFromContext(file.absolute.uri)
       .copyWith(coverUri: (await inferCoverFile(file))?.absolute.uri) : null;
-      final TrackMetadata record = (/*_mse ??*/ _id3 ?? _ctxmeta ?? const TrackMetadata()).copyWith(
+      final TrackMetadata record = (/*_mse ??*/ _id3 ?? _ctxmeta ?? TrackMetadata.empty()).copyWith(
         uri: file.absolute.uri
       );
       final tr_rec = songStore.record(record.artistName?.isEmpty != false || record.title?.isEmpty != false

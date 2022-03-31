@@ -110,7 +110,7 @@ class _NowPlayingViewState extends ConsumerState<NowPlayingView> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          Text(meta.title ?? meta.uri?.pathSegments.last ?? "",
+                          Text(meta.title ?? (meta.uri.pathSegments.isEmpty ? "" : meta.uri.pathSegments.last),
                             style: Theme.of(context).textTheme.headline6?.copyWith(
                               color: vtheme.onPrimary
                             ),
@@ -311,7 +311,7 @@ class _NowPlayingViewState extends ConsumerState<NowPlayingView> {
               player.playbackEventStream.firstWhere((e) => (e.processingState == ProcessingState.completed)).then((event) {
                 player.pause();
                 //player.setAudioSource(ProgressiveAudioSource(Uri.file("/")));
-                ref.read(nowPlayingProvider.notifier).changeTrack(const TrackMetadata());
+                ref.read(nowPlayingProvider.notifier).changeTrack(TrackMetadata.empty());
               });
             });
           } else {

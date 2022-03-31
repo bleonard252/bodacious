@@ -29,9 +29,10 @@ class _$TrackMetadataTearOff {
       int? trackNo,
       int discNo = 0,
       @JsonKey(ignore: true) ImageDescriptor? coverData,
-      Uri? uri,
+      required Uri uri,
       @JsonKey(ignore: true) List<int>? coverBytes,
-      Uri? coverUri}) {
+      Uri? coverUri,
+      Duration? duration}) {
     return _TrackMetadata(
       title: title,
       artistName: artistName,
@@ -42,6 +43,7 @@ class _$TrackMetadataTearOff {
       uri: uri,
       coverBytes: coverBytes,
       coverUri: coverUri,
+      duration: duration,
     );
   }
 
@@ -75,7 +77,7 @@ mixin _$TrackMetadata {
 
   /// The URI to the track. Used by the library (database) to find the file
   /// when it's time to play it, and for fallback details.
-  Uri? get uri => throw _privateConstructorUsedError;
+  Uri get uri => throw _privateConstructorUsedError;
 
   /// The raw bytes of the cover image. **DO NOT** STORE THIS IN THE DATABASE!
   @JsonKey(ignore: true)
@@ -83,6 +85,9 @@ mixin _$TrackMetadata {
 
   /// The URI to the cover.
   Uri? get coverUri => throw _privateConstructorUsedError;
+
+  /// The track's duration.
+  Duration? get duration => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -102,9 +107,10 @@ abstract class $TrackMetadataCopyWith<$Res> {
       int? trackNo,
       int discNo,
       @JsonKey(ignore: true) ImageDescriptor? coverData,
-      Uri? uri,
+      Uri uri,
       @JsonKey(ignore: true) List<int>? coverBytes,
-      Uri? coverUri});
+      Uri? coverUri,
+      Duration? duration});
 }
 
 /// @nodoc
@@ -127,6 +133,7 @@ class _$TrackMetadataCopyWithImpl<$Res>
     Object? uri = freezed,
     Object? coverBytes = freezed,
     Object? coverUri = freezed,
+    Object? duration = freezed,
   }) {
     return _then(_value.copyWith(
       title: title == freezed
@@ -156,7 +163,7 @@ class _$TrackMetadataCopyWithImpl<$Res>
       uri: uri == freezed
           ? _value.uri
           : uri // ignore: cast_nullable_to_non_nullable
-              as Uri?,
+              as Uri,
       coverBytes: coverBytes == freezed
           ? _value.coverBytes
           : coverBytes // ignore: cast_nullable_to_non_nullable
@@ -165,6 +172,10 @@ class _$TrackMetadataCopyWithImpl<$Res>
           ? _value.coverUri
           : coverUri // ignore: cast_nullable_to_non_nullable
               as Uri?,
+      duration: duration == freezed
+          ? _value.duration
+          : duration // ignore: cast_nullable_to_non_nullable
+              as Duration?,
     ));
   }
 }
@@ -183,9 +194,10 @@ abstract class _$TrackMetadataCopyWith<$Res>
       int? trackNo,
       int discNo,
       @JsonKey(ignore: true) ImageDescriptor? coverData,
-      Uri? uri,
+      Uri uri,
       @JsonKey(ignore: true) List<int>? coverBytes,
-      Uri? coverUri});
+      Uri? coverUri,
+      Duration? duration});
 }
 
 /// @nodoc
@@ -210,6 +222,7 @@ class __$TrackMetadataCopyWithImpl<$Res>
     Object? uri = freezed,
     Object? coverBytes = freezed,
     Object? coverUri = freezed,
+    Object? duration = freezed,
   }) {
     return _then(_TrackMetadata(
       title: title == freezed
@@ -239,7 +252,7 @@ class __$TrackMetadataCopyWithImpl<$Res>
       uri: uri == freezed
           ? _value.uri
           : uri // ignore: cast_nullable_to_non_nullable
-              as Uri?,
+              as Uri,
       coverBytes: coverBytes == freezed
           ? _value.coverBytes
           : coverBytes // ignore: cast_nullable_to_non_nullable
@@ -248,6 +261,10 @@ class __$TrackMetadataCopyWithImpl<$Res>
           ? _value.coverUri
           : coverUri // ignore: cast_nullable_to_non_nullable
               as Uri?,
+      duration: duration == freezed
+          ? _value.duration
+          : duration // ignore: cast_nullable_to_non_nullable
+              as Duration?,
     ));
   }
 }
@@ -262,9 +279,10 @@ class _$_TrackMetadata extends _TrackMetadata with DiagnosticableTreeMixin {
       this.trackNo,
       this.discNo = 0,
       @JsonKey(ignore: true) this.coverData,
-      this.uri,
+      required this.uri,
       @JsonKey(ignore: true) this.coverBytes,
-      this.coverUri})
+      this.coverUri,
+      this.duration})
       : super._();
 
   factory _$_TrackMetadata.fromJson(Map<String, dynamic> json) =>
@@ -299,7 +317,7 @@ class _$_TrackMetadata extends _TrackMetadata with DiagnosticableTreeMixin {
 
   /// The URI to the track. Used by the library (database) to find the file
   /// when it's time to play it, and for fallback details.
-  final Uri? uri;
+  final Uri uri;
   @override
 
   /// The raw bytes of the cover image. **DO NOT** STORE THIS IN THE DATABASE!
@@ -309,10 +327,14 @@ class _$_TrackMetadata extends _TrackMetadata with DiagnosticableTreeMixin {
 
   /// The URI to the cover.
   final Uri? coverUri;
+  @override
+
+  /// The track's duration.
+  final Duration? duration;
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'TrackMetadata(title: $title, artistName: $artistName, albumName: $albumName, trackNo: $trackNo, discNo: $discNo, coverData: $coverData, uri: $uri, coverBytes: $coverBytes, coverUri: $coverUri)';
+    return 'TrackMetadata(title: $title, artistName: $artistName, albumName: $albumName, trackNo: $trackNo, discNo: $discNo, coverData: $coverData, uri: $uri, coverBytes: $coverBytes, coverUri: $coverUri, duration: $duration)';
   }
 
   @override
@@ -328,7 +350,8 @@ class _$_TrackMetadata extends _TrackMetadata with DiagnosticableTreeMixin {
       ..add(DiagnosticsProperty('coverData', coverData))
       ..add(DiagnosticsProperty('uri', uri))
       ..add(DiagnosticsProperty('coverBytes', coverBytes))
-      ..add(DiagnosticsProperty('coverUri', coverUri));
+      ..add(DiagnosticsProperty('coverUri', coverUri))
+      ..add(DiagnosticsProperty('duration', duration));
   }
 
   @override
@@ -346,7 +369,8 @@ class _$_TrackMetadata extends _TrackMetadata with DiagnosticableTreeMixin {
             const DeepCollectionEquality().equals(other.uri, uri) &&
             const DeepCollectionEquality()
                 .equals(other.coverBytes, coverBytes) &&
-            const DeepCollectionEquality().equals(other.coverUri, coverUri));
+            const DeepCollectionEquality().equals(other.coverUri, coverUri) &&
+            const DeepCollectionEquality().equals(other.duration, duration));
   }
 
   @override
@@ -360,7 +384,8 @@ class _$_TrackMetadata extends _TrackMetadata with DiagnosticableTreeMixin {
       const DeepCollectionEquality().hash(coverData),
       const DeepCollectionEquality().hash(uri),
       const DeepCollectionEquality().hash(coverBytes),
-      const DeepCollectionEquality().hash(coverUri));
+      const DeepCollectionEquality().hash(coverUri),
+      const DeepCollectionEquality().hash(duration));
 
   @JsonKey(ignore: true)
   @override
@@ -381,9 +406,10 @@ abstract class _TrackMetadata extends TrackMetadata {
       int? trackNo,
       int discNo,
       @JsonKey(ignore: true) ImageDescriptor? coverData,
-      Uri? uri,
+      required Uri uri,
       @JsonKey(ignore: true) List<int>? coverBytes,
-      Uri? coverUri}) = _$_TrackMetadata;
+      Uri? coverUri,
+      Duration? duration}) = _$_TrackMetadata;
   const _TrackMetadata._() : super._();
 
   factory _TrackMetadata.fromJson(Map<String, dynamic> json) =
@@ -417,7 +443,7 @@ abstract class _TrackMetadata extends TrackMetadata {
 
   /// The URI to the track. Used by the library (database) to find the file
   /// when it's time to play it, and for fallback details.
-  Uri? get uri;
+  Uri get uri;
   @override
 
   /// The raw bytes of the cover image. **DO NOT** STORE THIS IN THE DATABASE!
@@ -427,6 +453,10 @@ abstract class _TrackMetadata extends TrackMetadata {
 
   /// The URI to the cover.
   Uri? get coverUri;
+  @override
+
+  /// The track's duration.
+  Duration? get duration;
   @override
   @JsonKey(ignore: true)
   _$TrackMetadataCopyWith<_TrackMetadata> get copyWith =>
