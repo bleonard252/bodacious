@@ -24,14 +24,3 @@ Future<Database> loadDatabase({String? boLibraryPath}) async {
   }
   return await factory.openDatabase(boLibraryPath ?? dbPath);
 }
-
-// /// The [Store] that will contain settings and the library root list.
-// final configStore = StoreRef<String, dynamic>.main();
-// /// Maps normalized artist names to (partial) ArtistMetadata objects.
-// final artistStore = StoreRef<String, dynamic>("artists");
-// /// Maps normalized artist name ` - ` normalized album name to (partial) AlbumMetadata objects.
-// final albumStore = StoreRef<String, dynamic>("albums");
-// /// Maps normalized artist name ` - ` normalized track name to (partial) TrackMetadata objects.
-// final songStore = StoreRef<String, dynamic>("songs");
-// /// Maps playlist names to lists of tracks.
-// final playlistStore = StoreRef<String, List<dynamic>>("playlists");

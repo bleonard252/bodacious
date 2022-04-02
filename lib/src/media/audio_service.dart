@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:audio_service/audio_service.dart';
+import 'package:bodacious/drift/database.dart';
 import 'package:bodacious/main.dart';
 import 'package:bodacious/src/library/init_db.dart';
 import 'package:dart_vlc/dart_vlc.dart' as vlc;
@@ -9,7 +10,6 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:just_audio/just_audio.dart' as just;
 import 'package:mime/mime.dart';
 import 'package:rxdart/src/subjects/behavior_subject.dart';
-import 'package:sembast/sembast.dart';
 
 import '../../models/track_data.dart';
 
@@ -30,6 +30,7 @@ abstract class BodaciousAudioHandler extends BaseAudioHandler with SeekHandler {
   @override
   Future<BodaciousMediaItem?> getMediaItem(String mediaId) async {
     try {
+      
       return TrackMetadata.fromJson((await songStore.findFirst(db, finder: Finder(filter: Filter.equals('uri', Uri.file(mediaId)))))!.value).asMediaItem();
     } catch(e) {
       return null;

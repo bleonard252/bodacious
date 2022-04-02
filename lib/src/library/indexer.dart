@@ -4,6 +4,7 @@ import 'dart:isolate';
 import 'dart:typed_data';
 
 import 'package:bodacious/models/album_data.dart';
+import 'package:bodacious/src/config.dart';
 import 'package:bodacious/src/library/cache_dir.dart';
 import 'package:bodacious/src/library/init_db.dart';
 import 'package:bodacious/src/metadata/id3.dart';
@@ -14,6 +15,7 @@ import 'package:mime/mime.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:rxdart/rxdart.dart';
 
+import '../../drift/database.dart';
 import '../../models/artist_data.dart';
 import '../../models/track_data.dart';
 import '../metadata/infer.dart';
@@ -79,9 +81,8 @@ class _IndexerIsolate {
     required this.cacheDir
   });
 
-  late final Database db;
-  // These are copied straight from the static metadata thing, just for safe keeping.
-  final configStore = StoreRef<String, dynamic>.main();
+  late final BoDatabase db;
+  late final ROConfig config;
   final artistStore = StoreRef<String, dynamic>("artists");
   final albumStore = StoreRef<String, dynamic>("albums");
   final songStore = StoreRef<String, dynamic>("songs");
@@ -108,7 +109,7 @@ class _IndexerIsolate {
       await artistStore.drop(db);
     }
     List<File> validFiles = [];
-    final List<String> _dbfolders = List.castFrom<dynamic, String>((await configStore.record("libraries").get(db))?.toList() as List<dynamic>? ?? []);
+    final List<String> _dbfolders = List.castFrom<dynamic, String>(config.libraries);
     for (final f in _dbfolders) {
       if (!await Directory(f).exists()) {
         if (kDebugMode) {print("INDEXER ERROR: `"+f+"` does not exist!");}

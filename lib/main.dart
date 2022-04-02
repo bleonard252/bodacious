@@ -3,7 +3,9 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:audio_service/audio_service.dart';
+import 'package:bodacious/drift/database.dart';
 import 'package:bodacious/models/track_data.dart';
+import 'package:bodacious/src/config.dart';
 import 'package:bodacious/src/library/indexer.dart';
 import 'package:bodacious/src/library/init_db.dart';
 import 'package:bodacious/src/media/audio_service.dart';
@@ -22,19 +24,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:just_audio/just_audio.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
-import 'package:sembast/sembast.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 //import 'package:bitsdojo_window/bitsdojo_window.dart';
 
-late Database db;
+late final BoDatabase db;
+late final Config config;
 
 late final BodaciousAudioHandler player;
 
 void main() async {
   try {DartVLC.initialize();} finally {}
   WidgetsFlutterBinding.ensureInitialized();
-  db = await loadDatabase();
+  db = BoDatabase();
+  config = Config(await SharedPreferences.getInstance());
 
   runApp(const ProviderScope(
     child: MyApp(),
@@ -77,12 +80,18 @@ void main() async {
         continue;
       }
       if (!ref.state.hasValue) yield nothingPlaying.copyWith(uri: Uri.file(update.id));
-      final _dbEntry = await songStore.findFirst(db, finder: Finder(filter: Filter.equals('uri', Uri.file(update.id).toString())));
-      if (kDebugMode) {
-        final value = (await songStore.find(db)).map((e) => e.value);
-      }
-      if (_dbEntry?.value != null) {
-        yield TrackMetadata.fromJson(_dbEntry!.value);
+      // final _dbEntry = await songStore.findFirst(db, finder: Finder(filter: Filter.equals('uri', Uri.file(update.id).toString())));
+      // if (kDebugMode) {
+      //   final value = (await songStore.find(db)).map((e) => e.value);
+      // }
+
+      final TrackMetadata? _dbEntry = await (db.select(db.trackTable)
+      ..where((tbl) => tbl.uri.equalsValue(Uri.file(update.id)))
+      ..limit(1)
+      ).getSingleOrNull();
+      
+      if (_dbEntry != null) {
+        yield _dbEntry;
       } else {
         yield nothingPlaying.copyWith(uri: Uri.file(update.id));
       }
