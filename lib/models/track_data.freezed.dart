@@ -32,7 +32,9 @@ class _$TrackMetadataTearOff {
       required Uri uri,
       @JsonKey(ignore: true) List<int>? coverBytes,
       Uri? coverUri,
-      Duration? duration}) {
+      Duration? duration,
+      int? year,
+      DateTime? releaseDate}) {
     return _TrackMetadata(
       title: title,
       artistName: artistName,
@@ -44,6 +46,8 @@ class _$TrackMetadataTearOff {
       coverBytes: coverBytes,
       coverUri: coverUri,
       duration: duration,
+      year: year,
+      releaseDate: releaseDate,
     );
   }
 
@@ -89,6 +93,12 @@ mixin _$TrackMetadata {
   /// The track's duration.
   Duration? get duration => throw _privateConstructorUsedError;
 
+  /// The year the track was released. Prefer to show [releaseDate] wherever given.
+  int? get year => throw _privateConstructorUsedError;
+
+  /// The release date of this track.
+  DateTime? get releaseDate => throw _privateConstructorUsedError;
+
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
   $TrackMetadataCopyWith<TrackMetadata> get copyWith =>
@@ -110,7 +120,9 @@ abstract class $TrackMetadataCopyWith<$Res> {
       Uri uri,
       @JsonKey(ignore: true) List<int>? coverBytes,
       Uri? coverUri,
-      Duration? duration});
+      Duration? duration,
+      int? year,
+      DateTime? releaseDate});
 }
 
 /// @nodoc
@@ -134,6 +146,8 @@ class _$TrackMetadataCopyWithImpl<$Res>
     Object? coverBytes = freezed,
     Object? coverUri = freezed,
     Object? duration = freezed,
+    Object? year = freezed,
+    Object? releaseDate = freezed,
   }) {
     return _then(_value.copyWith(
       title: title == freezed
@@ -176,6 +190,14 @@ class _$TrackMetadataCopyWithImpl<$Res>
           ? _value.duration
           : duration // ignore: cast_nullable_to_non_nullable
               as Duration?,
+      year: year == freezed
+          ? _value.year
+          : year // ignore: cast_nullable_to_non_nullable
+              as int?,
+      releaseDate: releaseDate == freezed
+          ? _value.releaseDate
+          : releaseDate // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
     ));
   }
 }
@@ -197,7 +219,9 @@ abstract class _$TrackMetadataCopyWith<$Res>
       Uri uri,
       @JsonKey(ignore: true) List<int>? coverBytes,
       Uri? coverUri,
-      Duration? duration});
+      Duration? duration,
+      int? year,
+      DateTime? releaseDate});
 }
 
 /// @nodoc
@@ -223,6 +247,8 @@ class __$TrackMetadataCopyWithImpl<$Res>
     Object? coverBytes = freezed,
     Object? coverUri = freezed,
     Object? duration = freezed,
+    Object? year = freezed,
+    Object? releaseDate = freezed,
   }) {
     return _then(_TrackMetadata(
       title: title == freezed
@@ -265,6 +291,14 @@ class __$TrackMetadataCopyWithImpl<$Res>
           ? _value.duration
           : duration // ignore: cast_nullable_to_non_nullable
               as Duration?,
+      year: year == freezed
+          ? _value.year
+          : year // ignore: cast_nullable_to_non_nullable
+              as int?,
+      releaseDate: releaseDate == freezed
+          ? _value.releaseDate
+          : releaseDate // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
     ));
   }
 }
@@ -282,7 +316,9 @@ class _$_TrackMetadata extends _TrackMetadata with DiagnosticableTreeMixin {
       required this.uri,
       @JsonKey(ignore: true) this.coverBytes,
       this.coverUri,
-      this.duration})
+      this.duration,
+      this.year,
+      this.releaseDate})
       : super._();
 
   factory _$_TrackMetadata.fromJson(Map<String, dynamic> json) =>
@@ -331,10 +367,18 @@ class _$_TrackMetadata extends _TrackMetadata with DiagnosticableTreeMixin {
 
   /// The track's duration.
   final Duration? duration;
+  @override
+
+  /// The year the track was released. Prefer to show [releaseDate] wherever given.
+  final int? year;
+  @override
+
+  /// The release date of this track.
+  final DateTime? releaseDate;
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'TrackMetadata(title: $title, artistName: $artistName, albumName: $albumName, trackNo: $trackNo, discNo: $discNo, coverData: $coverData, uri: $uri, coverBytes: $coverBytes, coverUri: $coverUri, duration: $duration)';
+    return 'TrackMetadata(title: $title, artistName: $artistName, albumName: $albumName, trackNo: $trackNo, discNo: $discNo, coverData: $coverData, uri: $uri, coverBytes: $coverBytes, coverUri: $coverUri, duration: $duration, year: $year, releaseDate: $releaseDate)';
   }
 
   @override
@@ -351,7 +395,9 @@ class _$_TrackMetadata extends _TrackMetadata with DiagnosticableTreeMixin {
       ..add(DiagnosticsProperty('uri', uri))
       ..add(DiagnosticsProperty('coverBytes', coverBytes))
       ..add(DiagnosticsProperty('coverUri', coverUri))
-      ..add(DiagnosticsProperty('duration', duration));
+      ..add(DiagnosticsProperty('duration', duration))
+      ..add(DiagnosticsProperty('year', year))
+      ..add(DiagnosticsProperty('releaseDate', releaseDate));
   }
 
   @override
@@ -370,7 +416,10 @@ class _$_TrackMetadata extends _TrackMetadata with DiagnosticableTreeMixin {
             const DeepCollectionEquality()
                 .equals(other.coverBytes, coverBytes) &&
             const DeepCollectionEquality().equals(other.coverUri, coverUri) &&
-            const DeepCollectionEquality().equals(other.duration, duration));
+            const DeepCollectionEquality().equals(other.duration, duration) &&
+            const DeepCollectionEquality().equals(other.year, year) &&
+            const DeepCollectionEquality()
+                .equals(other.releaseDate, releaseDate));
   }
 
   @override
@@ -385,7 +434,9 @@ class _$_TrackMetadata extends _TrackMetadata with DiagnosticableTreeMixin {
       const DeepCollectionEquality().hash(uri),
       const DeepCollectionEquality().hash(coverBytes),
       const DeepCollectionEquality().hash(coverUri),
-      const DeepCollectionEquality().hash(duration));
+      const DeepCollectionEquality().hash(duration),
+      const DeepCollectionEquality().hash(year),
+      const DeepCollectionEquality().hash(releaseDate));
 
   @JsonKey(ignore: true)
   @override
@@ -409,7 +460,9 @@ abstract class _TrackMetadata extends TrackMetadata {
       required Uri uri,
       @JsonKey(ignore: true) List<int>? coverBytes,
       Uri? coverUri,
-      Duration? duration}) = _$_TrackMetadata;
+      Duration? duration,
+      int? year,
+      DateTime? releaseDate}) = _$_TrackMetadata;
   const _TrackMetadata._() : super._();
 
   factory _TrackMetadata.fromJson(Map<String, dynamic> json) =
@@ -457,6 +510,14 @@ abstract class _TrackMetadata extends TrackMetadata {
 
   /// The track's duration.
   Duration? get duration;
+  @override
+
+  /// The year the track was released. Prefer to show [releaseDate] wherever given.
+  int? get year;
+  @override
+
+  /// The release date of this track.
+  DateTime? get releaseDate;
   @override
   @JsonKey(ignore: true)
   _$TrackMetadataCopyWith<_TrackMetadata> get copyWith =>

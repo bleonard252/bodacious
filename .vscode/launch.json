@@ -13,6 +13,7 @@
       "name": "bodacious",
       "request": "launch",
       "type": "dart",
+      //"preLaunchTask": "Pre-build app",
       "toolArgs": ["--multidex"]
     },
     {

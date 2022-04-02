@@ -45,8 +45,8 @@ class SongLibraryList extends ConsumerWidget {
                       title: Text(track.title ?? (track.uri.pathSegments.isEmpty ? "Unknown track" : track.uri.pathSegments.last)),
                       subtitle: track.artistName?.isEmpty == false ? Text(track.artistName!) : null,
                       onTap: () {
-                        player.setFilePath(track.uri.toFilePath());
-                        ref.read(nowPlayingProvider.notifier).changeTrack(track);
+                        player.prepareFromTrackMetadata(track);
+                        //ref.read(nowPlayingProvider.notifier).changeTrack(track);
                         player.play();
                       },
                     ),

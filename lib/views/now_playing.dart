@@ -2,19 +2,14 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui';
 
+import 'package:audio_service/audio_service.dart';
 import 'package:bodacious/main.dart';
-import 'package:bodacious/models/track_data.dart';
 import 'package:bodacious/widgets/cover_placeholder.dart';
-import 'package:file_picker/file_picker.dart';
 import "package:flutter/material.dart";
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:palette_generator/palette_generator.dart';
-
-import '../src/metadata/id3.dart';
-import '../widgets/now_playing.dart';
 
 class NowPlayingView extends ConsumerStatefulWidget {
   const NowPlayingView({Key? key}) : super(key: key);
@@ -27,14 +22,14 @@ class _NowPlayingViewState extends ConsumerState<NowPlayingView> {
 
   @override
   Widget build(BuildContext context) {
-    final meta = ref.watch(nowPlayingProvider);
+    final meta = ref.watch(nowPlayingProvider).asData!.value;
     final _fallbackColors = [
       PaletteColor(Theme.of(context).colorScheme.primary, 500),
       PaletteColor(Theme.of(context).canvasColor, 100),
     ];
     return FutureBuilder<PaletteGenerator>(
       future: () async {
-        if (ref.watch(nowPlayingProvider).coverBytes != null) {
+        if (meta.coverBytes != null) {
           return PaletteGenerator.fromImage(
             (await 
               (await 
@@ -46,7 +41,7 @@ class _NowPlayingViewState extends ConsumerState<NowPlayingView> {
               ).getNextFrame()
             ).image
           );
-        } else if (ref.watch(nowPlayingProvider).coverUri != null) {
+        } else if (meta.coverUri != null) {
           return PaletteGenerator.fromImage(
             (await 
               (await 
@@ -88,19 +83,22 @@ class _NowPlayingViewState extends ConsumerState<NowPlayingView> {
                   mainAxisSize: MainAxisSize.max,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: ClipRRect(
-                        borderRadius: const BorderRadius.all(Radius.circular(12)),
-                        child: AspectRatio(
-                          aspectRatio: 1/1,
-                          child: meta.coverBytes != null || meta.coverUri?.scheme == "file" ? Image(
-                            image: (meta.coverBytes != null ? MemoryImage(Uint8List.fromList(meta.coverBytes!))
-                              : meta.coverUri?.scheme == "file" ? FileImage(File.fromUri(meta.coverUri!))
-                              : NetworkImage(meta.coverUri.toString())) as ImageProvider,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, e, s) => const CoverPlaceholder(size: null, iconSize: 64)
-                          ) : const CoverPlaceholder(size: null, iconSize: 64),
+                    ConstrainedBox(
+                      constraints: BoxConstraints.loose(MediaQuery.of(context).size/2),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: ClipRRect(
+                          borderRadius: const BorderRadius.all(Radius.circular(12)),
+                          child: AspectRatio(
+                            aspectRatio: 1/1,
+                            child: meta.coverBytes != null || meta.coverUri?.scheme == "file" ? Image(
+                              image: (meta.coverBytes != null ? MemoryImage(Uint8List.fromList(meta.coverBytes!))
+                                : meta.coverUri?.scheme == "file" ? FileImage(File.fromUri(meta.coverUri!))
+                                : NetworkImage(meta.coverUri.toString())) as ImageProvider,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, e, s) => const CoverPlaceholder(size: null, iconSize: 64)
+                            ) : const CoverPlaceholder(size: null, iconSize: 64),
+                          ),
                         ),
                       ),
                     ),
@@ -135,7 +133,7 @@ class _NowPlayingViewState extends ConsumerState<NowPlayingView> {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           StreamBuilder<Duration>(
-                            stream: player.positionStream,
+                            stream: player.playbackState.map((event) => event.position),
                             initialData: player.position,
                             builder: (context, _snapshot) => Slider(
                               value: player.position > (player.duration ?? const Duration(milliseconds: 0)) ? 0 
@@ -150,7 +148,7 @@ class _NowPlayingViewState extends ConsumerState<NowPlayingView> {
                             )
                           ),
                           StreamBuilder(
-                            stream: player.playerStateStream,
+                            stream: player.playbackState,
                             builder: (context, snapshot) {
                               return IconTheme(
                                 data: IconThemeData(
@@ -168,19 +166,16 @@ class _NowPlayingViewState extends ConsumerState<NowPlayingView> {
                                     const Spacer(),
                                     Tooltip(
                                       message: "Previous",
-                                      child: IconButton(onPressed: player.hasPrevious || player.audioSource != null ? () {
-                                        if (player.position > const Duration(seconds: 1) || !player.hasPrevious) {
-                                          player.seek(const Duration(seconds: 0));
-                                        } else {
-                                          player.seekToPrevious();
-                                        }
-                                      } : null, icon: const Icon(MdiIcons.skipBackward))
+                                      child: IconButton(
+                                        onPressed: () => player.skipToPrevious(),
+                                        icon: const Icon(MdiIcons.skipBackward)
+                                      )
                                     ),
                                     buildPlayPauseButton(),
                                     Tooltip(
                                       message: "Next",
                                       child: IconButton(
-                                        onPressed: player.hasNext ? () => player.seekToNext() : null,
+                                        onPressed: () => player.skipToNext(),
                                         icon: const Icon(MdiIcons.skipForward)
                                       )
                                     ),
@@ -228,33 +223,41 @@ class _NowPlayingViewState extends ConsumerState<NowPlayingView> {
                             crossAxisAlignment: CrossAxisAlignment.center,
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              StreamBuilder(
-                                stream: player.shuffleModeEnabledStream,
+                              StreamBuilder<PlaybackState>(
+                                stream: player.playbackState.where((event) => event.shuffleMode != player.playbackState.valueOrNull?.shuffleMode),
+                                initialData: player.playbackState.valueOrNull,
                                 builder: (context, snapshot) => Tooltip(
-                                  message: player.shuffleModeEnabled ? "Shuffling" : "Not shuffling",
+                                  message: snapshot.data?.shuffleMode != AudioServiceShuffleMode.none ? "Shuffling" : "Not shuffling",
                                   child: IconButton(
-                                    onPressed: () => player.setShuffleModeEnabled(!player.shuffleModeEnabled),
+                                    onPressed: () => player.setShuffleMode(
+                                      (snapshot.data?.shuffleMode == AudioServiceShuffleMode.none)
+                                      ? AudioServiceShuffleMode.all
+                                      : AudioServiceShuffleMode.none
+                                    ),
                                     icon: Icon(
-                                      player.shuffleModeEnabled ? MdiIcons.shuffle : MdiIcons.shuffleDisabled,
+                                      snapshot.data?.shuffleMode != AudioServiceShuffleMode.none
+                                      ? MdiIcons.shuffle
+                                      : MdiIcons.shuffleDisabled,
                                     ),
                                   ),
                                 ),
                               ),
-                              StreamBuilder(
-                                stream: player.loopModeStream,
+                              StreamBuilder<PlaybackState>(
+                                stream: player.playbackState.where((event) => event.repeatMode != player.playbackState.valueOrNull?.repeatMode),
+                                initialData: player.playbackState.valueOrNull,
                                 builder: (context, snapshot) => Tooltip(
-                                  message: player.loopMode == LoopMode.all ? "Repeating all. Press to repeat this track" 
-                                    : player.loopMode == LoopMode.one ? "Repeating this track. Press to turn off repeat" 
+                                  message: snapshot.data?.repeatMode == AudioServiceRepeatMode.all ? "Repeating all. Press to repeat this track" 
+                                    : snapshot.data?.repeatMode == AudioServiceRepeatMode.one ? "Repeating this track. Press to turn off repeat" 
                                     : "Repeating off. Press to repeat all",
                                   child: IconButton(
-                                    onPressed: () => player.setLoopMode(
-                                      (player.loopMode == LoopMode.off) ? LoopMode.all
-                                      : (player.loopMode == LoopMode.all) ? LoopMode.one
-                                      : LoopMode.off
+                                    onPressed: () => player.setRepeatMode(
+                                      (snapshot.data?.repeatMode == AudioServiceRepeatMode.none) ? AudioServiceRepeatMode.all
+                                      : (snapshot.data?.repeatMode == AudioServiceRepeatMode.all) ? AudioServiceRepeatMode.one
+                                      : AudioServiceRepeatMode.none
                                     ),
                                     icon: Icon(
-                                      player.loopMode == LoopMode.all ? MdiIcons.repeat 
-                                      : player.loopMode == LoopMode.one ? MdiIcons.repeatOnce
+                                      snapshot.data?.repeatMode == LoopMode.all ? MdiIcons.repeat 
+                                      : snapshot.data?.repeatMode == LoopMode.one ? MdiIcons.repeatOnce
                                       : MdiIcons.repeatOff
                                     ),
                                   ),
@@ -284,39 +287,17 @@ class _NowPlayingViewState extends ConsumerState<NowPlayingView> {
   
   Widget buildPlayPauseButton() {
     return StreamBuilder(
-      stream: player.playingStream,
+      stream: player.playbackState.map((event) => event.playing),
+      initialData: player.playbackState.valueOrNull?.playing,
       builder: (context, snap) => snap.data == true ? Tooltip(
         message: "Pause",
         child: IconButton(onPressed: () {
-          assert(player.audioSource != null);
-          if (player.audioSource == null) return;
           player.pause();
         }, icon: const Icon(MdiIcons.pause))
       ) : Tooltip(
         message: "Play",
         child: IconButton(onPressed: () {
-          if (player.audioSource == null || player.position >= (player.duration ?? const Duration())-(const Duration(milliseconds: 500))) {
-            FilePicker.platform.pickFiles(
-              type: FileType.audio,
-              withData: true,
-              allowCompression: false,
-              allowMultiple: false
-            ).then((file) {
-              if (file == null || file.files.isEmpty) return;
-              player.setAudioSource(AudioSource.uri(Uri.file(file.files.single.path!)));
-              loadID3FromBytes(file.files.single.bytes!, File(file.files.single.path!)).then((value) => 
-                ref.read(nowPlayingProvider.notifier).changeTrack(value)
-              );
-              player.play();
-              player.playbackEventStream.firstWhere((e) => (e.processingState == ProcessingState.completed)).then((event) {
-                player.pause();
-                //player.setAudioSource(ProgressiveAudioSource(Uri.file("/")));
-                ref.read(nowPlayingProvider.notifier).changeTrack(TrackMetadata.empty());
-              });
-            });
-          } else {
-            player.play();
-          }
+          player.play();
         }, icon: const Icon(MdiIcons.play))
       ),
     );

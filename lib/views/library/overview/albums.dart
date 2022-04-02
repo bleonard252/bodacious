@@ -23,7 +23,7 @@ class AlbumLibraryList extends ConsumerWidget {
             if (snapshot.connectionState != ConnectionState.done) return Container();
             return ListView.builder(
               itemBuilder: (context, index) => FutureBuilder<Map<String, dynamic>?>(
-                future: albumStore.findFirst(db, finder: Finder(offset: index, limit: 1, sortOrders: [SortOrder('year'), SortOrder('name')])).then((value) => value?.value),
+                future: albumStore.findFirst(db, finder: Finder(offset: index, limit: 1, sortOrders: [SortOrder('year', false), SortOrder('name')])).then((value) => value?.value),
                 builder: (context, snapshot) {
                   final album = AlbumMetadata.fromJson(snapshot.data ?? {"name": "Unknown album", "artistName": "Unknown artist"});
                   return SizedBox(
@@ -48,7 +48,8 @@ class AlbumLibraryList extends ConsumerWidget {
                       subtitle: Text.rich(TextSpan(children: [
                         // const WidgetSpan(child: Icon(MdiIcons.spotify)),
                         // const WidgetSpan(child: SizedBox(width: 6)),
-                        TextSpan(text: album.artistName)
+                        TextSpan(text: album.artistName),
+                        if (album.year != null) TextSpan(text: album.year.toString())
                       ])),
                       onTap: () {
                         // TODO: open the details page, show the songs on the album

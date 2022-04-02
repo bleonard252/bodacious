@@ -20,6 +20,10 @@ _$_TrackMetadata _$$_TrackMetadataFromJson(Map<String, dynamic> json) =>
       duration: json['duration'] == null
           ? null
           : Duration(microseconds: json['duration'] as int),
+      year: json['year'] as int?,
+      releaseDate: json['releaseDate'] == null
+          ? null
+          : DateTime.parse(json['releaseDate'] as String),
     );
 
 Map<String, dynamic> _$$_TrackMetadataToJson(_$_TrackMetadata instance) =>
@@ -32,4 +36,6 @@ Map<String, dynamic> _$$_TrackMetadataToJson(_$_TrackMetadata instance) =>
       'uri': instance.uri.toString(),
       'coverUri': instance.coverUri?.toString(),
       'duration': instance.duration?.inMicroseconds,
+      'year': instance.year,
+      'releaseDate': instance.releaseDate?.toIso8601String(),
     };

@@ -16,7 +16,9 @@ import 'package:mime/mime.dart';
 
 Future<TrackMetadata> loadID3FromBytes(List<int> bytes, File file, {String? cacheDir}) async {
   final mp3 = MP3Instance(bytes);
-  mp3.parseTagsSync();
+  if (bytes.length > 3) {
+    mp3.parseTagsSync();
+  }
   final rawTags = mp3.getMetaTags() ?? {};
   // if (kDebugMode) {
   //   print(rawTags);
@@ -97,6 +99,7 @@ Future<TrackMetadata> loadID3FromBytes(List<int> bytes, File file, {String? cach
     title: flacdata["title"] ?? rawTags["Title"],
     artistName: flacdata["artist"] ?? rawTags["Artist"],
     albumName: flacdata["album"] ?? rawTags["Album"],
+    year: int.tryParse(flacdata["year"]?.toString() ?? rawTags["Year"]?.toString() ?? ""),
     //coverData: descriptor,
     uri: file.absolute.uri,
     coverBytes: coverBytes2, //?? coverBytes?.buffer.asUint8List(),

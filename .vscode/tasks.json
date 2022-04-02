@@ -1,0 +1,34 @@
+{
+  // See https://go.microsoft.com/fwlink/?LinkId=733558
+  // for the documentation about the tasks.json format
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Pre-build app",
+      "detail": "Runs build_runner and flutter_brand",
+      "type": "shell",
+      "command": "just prebuild",
+      "problemMatcher": [
+        "$dart-build_runner",
+        {
+          "pattern": {
+            "regexp": "(.+?) ((API key|secret) not set.)",
+            "file": -1,
+            "line": -1,
+            "column": -1,
+            "message": 2,
+          }
+        }
+      ],
+      "presentation": {
+        "echo": true,
+        "reveal": "silent",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "isBackground": true
+    }
+  ]
+}

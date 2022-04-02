@@ -1,4 +1,7 @@
 
+import 'dart:developer';
+import 'dart:io';
+
 import 'package:audio_service/audio_service.dart';
 import 'package:bodacious/models/track_data.dart';
 import 'package:bodacious/src/library/indexer.dart';
@@ -13,7 +16,10 @@ import 'package:bodacious/views/settings/library.dart';
 import 'package:bodacious/views/settings/root.dart';
 import 'package:bodacious/widgets/now_playing.dart';
 import 'package:bodacious/widgets/now_playing_data.dart';
+import 'package:dart_vlc/dart_vlc.dart' show DartVLC;
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:just_audio/just_audio.dart';
@@ -23,35 +29,73 @@ import 'package:sembast/sembast.dart';
 
 late Database db;
 
-late final AudioPlayer player;
-WidgetRef? playerBackgroundRef;
+late final BodaciousAudioHandler player;
 
 void main() async {
+  try {DartVLC.initialize();} finally {}
   WidgetsFlutterBinding.ensureInitialized();
   db = await loadDatabase();
-  player = AudioPlayer();
-
-  await AudioService.init(
-    builder: () => BodaciousBackgroundService(player),
-    config: const AudioServiceConfig(
-      androidNotificationChannelId: 'xyz.u1024256.bodacious.player',
-      androidNotificationChannelName: 'Audio player',
-      androidNotificationChannelDescription: "Bodacious puts your music in the notifications with this, which also lets it play in the background.",
-      androidNotificationOngoing: true,
-      androidNotificationIcon: "drawable/notification",
-      androidStopForegroundOnPause: true,
-      notificationColor: Colors.amber,
-    )
-  );
 
   runApp(const ProviderScope(
-    child: MyApp()
+    child: MyApp(),
   ));
 
-  TheIndexer.spawn().then((_) async {
-    await db.close();
-    db = await loadDatabase();
+  try {
+    player = await AudioService.init<BodaciousAudioHandler>(
+      builder: () {
+        if (Platform.isAndroid || Platform.isIOS || kIsWeb) {
+          return JustAudioHandler();
+        } else {
+          return VlcAudioHandler();
+        }
+      },
+      config: const AudioServiceConfig(
+        androidNotificationChannelId: 'xyz.u1024256.bodacious.player',
+        androidNotificationChannelName: 'Audio player',
+        androidNotificationChannelDescription: "Bodacious puts your music in the notifications with this, which also lets it play in the background.",
+        androidNotificationOngoing: true,
+        androidNotificationIcon: "drawable/notification",
+        androidStopForegroundOnPause: true,
+        notificationColor: Colors.amber,
+      )
+    );
+  } on MissingPluginException {
+    if (kDebugMode) {
+      print("Audio service is not available on this device");
+    }
+  }
+  nowPlayingProvider = StreamProvider<TrackMetadata>((ref) async* {
+    final stream = player.mediaItem;
+    final nothingPlaying = TrackMetadata.empty();
+    yield nothingPlaying;
+    await for (final update in stream) {
+      if (update == null) continue;
+      if (update.id.contains("://") && !update.id.startsWith("file:///")) {
+        if (kDebugMode) {
+          print(update.id+" is not a supported URI.");
+        }
+        continue;
+      }
+      if (!ref.state.hasValue) yield nothingPlaying.copyWith(uri: Uri.file(update.id));
+      final _dbEntry = await songStore.findFirst(db, finder: Finder(filter: Filter.equals('uri', Uri.file(update.id).toString())));
+      if (kDebugMode) {
+        final value = (await songStore.find(db)).map((e) => e.value);
+      }
+      if (_dbEntry?.value != null) {
+        yield TrackMetadata.fromJson(_dbEntry!.value);
+      } else {
+        yield nothingPlaying.copyWith(uri: Uri.file(update.id));
+      }
+    }
   });
+
+  // TheIndexer.spawn().then((_) async {
+  //   //await db.close();
+  //   db = await loadDatabase();
+  //   if (kDebugMode) {
+  //     print("Database reloaded");
+  //   }
+  // });
 
   // doWhenWindowReady(() {
   //   const initialSize = Size(600, 450);
@@ -64,7 +108,8 @@ void main() async {
 
 }
 
-final nowPlayingProvider = StateNotifierProvider<NowPlayingNotifier, TrackMetadata>((ref) => NowPlayingNotifier());
+//final nowPlayingProvider = StateNotifierProvider<NowPlayingNotifier, TrackMetadata>((ref) => NowPlayingNotifier());
+late final StreamProvider<TrackMetadata> nowPlayingProvider;
 
 class MyApp extends ConsumerWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -72,7 +117,6 @@ class MyApp extends ConsumerWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    playerBackgroundRef = ref;
     return MaterialApp(
       title: 'Bodacious',
       theme: ThemeData.light().copyWith(
@@ -85,7 +129,6 @@ class MyApp extends ConsumerWidget {
       ),
       home: NowPlayingData(
         child: OuterFrame(),
-        player: player,
         //metadataProvider: NowPlayingNotifier(),
       )
     );

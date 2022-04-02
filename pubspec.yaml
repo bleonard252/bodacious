@@ -18,6 +18,7 @@ dependencies:
   #just_audio_libwinmedia: ^0.0.4
   #just_audio_background: ^0.0.1-beta.5
   audio_service: ^0.18.4
+  dart_vlc: ^0.1.9
   
   # Widget & Flutter Deps
   go_router: ^3.0.5
@@ -32,6 +33,7 @@ dependencies:
   freezed_annotation:
   json_annotation: ^4.4.0
   path_provider: ^2.0.9
+  rxdart: ^0.27.3
 
   # Library & Metadata Deps
   file_picker: ^4.5.1 # for picking directories (and files in early versions)

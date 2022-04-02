@@ -1,8 +1,13 @@
+import 'dart:io';
+
 import 'package:audio_service/audio_service.dart';
+import 'package:dart_vlc/dart_vlc.dart';
 import 'package:flutter/foundation.dart';
 
 import 'dart:ui' show ImageDescriptor;
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:just_audio/just_audio.dart';
+import 'package:audio_service_platform_interface/audio_service_platform_interface.dart';
 
 part 'track_data.freezed.dart';
 part 'track_data.g.dart';
@@ -32,17 +37,47 @@ class TrackMetadata with _$TrackMetadata {
     /// The URI to the cover.
     Uri? coverUri,
     /// The track's duration.
-    Duration? duration
+    Duration? duration,
+    /// The year the track was released. Prefer to show [releaseDate] wherever given.
+    int? year,
+    /// The release date of this track.
+    DateTime? releaseDate,
   }) = _TrackMetadata;
 
   factory TrackMetadata.fromJson(Map<String, dynamic> json) => _$TrackMetadataFromJson(json);
 
-  _BodaciousMediaItem asMediaItem() => _BodaciousMediaItem(this);
+  BodaciousMediaItem asMediaItem() => BodaciousMediaItem(this);
+  BodaciousAudioSource asAudioSource() => BodaciousAudioSource(this);
+  BodaciousVlcMedia asVlcMedia() => BodaciousVlcMedia(this);
 }
 
-class _BodaciousMediaItem implements MediaItem {
+class BodaciousAudioSource extends UriAudioSource {
   final TrackMetadata parent;
-  _BodaciousMediaItem(this.parent);
+  BodaciousAudioSource(this.parent) : super(parent.uri, duration: parent.duration);
+}
+class BodaciousVlcMedia implements Media {
+  final TrackMetadata parent;
+  BodaciousVlcMedia(this.parent);
+  
+  @override
+  MediaSourceType get mediaSourceType => MediaSourceType.media;
+  @override
+  final MediaType mediaType = MediaType.file; // rework so maybe later it can read from network
+  @override
+  Map<String, String> get metas => {};
+  @override
+  void parse(Duration timeout) {}
+  @override
+  String get resource => parent.uri.toFilePath();
+  @override
+  Duration get startTime => const Duration();
+  @override
+  Duration get stopTime => const Duration();
+}
+
+class BodaciousMediaItem extends MediaItem {
+  final TrackMetadata parent;
+  BodaciousMediaItem(this.parent) : super(id: parent.uri.toFilePath(), title: parent.title ?? parent.uri.pathSegments.lastOrNull ?? "");
 
   @override
   String? get album => parent.albumName;
@@ -53,7 +88,7 @@ class _BodaciousMediaItem implements MediaItem {
   String? get artist => parent.artistName;
 
   @override
-  MediaItemCopyWith get copyWith => throw UnimplementedError();
+  MediaItemCopyWith get copyWith => throw UnimplementedError("Check for BodaciousMediaItem before trying to copyWith!");
 
   @override
   String? get displayDescription => null;
@@ -84,5 +119,4 @@ class _BodaciousMediaItem implements MediaItem {
 
   @override
   String get title => parent.title ?? parent.uri.pathSegments.lastOrNull ?? "Bodacious";
-    
 }

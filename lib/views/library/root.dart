@@ -25,9 +25,7 @@ class _LibraryRootViewState extends State<LibraryRootView> {
     return Stack(
       children: [
         const Positioned.fill(child: Material()),
-        AnimatedPositioned(
-          duration: const Duration(milliseconds: 25),
-          curve: Curves.easeInOut,
+        Positioned(
           left: 0,
           right: 0,
           top: 0,
@@ -53,6 +51,7 @@ class _LibraryRootViewState extends State<LibraryRootView> {
         Positioned.fill(
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 72, sigmaY: 72),
+            blendMode: BlendMode.src,
             child: SafeArea(
               bottom: false,
               child: DefaultTabController(

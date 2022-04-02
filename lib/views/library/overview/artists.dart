@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:bodacious/main.dart';
@@ -26,16 +27,25 @@ class ArtistLibraryList extends ConsumerWidget {
               itemBuilder: (context, index) => FutureBuilder<Map<String, dynamic>?>(
                 future: artistStore.findFirst(db, finder: Finder(offset: index, limit: 1, sortOrders: [SortOrder('name')])).then((value) => value?.value),
                 builder: (context, snapshot) {
-                  final artist = ArtistMetadata.fromJson(snapshot.data ?? {"name": "Unknown album", "artistName": "Unknown artist"});
+                  final artist = ArtistMetadata.fromJson(snapshot.data ?? {"name": "Unknown artist"});
                   return ListTile(
-                    leading: ClipOval(child: artist.coverUri?.scheme == "file" ? Image(
-                      image: (artist.coverUri?.scheme == "file" ? FileImage(File.fromUri(artist.coverUri!))
-                        : NetworkImage(artist.coverUri.toString())) as ImageProvider,
-                      width: 48,
-                      height: 48,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, e, s) => const CoverPlaceholder(size: 48, iconSize: 24),
-                    ) : const CoverPlaceholder(size: 48, iconSize: 24)),
+                    leading: ClipOval(child: FutureBuilder(
+                      future: albumStore.findFirst(db, finder: Finder(
+                        filter: Filter.matches('artistName', artist.name),
+                        sortOrders: [SortOrder('releaseDate', false), SortOrder('year', false)]
+                      )),
+                      builder: (context, snapshot) {
+                        final album = AlbumMetadata.fromJson((snapshot.data as dynamic)?.value ?? {"name": "Unknown album", "artistName": "Unknown artist"});
+                        return album.coverUri?.scheme == "file" ? Image(
+                          image: (album.coverUri?.scheme == "file" ? FileImage(File.fromUri(album.coverUri!))
+                            : NetworkImage(album.coverUri.toString())) as ImageProvider,
+                          width: 48,
+                          height: 48,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, e, s) => const CoverPlaceholder(size: 48, iconSize: 24),
+                        ): const CoverPlaceholder(size: 48, iconSize: 24);
+                      })
+                    ),
                     title: Text.rich(TextSpan(children: [
                       // WidgetSpan(
                       //   child: Icon(MdiIcons.album, size: Theme.of(context).textTheme.subtitle1?.fontSize),

@@ -12,6 +12,7 @@ import 'package:flutter/widgets.dart' show WidgetsFlutterBinding;
 import 'package:integer/integer.dart';
 import 'package:mime/mime.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:rxdart/rxdart.dart';
 import 'package:sembast/sembast.dart';
 import 'package:sembast/sembast_io.dart';
 
@@ -23,17 +24,8 @@ abstract class TheIndexer {
   // Isolate main logic
   static final ReceivePort progressReceiver = ReceivePort("The Indexer's Progress Receiver");
   static dynamic _progress;
-  static get progress => _progress ??=
-  progressReceiver.asBroadcastStream(
-    onCancel: (controller) {
-      controller.pause();
-    },
-    onListen: (controller) async {
-      if (controller.isPaused) {
-        controller.resume();
-      }
-    },
-  );
+  static ValueConnectableStream<dynamic> get progress => _progress ??=
+  progressReceiver.publishValue();
 
   //static late final Isolate indexerIsolate;
   
@@ -52,10 +44,18 @@ abstract class TheIndexer {
       }
       return dbPath;
     }();
+    progress; // invoke the getter
     final _cacheDir = await getCacheDirectory();
-    await compute<Map, dynamic>((message) {
-      return _IndexerIsolate(dbPath: message["dbDir"], cacheDir: message["cacheDir"])(message["sendPort"]);
-    }, {"sendPort": progressReceiver.sendPort, "dbDir": _dbPath, "cacheDir": _cacheDir});
+    try {
+      await compute<Map, dynamic>((message) {
+        return _IndexerIsolate(dbPath: message["dbDir"], cacheDir: message["cacheDir"])(message["sendPort"]);
+      }, {"sendPort": progressReceiver.sendPort, "dbDir": _dbPath, "cacheDir": _cacheDir});
+    } catch(e, st) {
+      // ignore: avoid_print
+      print(e);
+      // ignore: avoid_print
+      print(st);
+    }
   }
 }
 
@@ -94,17 +94,21 @@ class _IndexerIsolate {
   /// This makes this class function as a function.
   /// And gee I wonder why I did that.
   Future<void> call(SendPort sendProgressReport) async {
-    if (kDebugMode) {
-      print("This is not complete and may appear to hang");
-      //sendProgressReport.send(const IndexerProgressReport(state: IndexerState.STARTING, max));
-      //await Future.delayed(const Duration(seconds: 5)); // just so I can get to this screen
-    } else {
-      throw UnimplementedError("The Indexer doesn't work yet.");
-    }
+    // if (kDebugMode) {
+    //   print("This is not complete and may appear to hang");
+    //   //sendProgressReport.send(const IndexerProgressReport(state: IndexerState.STARTING, max));
+    //   //await Future.delayed(const Duration(seconds: 5)); // just so I can get to this screen
+    // } else {
+    //   throw UnimplementedError("The Indexer doesn't work yet.");
+    // }
     db = await loadDatabase(boLibraryPath: dbPath);
     sendProgressReport.send(const IndexerProgressReport(state: IndexerState.STARTING, max: 0));
     // == STARTING PHASE == //
-    StoreRef("songs").drop(db);
+    if (preclean) {
+      await songStore.drop(db);
+      await albumStore.drop(db);
+      await artistStore.drop(db);
+    }
     List<File> validFiles = [];
     final List<String> _dbfolders = List.castFrom<dynamic, String>((await configStore.record("libraries").get(db))?.toList() as List<dynamic>? ?? []);
     for (final f in _dbfolders) {
@@ -152,7 +156,7 @@ class _IndexerIsolate {
       ));
       final _matches = await songStore.find(db, finder: Finder(filter: Filter.custom(
         // Find this file in the database.
-        (record) => record.value.uri == file.absolute.uri
+        (record) => record.value.uri == file.absolute.uri.toString()
       )));
       // Skip processing files that have already been processed
       if (_matches.isNotEmpty) continue;
@@ -168,13 +172,21 @@ class _IndexerIsolate {
         }
         if (metaBytes.length >= 10*1000000 /* 10MB */) {
           _metaByteReader.cancel();
-          /* Really I have no idea why you'd need more than 10MB of TAGS in a file... */
-          /* If there is a case I might be able to bump it */
+          /* Really I have no idea why you'd need more than 10MB of TAGS in a file...
+             If there is a case I might be able to bump it */
           metaBytes = metaBytes.take(10*1000000).toList();
           c.complete();
+          /* Trust me though, I did try to figure out when the id3 tags ended
+             so I could get ONLY the tags.
+             I don't want to rely on id3 being only in mp3 form, and I wanted
+             to reduce the amount of data looked at to only the necessary data,
+             so that the library could scan faster.
+          */
         }
         if (_class == "flac") {
           _metaByteReader.cancel();
+          c.complete();
+          metaBytes.clear();
           // the FLAC metadata reader reads the file itself
           // so gathering the bytes for it is not important
         } else if (_class == "id3" && metaBytes.length > 10) {
@@ -247,13 +259,20 @@ class _IndexerIsolate {
           currentFilename: album
         ));
         final _record = AlbumMetadata.fromJson(await albumStore.record(album).get(db));
-        final trackCount = await songStore.count(db, filter: Filter.and([
-          Filter.matches('artistName', _record.artistName),
-          Filter.matches('albumName', _record.name)
-        ]));
-        await albumStore.record(album).put(db, _record.copyWith(
-          trackCount: trackCount
-        ).toJson());
+        //await songStore.find(db, finder: Finder(filter: Filter.matches('albumName', _record.name))); //just re-something-whatever this???
+        final trackCount = await songStore.find(db, finder: Finder(filter: Filter.and([
+          Filter.equals('artistName', _record.artistName),
+          Filter.equals('albumName', _record.name)
+        ])));
+        //print(await songStore.find(db, finder: Finder()));
+        if (trackCount.isNotEmpty) {
+          trackCount.sort((a, b) => (a.value["year"]??0).compareTo(b.value["year"]??0));
+          final year = trackCount.last["year"];
+          await albumStore.record(album).put(db, _record.copyWith(
+            trackCount: trackCount.length,
+            year: (year as num?)?.toInt()
+          ).toJson());
+        }
       }
     }
 
