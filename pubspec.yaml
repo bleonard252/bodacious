@@ -42,9 +42,13 @@ dependencies:
   integer: ^2.0.1
   flac_metadata: #^1.0.4
     git: https://github.com/bleonard252/flac_metadata
-  sembast: ^3.2.0
   mime: ^1.0.1
   #on_audio_query: ^2.6.0 # for finding songs from Android and iOS system libraries
+
+  # Database deps
+  drift: ^1.5.0
+  sqlite3_flutter_libs: ^0.5.0
+  path: ^1.8.1
 
 dev_dependencies:
   flutter_test:
@@ -54,6 +58,7 @@ dev_dependencies:
   json_serializable: ^6.1.5
   flutter_launcher_icons: ^0.9.2
   flutter_app_name: ^0.1.1
+  drift_dev: ^1.5.2
 
   # See `analysis_options.yaml`
   flutter_lints: ^1.0.0

@@ -13,8 +13,6 @@ import 'package:integer/integer.dart';
 import 'package:mime/mime.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:rxdart/rxdart.dart';
-import 'package:sembast/sembast.dart';
-import 'package:sembast/sembast_io.dart';
 
 import '../../models/artist_data.dart';
 import '../../models/track_data.dart';
