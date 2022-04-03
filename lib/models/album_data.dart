@@ -1,3 +1,5 @@
+import 'package:bodacious/drift/database.dart';
+import 'package:drift/drift.dart' hide JsonKey;
 import 'package:flutter/foundation.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
@@ -6,7 +8,8 @@ part 'album_data.g.dart';
 
 
 @freezed
-class AlbumMetadata with _$AlbumMetadata {
+class AlbumMetadata with _$AlbumMetadata implements Insertable<AlbumMetadata> {
+  const AlbumMetadata._();
   const factory AlbumMetadata({
     /// The artist's name, used to group this album and make it unique.
     required String artistName,
@@ -23,4 +26,16 @@ class AlbumMetadata with _$AlbumMetadata {
   }) = _AlbumMetadata;
 
   factory AlbumMetadata.fromJson(Map<String, dynamic> json) => _$AlbumMetadataFromJson(json);
+  
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    return AlbumTableCompanion(
+      artistName: Value(artistName),
+      name: Value(name),
+      coverUri: Value(coverUri),
+      trackCount: Value(trackCount),
+      year: Value(year),
+      releaseDate: Value(releaseDate)
+    ).toColumns(nullToAbsent);
+  }
 }

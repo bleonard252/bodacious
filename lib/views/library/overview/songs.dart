@@ -1,17 +1,10 @@
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:bodacious/main.dart';
 import 'package:bodacious/models/track_data.dart';
-import 'package:bodacious/src/library/indexer.dart';
-import 'package:bodacious/src/library/init_db.dart';
-import 'package:file_picker/file_picker.dart';
-import 'package:flutter/foundation.dart';
+import 'package:drift/drift.dart';
 import "package:flutter/material.dart";
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
-import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
-import 'package:sembast/sembast.dart';
 
 import '../../../widgets/cover_placeholder.dart';
 
@@ -23,14 +16,20 @@ class SongLibraryList extends ConsumerWidget {
     return StreamBuilder<void>(
       builder: (context, snapshot) {
         return FutureBuilder<int>(
-          future: songStore.count(db),
+          future: (db.selectOnly(db.trackTable)..addColumns([db.trackTable.title])).get().then((value) => value.length),
           builder: (context, snapshot) {
             if (snapshot.connectionState != ConnectionState.done) return Container();
             return ListView.builder(
-              itemBuilder: (context, index) => FutureBuilder<Map<String, dynamic>?>(
-                future: songStore.findFirst(db, finder: Finder(offset: index, limit: 1, sortOrders: [SortOrder('title')])).then((value) => value?.value),
+              itemBuilder: (context, index) => FutureBuilder<TrackMetadata>(
+                future: (
+                  db.select(db.trackTable)
+                  ..orderBy([
+                    (tbl) => OrderingTerm.asc(tbl.title)
+                  ])
+                  ..limit(1, offset: index)
+                ).getSingle(),
                 builder: (context, snapshot) {
-                  final track = TrackMetadata.fromJson(snapshot.data ?? {"uri": ""});
+                  final track = snapshot.data ?? TrackMetadata(uri: Uri(), title: "Loading...");
                   return SizedBox(
                     height: 72.0,
                     child: ListTile(

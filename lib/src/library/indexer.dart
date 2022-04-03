@@ -3,11 +3,14 @@ import 'dart:io';
 import 'dart:isolate';
 import 'dart:typed_data';
 
+import 'package:bodacious/drift/track_data.dart';
+import 'package:bodacious/main.dart';
 import 'package:bodacious/models/album_data.dart';
 import 'package:bodacious/src/config.dart';
 import 'package:bodacious/src/library/cache_dir.dart';
-import 'package:bodacious/src/library/init_db.dart';
 import 'package:bodacious/src/metadata/id3.dart';
+import 'package:drift/drift.dart';
+import 'package:drift/native.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart' show WidgetsFlutterBinding;
 import 'package:integer/integer.dart';
@@ -34,22 +37,22 @@ abstract class TheIndexer {
     final _dbPath = await () async {
       late final String dbPath;
       try {
-        dbPath = (await getLibraryDirectory()).absolute.path+"/_boLibrary";
+        dbPath = (await getLibraryDirectory()).absolute.path+"/_boLibrary.sqlite";
       } catch(_) {
         try {
-          dbPath = (await getApplicationSupportDirectory()).absolute.path+"/_boLibrary";
+          dbPath = (await getApplicationSupportDirectory()).absolute.path+"/_boLibrary.sqlite";
         } catch(_) {
-          dbPath = (await getApplicationDocumentsDirectory()).absolute.path+"/_boLibrary";
+          dbPath = (await getApplicationDocumentsDirectory()).absolute.path+"/_boLibrary.sqlite";
         }
       }
       return dbPath;
     }();
-    progress; // invoke the getter
+    progress.connect(); // invoke the getter
     final _cacheDir = await getCacheDirectory();
     try {
       await compute<Map, dynamic>((message) {
-        return _IndexerIsolate(dbPath: message["dbDir"], cacheDir: message["cacheDir"])(message["sendPort"]);
-      }, {"sendPort": progressReceiver.sendPort, "dbDir": _dbPath, "cacheDir": _cacheDir});
+        return _IndexerIsolate(dbPath: message["dbDir"], cacheDir: message["cacheDir"], config: message["config"])(message["sendPort"]);
+      }, {"sendPort": progressReceiver.sendPort, "dbDir": _dbPath, "cacheDir": _cacheDir, "config": ROConfig(config)});
     } catch(e, st) {
       // ignore: avoid_print
       print(e);
@@ -77,15 +80,13 @@ class _IndexerIsolate {
     this.preclean = false,
     this.fetch = false,
     this.scanOnlyPath,
+    required this.config,
     required this.dbPath,
     required this.cacheDir
   });
 
   late final BoDatabase db;
-  late final ROConfig config;
-  final artistStore = StoreRef<String, dynamic>("artists");
-  final albumStore = StoreRef<String, dynamic>("albums");
-  final songStore = StoreRef<String, dynamic>("songs");
+  final ROConfig config;
 
   final List<String> newArtists = [];
   final List<String> newAlbums = [];
@@ -100,13 +101,14 @@ class _IndexerIsolate {
     // } else {
     //   throw UnimplementedError("The Indexer doesn't work yet.");
     // }
-    db = await loadDatabase(boLibraryPath: dbPath);
+    db = BoDatabase.connect(DatabaseConnection.fromExecutor(NativeDatabase(File(dbPath))));
     sendProgressReport.send(const IndexerProgressReport(state: IndexerState.STARTING, max: 0));
     // == STARTING PHASE == //
     if (preclean) {
-      await songStore.drop(db);
-      await albumStore.drop(db);
-      await artistStore.drop(db);
+      throw UnimplementedError("Pre-clean is not currently supported");
+      // await db.delete();
+      // await albumStore.drop(db);
+      // await artistStore.drop(db);
     }
     List<File> validFiles = [];
     final List<String> _dbfolders = List.castFrom<dynamic, String>(config.libraries);
@@ -153,15 +155,19 @@ class _IndexerIsolate {
         value: validFiles.indexOf(file),
         currentFilename: file.uri.pathSegments.last
       ));
-      final _matches = await songStore.find(db, finder: Finder(filter: Filter.custom(
-        // Find this file in the database.
-        (record) => record.value.uri == file.absolute.uri.toString()
-      )));
+      // final _matches = await songStore.find(db, finder: Finder(filter: Filter.custom(
+      //   // Find this file in the database.
+      //   (record) => record.value.uri == file.absolute.uri.toString()
+      // )));
+      final _matches = await (
+        db.select(db.trackTable)
+        ..where((tbl) => tbl.uri.equalsValue(file.absolute.uri))
+      ).get();
       // Skip processing files that have already been processed
       if (_matches.isNotEmpty) continue;
       var metaBytes = <int>[], _class = "none";
       final _metaByteReader = file.openRead().listen(null);
-      double? targetLength;
+      //double? targetLength;
       final c = Completer();
       _metaByteReader.onData((data) {
         metaBytes.addAll(data);
@@ -212,10 +218,10 @@ class _IndexerIsolate {
         }
       });
       _metaByteReader.onDone(() {c.complete();});
-      _metaByteReader.onError((_) {c.complete();});
+      _metaByteReader.onError((_) {_metaByteReader.cancel().then((_)=>c.complete());});
       await Future.any([c.future, _metaByteReader.asFuture()]);
 
-      final _mseFile = File(file.path.replaceFirst(fileExtensionRegex, ".mse"));
+      //final _mseFile = File(file.path.replaceFirst(fileExtensionRegex, ".mse"));
       // final _mse = (await _mseFile.exists()) ? await parseMseFile(_mseFile.openRead()) : null;
       final TrackMetadata? _id3 = (/* _mse == null && */ _class == "id3" || _class == "flac") ? await loadID3FromBytes(metaBytes, file, cacheDir: cacheDir) : null;
       final TrackMetadata? _ctxmeta = (/* _mse == null && */ _id3 == null) ? inferMetadataFromContext(file.absolute.uri)
@@ -223,12 +229,11 @@ class _IndexerIsolate {
       final TrackMetadata record = (/*_mse ??*/ _id3 ?? _ctxmeta ?? TrackMetadata.empty()).copyWith(
         uri: file.absolute.uri
       );
-      final tr_rec = songStore.record(record.artistName?.isEmpty != false || record.title?.isEmpty != false
+      final tr_rec = record.artistName?.isEmpty != false || record.title?.isEmpty != false
         ? file.uri.pathSegments.last
-        : record.artistName! +" - "+ record.title!
-      );
-      //if (!await tr_rec.exists(db))
-      await tr_rec.put(db, record.toJson());
+        : record.artistName! +" - "+ record.title!;
+      //await tr_rec.put(db, record.toJson());
+      db.into(db.trackTable).insert(record);
       await registerAlbumMetadata(record);
       await registerArtistMetadata(record);
     }
@@ -241,12 +246,21 @@ class _IndexerIsolate {
           value: newArtists.indexOf(artist),
           currentFilename: artist
         ));
-        final albumCount = await albumStore.count(db, filter: Filter.matches('artistName', artist));
-        final trackCount = await songStore.count(db, filter: Filter.matches('artistName', artist));
-        await artistStore.record(artist).put(db, {
-          "trackCount": trackCount,
-          "albumCount": albumCount
-        }, merge: true);
+        final albumCount = (await (
+          db.selectOnly(db.albumTable)
+          ..where(db.albumTable.artistName.equals(artist))
+         ).get()).length;
+        final trackCount = (await (
+          db.selectOnly(db.trackTable)
+          ..where(db.trackTable.artistName.equals(artist))
+         ).get()).length;
+        await (
+          db.artistTable.update()
+          ..where((tbl) => tbl.name.equals(artist))
+        ).write(ArtistTableCompanion(
+          trackCount: Value(trackCount),
+          albumCount: Value(albumCount)
+        ));
       }
     }
     if (newAlbums.isNotEmpty) {
@@ -257,20 +271,28 @@ class _IndexerIsolate {
           value: newAlbums.indexOf(album),
           currentFilename: album
         ));
-        final _record = AlbumMetadata.fromJson(await albumStore.record(album).get(db));
+        final _album = album.split(" - ");
         //await songStore.find(db, finder: Finder(filter: Filter.matches('albumName', _record.name))); //just re-something-whatever this???
-        final trackCount = await songStore.find(db, finder: Finder(filter: Filter.and([
-          Filter.equals('artistName', _record.artistName),
-          Filter.equals('albumName', _record.name)
-        ])));
+        // final trackCount = await songStore.find(db, finder: Finder(filter: Filter.and([
+        //   Filter.equals('artistName', _record.artistName),
+        //   Filter.equals('albumName', _record.name)
+        // ])));
+        final trackCount = (await (
+          db.selectOnly(db.trackTable)
+          ..addColumns([db.trackTable.year])
+          ..where(db.trackTable.artistName.equals(_album[0]) & db.trackTable.albumName.equals(_album[1]))
+         ).get());
         //print(await songStore.find(db, finder: Finder()));
-        if (trackCount.isNotEmpty) {
-          trackCount.sort((a, b) => (a.value["year"]??0).compareTo(b.value["year"]??0));
-          final year = trackCount.last["year"];
-          await albumStore.record(album).put(db, _record.copyWith(
-            trackCount: trackCount.length,
-            year: (year as num?)?.toInt()
-          ).toJson());
+        if (trackCount.isEmpty) {
+          trackCount.sort((a, b) => (a.read(db.trackTable.year)?.compareTo(b.read(db.trackTable.year)??0)??0));
+          final year = trackCount.last.read(db.trackTable.year);
+          await (
+            db.albumTable.update()
+            ..where((tbl) => tbl.name.equals(_album[1]) & tbl.artistName.equals(_album[0]))
+          ).write(AlbumTableCompanion(
+            trackCount: Value(trackCount.length),
+            year: Value(year)
+          ));
         }
       }
     }
@@ -290,26 +312,27 @@ class _IndexerIsolate {
 
   Future<void> registerAlbumMetadata(TrackMetadata track) async {
     if (track.artistName == null || track.albumName == null) return;
-    final record = albumStore.record(track.artistName!+" - "+track.albumName!);
-    if (newArtists.contains(record.key) || await record.exists(db)) return;
-    newAlbums.add(record.key);
+    final record = await db.tryGetAlbum(track.albumName!, by: track.albumName!);
+    if (newArtists.contains(track.artistName!+" - "+track.albumName!) || record != null) return;
+    newAlbums.add(track.artistName!+" - "+track.albumName!);
     var _record = AlbumMetadata(
       artistName: track.artistName!,
       name: track.albumName!,
       coverUri: track.coverUri
     );
-    await record.put(db, _record.toJson());
+    await db.albumTable.insert().insert(_record);
   }
 
   Future<void> registerArtistMetadata(TrackMetadata track) async {
     if (track.artistName == null) return;
-    final record = artistStore.record(track.artistName!);
-    if (newArtists.contains(record.key) || await record.exists(db)) return;
-    newArtists.add(record.key);
+    //final record = artistStore.record(track.artistName!);
+    final record = await db.tryGetArtist(track.albumName!);
+    if (newArtists.contains(track.albumName!) || record != null) return;
+    newArtists.add(track.albumName!);
     var _record = ArtistMetadata(
       name: track.artistName!
     );
-    await record.put(db, _record.toJson());
+    await db.artistTable.insert().insert(_record);
   }
 
 }

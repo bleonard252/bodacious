@@ -12,17 +12,23 @@ class AlbumTableCompanion extends UpdateCompanion<AlbumMetadata> {
   final Value<String> artistName;
   final Value<Uri?> coverUri;
   final Value<int?> trackCount;
+  final Value<int?> year;
+  final Value<DateTime?> releaseDate;
   const AlbumTableCompanion({
     this.name = const Value.absent(),
     this.artistName = const Value.absent(),
     this.coverUri = const Value.absent(),
     this.trackCount = const Value.absent(),
+    this.year = const Value.absent(),
+    this.releaseDate = const Value.absent(),
   });
   AlbumTableCompanion.insert({
     required String name,
     required String artistName,
     this.coverUri = const Value.absent(),
     this.trackCount = const Value.absent(),
+    this.year = const Value.absent(),
+    this.releaseDate = const Value.absent(),
   })  : name = Value(name),
         artistName = Value(artistName);
   static Insertable<AlbumMetadata> custom({
@@ -30,12 +36,16 @@ class AlbumTableCompanion extends UpdateCompanion<AlbumMetadata> {
     Expression<String>? artistName,
     Expression<Uri?>? coverUri,
     Expression<int?>? trackCount,
+    Expression<int?>? year,
+    Expression<DateTime?>? releaseDate,
   }) {
     return RawValuesInsertable({
       if (name != null) 'name': name,
       if (artistName != null) 'artist_name': artistName,
       if (coverUri != null) 'cover_uri': coverUri,
       if (trackCount != null) 'track_count': trackCount,
+      if (year != null) 'year': year,
+      if (releaseDate != null) 'release_date': releaseDate,
     });
   }
 
@@ -43,12 +53,16 @@ class AlbumTableCompanion extends UpdateCompanion<AlbumMetadata> {
       {Value<String>? name,
       Value<String>? artistName,
       Value<Uri?>? coverUri,
-      Value<int?>? trackCount}) {
+      Value<int?>? trackCount,
+      Value<int?>? year,
+      Value<DateTime?>? releaseDate}) {
     return AlbumTableCompanion(
       name: name ?? this.name,
       artistName: artistName ?? this.artistName,
       coverUri: coverUri ?? this.coverUri,
       trackCount: trackCount ?? this.trackCount,
+      year: year ?? this.year,
+      releaseDate: releaseDate ?? this.releaseDate,
     );
   }
 
@@ -68,6 +82,12 @@ class AlbumTableCompanion extends UpdateCompanion<AlbumMetadata> {
     if (trackCount.present) {
       map['track_count'] = Variable<int?>(trackCount.value);
     }
+    if (year.present) {
+      map['year'] = Variable<int?>(year.value);
+    }
+    if (releaseDate.present) {
+      map['release_date'] = Variable<DateTime?>(releaseDate.value);
+    }
     return map;
   }
 
@@ -77,7 +97,9 @@ class AlbumTableCompanion extends UpdateCompanion<AlbumMetadata> {
           ..write('name: $name, ')
           ..write('artistName: $artistName, ')
           ..write('coverUri: $coverUri, ')
-          ..write('trackCount: $trackCount')
+          ..write('trackCount: $trackCount, ')
+          ..write('year: $year, ')
+          ..write('releaseDate: $releaseDate')
           ..write(')'))
         .toString();
   }
@@ -110,9 +132,20 @@ class $AlbumTableTable extends AlbumTable
   late final GeneratedColumn<int?> trackCount = GeneratedColumn<int?>(
       'track_count', aliasedName, true,
       type: const IntType(), requiredDuringInsert: false);
+  final VerificationMeta _yearMeta = const VerificationMeta('year');
+  @override
+  late final GeneratedColumn<int?> year = GeneratedColumn<int?>(
+      'year', aliasedName, true,
+      type: const IntType(), requiredDuringInsert: false);
+  final VerificationMeta _releaseDateMeta =
+      const VerificationMeta('releaseDate');
+  @override
+  late final GeneratedColumn<DateTime?> releaseDate =
+      GeneratedColumn<DateTime?>('release_date', aliasedName, true,
+          type: const IntType(), requiredDuringInsert: false);
   @override
   List<GeneratedColumn> get $columns =>
-      [name, artistName, coverUri, trackCount];
+      [name, artistName, coverUri, trackCount, year, releaseDate];
   @override
   String get aliasedName => _alias ?? 'album_table';
   @override
@@ -143,6 +176,16 @@ class $AlbumTableTable extends AlbumTable
           trackCount.isAcceptableOrUnknown(
               data['track_count']!, _trackCountMeta));
     }
+    if (data.containsKey('year')) {
+      context.handle(
+          _yearMeta, year.isAcceptableOrUnknown(data['year']!, _yearMeta));
+    }
+    if (data.containsKey('release_date')) {
+      context.handle(
+          _releaseDateMeta,
+          releaseDate.isAcceptableOrUnknown(
+              data['release_date']!, _releaseDateMeta));
+    }
     return context;
   }
 
@@ -160,6 +203,10 @@ class $AlbumTableTable extends AlbumTable
           .mapFromDatabaseResponse(data['${effectivePrefix}cover_uri'])),
       trackCount: const IntType()
           .mapFromDatabaseResponse(data['${effectivePrefix}track_count']),
+      year: const IntType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}year']),
+      releaseDate: const DateTimeType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}release_date']),
     );
   }
 
@@ -175,34 +222,43 @@ class ArtistTableCompanion extends UpdateCompanion<ArtistMetadata> {
   final Value<String> name;
   final Value<Uri?> coverUri;
   final Value<int?> trackCount;
+  final Value<int?> albumCount;
   const ArtistTableCompanion({
     this.name = const Value.absent(),
     this.coverUri = const Value.absent(),
     this.trackCount = const Value.absent(),
+    this.albumCount = const Value.absent(),
   });
   ArtistTableCompanion.insert({
     required String name,
     this.coverUri = const Value.absent(),
     this.trackCount = const Value.absent(),
+    this.albumCount = const Value.absent(),
   }) : name = Value(name);
   static Insertable<ArtistMetadata> custom({
     Expression<String>? name,
     Expression<Uri?>? coverUri,
     Expression<int?>? trackCount,
+    Expression<int?>? albumCount,
   }) {
     return RawValuesInsertable({
       if (name != null) 'name': name,
       if (coverUri != null) 'cover_uri': coverUri,
       if (trackCount != null) 'track_count': trackCount,
+      if (albumCount != null) 'album_count': albumCount,
     });
   }
 
   ArtistTableCompanion copyWith(
-      {Value<String>? name, Value<Uri?>? coverUri, Value<int?>? trackCount}) {
+      {Value<String>? name,
+      Value<Uri?>? coverUri,
+      Value<int?>? trackCount,
+      Value<int?>? albumCount}) {
     return ArtistTableCompanion(
       name: name ?? this.name,
       coverUri: coverUri ?? this.coverUri,
       trackCount: trackCount ?? this.trackCount,
+      albumCount: albumCount ?? this.albumCount,
     );
   }
 
@@ -219,6 +275,9 @@ class ArtistTableCompanion extends UpdateCompanion<ArtistMetadata> {
     if (trackCount.present) {
       map['track_count'] = Variable<int?>(trackCount.value);
     }
+    if (albumCount.present) {
+      map['album_count'] = Variable<int?>(albumCount.value);
+    }
     return map;
   }
 
@@ -227,7 +286,8 @@ class ArtistTableCompanion extends UpdateCompanion<ArtistMetadata> {
     return (StringBuffer('ArtistTableCompanion(')
           ..write('name: $name, ')
           ..write('coverUri: $coverUri, ')
-          ..write('trackCount: $trackCount')
+          ..write('trackCount: $trackCount, ')
+          ..write('albumCount: $albumCount')
           ..write(')'))
         .toString();
   }
@@ -255,8 +315,14 @@ class $ArtistTableTable extends ArtistTable
   late final GeneratedColumn<int?> trackCount = GeneratedColumn<int?>(
       'track_count', aliasedName, true,
       type: const IntType(), requiredDuringInsert: false);
+  final VerificationMeta _albumCountMeta = const VerificationMeta('albumCount');
   @override
-  List<GeneratedColumn> get $columns => [name, coverUri, trackCount];
+  late final GeneratedColumn<int?> albumCount = GeneratedColumn<int?>(
+      'album_count', aliasedName, true,
+      type: const IntType(), requiredDuringInsert: false);
+  @override
+  List<GeneratedColumn> get $columns =>
+      [name, coverUri, trackCount, albumCount];
   @override
   String get aliasedName => _alias ?? 'artist_table';
   @override
@@ -279,6 +345,12 @@ class $ArtistTableTable extends ArtistTable
           trackCount.isAcceptableOrUnknown(
               data['track_count']!, _trackCountMeta));
     }
+    if (data.containsKey('album_count')) {
+      context.handle(
+          _albumCountMeta,
+          albumCount.isAcceptableOrUnknown(
+              data['album_count']!, _albumCountMeta));
+    }
     return context;
   }
 
@@ -292,6 +364,8 @@ class $ArtistTableTable extends ArtistTable
           .mapFromDatabaseResponse(data['${effectivePrefix}name'])!,
       coverUri: $ArtistTableTable.$converter0.mapToDart(const StringType()
           .mapFromDatabaseResponse(data['${effectivePrefix}cover_uri'])),
+      albumCount: const IntType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}album_count']),
       trackCount: const IntType()
           .mapFromDatabaseResponse(data['${effectivePrefix}track_count']),
     );

@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:audio_service/audio_service.dart';
 import 'package:bodacious/drift/database.dart';
 import 'package:bodacious/main.dart';
-import 'package:bodacious/src/library/init_db.dart';
 import 'package:dart_vlc/dart_vlc.dart' as vlc;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
@@ -31,7 +30,7 @@ abstract class BodaciousAudioHandler extends BaseAudioHandler with SeekHandler {
   Future<BodaciousMediaItem?> getMediaItem(String mediaId) async {
     try {
       
-      return TrackMetadata.fromJson((await songStore.findFirst(db, finder: Finder(filter: Filter.equals('uri', Uri.file(mediaId)))))!.value).asMediaItem();
+      return (await db.tryGetTrackFromUri(Uri.file(mediaId)))?.asMediaItem();
     } catch(e) {
       return null;
     }
@@ -137,9 +136,7 @@ class VlcAudioHandler extends BodaciousAudioHandler {
         shuffleMode: _shuffling ? AudioServiceShuffleMode.all : AudioServiceShuffleMode.none,
       ));
       if (player.current.media is vlc.Playlist) {
-        queue.add(await Future.wait((player.current.media as vlc.Playlist).medias.map((e) async => TrackMetadata.fromJson((await songStore.findFirst(db, finder: Finder(filter: Filter.and([
-          Filter.equals('uri', Uri.file(e.resource))
-        ]))))?.value).asMediaItem())));
+        queue.add(await Future.wait((player.current.media as vlc.Playlist).medias.map((e) async => (await db.tryGetTrackFromUri(Uri.file(e.resource)))!.asMediaItem())));
       }
     } else if (event is vlc.PositionState) {
       if (event.position != null) {

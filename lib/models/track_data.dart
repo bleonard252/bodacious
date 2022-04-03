@@ -1,7 +1,9 @@
 import 'dart:io';
 
 import 'package:audio_service/audio_service.dart';
+import 'package:bodacious/drift/database.dart';
 import 'package:dart_vlc/dart_vlc.dart';
+import 'package:drift/drift.dart' hide JsonKey;
 import 'package:flutter/foundation.dart';
 
 import 'dart:ui' show ImageDescriptor;
@@ -13,7 +15,7 @@ part 'track_data.freezed.dart';
 part 'track_data.g.dart';
 
 @freezed
-class TrackMetadata with _$TrackMetadata {
+class TrackMetadata with _$TrackMetadata implements Insertable<TrackMetadata> {
   const TrackMetadata._();
   factory TrackMetadata.empty() => TrackMetadata(uri: Uri());
   const factory TrackMetadata({
@@ -49,6 +51,22 @@ class TrackMetadata with _$TrackMetadata {
   BodaciousMediaItem asMediaItem() => BodaciousMediaItem(this);
   BodaciousAudioSource asAudioSource() => BodaciousAudioSource(this);
   BodaciousVlcMedia asVlcMedia() => BodaciousVlcMedia(this);
+  
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    return TrackTableCompanion(
+      title: Value(title),
+      artistName: Value(artistName),
+      albumName: Value(albumName),
+      trackNo: Value.ofNullable(trackNo),
+      discNo: Value.ofNullable(discNo),
+      coverUri: Value(coverUri),
+      duration: Value(duration),
+      releaseDate: Value(releaseDate),
+      uri: Value(uri),
+      year: Value(year)
+    ).toColumns(nullToAbsent);
+  }
 }
 
 class BodaciousAudioSource extends UriAudioSource {

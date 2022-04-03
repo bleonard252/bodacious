@@ -1,12 +1,14 @@
+import 'package:bodacious/drift/database.dart';
+import 'package:drift/drift.dart' hide JsonKey;
 import 'package:flutter/foundation.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'artist_data.freezed.dart';
 part 'artist_data.g.dart';
 
-
 @freezed
-class ArtistMetadata with _$ArtistMetadata {
+class ArtistMetadata with _$ArtistMetadata implements Insertable<ArtistMetadata> {
+  const ArtistMetadata._();
   const factory ArtistMetadata({
     /// The artist's name.
     required String name,
@@ -19,4 +21,14 @@ class ArtistMetadata with _$ArtistMetadata {
   }) = _ArtistMetadata;
 
   factory ArtistMetadata.fromJson(Map<String, dynamic> json) => _$ArtistMetadataFromJson(json);
+  
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    return ArtistTableCompanion(
+      name: Value(name),
+      coverUri: Value(coverUri),
+      albumCount: Value(albumCount),
+      trackCount: Value(trackCount)
+    ).toColumns(nullToAbsent);
+  }
 }

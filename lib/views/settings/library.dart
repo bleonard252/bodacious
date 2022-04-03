@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:bodacious/main.dart';
-import 'package:bodacious/src/library/init_db.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import "package:flutter/material.dart";
@@ -66,12 +65,12 @@ class _LibrarySettingsViewState extends State<LibrarySettingsView> {
               );
               if (library?.isNotEmpty != true) return;
               libraryDirs.add(library!);
-              config.libraries = libraryDirs;
+              await config.setLibraries(libraryDirs);
               setState(() {});
             },
           )
         ],
-      );
+      )
     );
   }
 }

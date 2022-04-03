@@ -201,14 +201,15 @@ class __$AlbumMetadataCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$_AlbumMetadata with DiagnosticableTreeMixin implements _AlbumMetadata {
+class _$_AlbumMetadata extends _AlbumMetadata with DiagnosticableTreeMixin {
   const _$_AlbumMetadata(
       {required this.artistName,
       required this.name,
       this.coverUri,
       this.trackCount,
       this.year,
-      this.releaseDate});
+      this.releaseDate})
+      : super._();
 
   factory _$_AlbumMetadata.fromJson(Map<String, dynamic> json) =>
       _$$_AlbumMetadataFromJson(json);
@@ -293,7 +294,7 @@ class _$_AlbumMetadata with DiagnosticableTreeMixin implements _AlbumMetadata {
   }
 }
 
-abstract class _AlbumMetadata implements AlbumMetadata {
+abstract class _AlbumMetadata extends AlbumMetadata {
   const factory _AlbumMetadata(
       {required String artistName,
       required String name,
@@ -301,6 +302,7 @@ abstract class _AlbumMetadata implements AlbumMetadata {
       int? trackCount,
       int? year,
       DateTime? releaseDate}) = _$_AlbumMetadata;
+  const _AlbumMetadata._() : super._();
 
   factory _AlbumMetadata.fromJson(Map<String, dynamic> json) =
       _$_AlbumMetadata.fromJson;

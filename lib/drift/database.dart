@@ -3,6 +3,9 @@ import 'dart:io';
 import 'package:bodacious/drift/album_data.dart';
 import 'package:bodacious/drift/artist_data.dart';
 import 'package:bodacious/drift/track_data.dart';
+import 'package:bodacious/models/album_data.dart';
+import 'package:bodacious/models/artist_data.dart';
+import 'package:bodacious/models/track_data.dart';
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:path_provider/path_provider.dart';
@@ -20,6 +23,25 @@ class BoDatabase extends _$BoDatabase {
   // you should bump this number whenever you change or add a table definition
   @override
   int get schemaVersion => 1;
+
+  Future<TrackMetadata?> tryGetTrackFromUri(Uri uri) {
+    return (
+      select(trackTable)
+      ..where((tbl) => tbl.uri.equalsValue(uri))
+    ).getSingleOrNull();
+  }
+  Future<ArtistMetadata?> tryGetArtist(String artistName) {
+    return (
+      select(artistTable)
+      ..where((tbl) => tbl.name.equals(artistName))
+    ).getSingleOrNull();
+  }
+  Future<AlbumMetadata?> tryGetAlbum(String albumName, {required String by}) {
+    return (
+      select(albumTable)
+      ..where((tbl) => tbl.name.equals(albumName) & tbl.artistName.equals(by))
+    ).getSingleOrNull();
+  }
 }
 
 LazyDatabase _openConnection() {

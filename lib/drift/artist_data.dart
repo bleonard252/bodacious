@@ -9,4 +9,5 @@ class ArtistTable extends Table {
   TextColumn get name => text()();
   TextColumn get coverUri => text().map(UriConverter()).nullable()();
   IntColumn get trackCount => integer().nullable()();
+  IntColumn get albumCount => integer().nullable()();
 }

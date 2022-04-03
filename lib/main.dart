@@ -1,4 +1,5 @@
 
+import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
 
@@ -7,7 +8,6 @@ import 'package:bodacious/drift/database.dart';
 import 'package:bodacious/models/track_data.dart';
 import 'package:bodacious/src/config.dart';
 import 'package:bodacious/src/library/indexer.dart';
-import 'package:bodacious/src/library/init_db.dart';
 import 'package:bodacious/src/media/audio_service.dart';
 import 'package:bodacious/src/metadata/provider.dart';
 import 'package:bodacious/src/navigate_observer.dart';
@@ -98,13 +98,7 @@ void main() async {
     }
   });
 
-  // TheIndexer.spawn().then((_) async {
-  //   //await db.close();
-  //   db = await loadDatabase();
-  //   if (kDebugMode) {
-  //     print("Database reloaded");
-  //   }
-  // });
+  unawaited(TheIndexer.spawn());
 
   // doWhenWindowReady(() {
   //   const initialSize = Size(600, 450);

@@ -10,4 +10,6 @@ class AlbumTable extends Table {
   TextColumn get artistName => text()();
   TextColumn get coverUri => text().map(UriConverter()).nullable()();
   IntColumn get trackCount => integer().nullable()();
+  IntColumn get year => integer().nullable()();
+  DateTimeColumn get releaseDate => dateTime().nullable()();
 }

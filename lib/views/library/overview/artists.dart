@@ -4,11 +4,9 @@ import 'dart:io';
 import 'package:bodacious/main.dart';
 import 'package:bodacious/models/album_data.dart';
 import 'package:bodacious/models/artist_data.dart';
-import 'package:bodacious/src/library/init_db.dart';
+import 'package:drift/drift.dart';
 import "package:flutter/material.dart";
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
-import 'package:sembast/sembast.dart';
 
 import '../../../widgets/cover_placeholder.dart';
 
@@ -20,25 +18,42 @@ class ArtistLibraryList extends ConsumerWidget {
     return StreamBuilder<void>(
       builder: (context, snapshot) {
         return FutureBuilder<int>(
-          future: artistStore.count(db),
+          future: db.selectOnly(db.artistTable).get().then((value) => value.length),
           builder: (context, snapshot) {
             if (snapshot.connectionState != ConnectionState.done) return Container();
             return ListView.builder(
-              itemBuilder: (context, index) => FutureBuilder<Map<String, dynamic>?>(
-                future: artistStore.findFirst(db, finder: Finder(offset: index, limit: 1, sortOrders: [SortOrder('name')])).then((value) => value?.value),
+              itemBuilder: (context, index) => FutureBuilder<ArtistMetadata>(
+                future: (
+                  db.select(db.artistTable)
+                  ..orderBy([
+                    (tbl) => OrderingTerm.asc(tbl.name)
+                  ])
+                  ..limit(1, offset: index)
+                ).getSingle(),
                 builder: (context, snapshot) {
-                  final artist = ArtistMetadata.fromJson(snapshot.data ?? {"name": "Unknown artist"});
+                  final artist = snapshot.data ?? const ArtistMetadata(name: "Loading...");
                   return ListTile(
-                    leading: ClipOval(child: FutureBuilder(
-                      future: albumStore.findFirst(db, finder: Finder(
-                        filter: Filter.matches('artistName', artist.name),
-                        sortOrders: [SortOrder('releaseDate', false), SortOrder('year', false)]
-                      )),
+                    leading: ClipOval(child: FutureBuilder<TypedResult?>(
+                      future: (
+                        db.selectOnly(db.albumTable)
+                        ..where(db.albumTable.artistName.equals(artist.name))
+                        ..orderBy([
+                          OrderingTerm.desc(db.albumTable.releaseDate),
+                          OrderingTerm.desc(db.albumTable.year),
+                        ])
+                        ..limit(1)
+                        ..addColumns([db.albumTable.coverUri])
+                      ).getSingleOrNull(),
+                      // albumStore.findFirst(db, finder: Finder(
+                      //   filter: Filter.matches('artistName', artist.name),
+                      //   sortOrders: [SortOrder('releaseDate', false), SortOrder('year', false)]
+                      // )),
                       builder: (context, snapshot) {
-                        final album = AlbumMetadata.fromJson((snapshot.data as dynamic)?.value ?? {"name": "Unknown album", "artistName": "Unknown artist"});
-                        return album.coverUri?.scheme == "file" ? Image(
-                          image: (album.coverUri?.scheme == "file" ? FileImage(File.fromUri(album.coverUri!))
-                            : NetworkImage(album.coverUri.toString())) as ImageProvider,
+                        //final album = AlbumMetadata.fromJson((snapshot.data as dynamic)?.value ?? {"name": "Unknown album", "artistName": "Unknown artist"});
+                        final coverUri = snapshot.data?.read<Uri>(db.albumTable.coverUri.dartCast());
+                        return coverUri?.scheme == "file" ? Image(
+                          image: (coverUri?.scheme == "file" ? FileImage(File.fromUri(coverUri!))
+                            : NetworkImage(coverUri.toString())) as ImageProvider,
                           width: 48,
                           height: 48,
                           fit: BoxFit.cover,

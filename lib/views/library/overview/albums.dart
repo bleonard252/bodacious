@@ -2,11 +2,10 @@ import 'dart:io';
 
 import 'package:bodacious/main.dart';
 import 'package:bodacious/models/album_data.dart';
-import 'package:bodacious/src/library/init_db.dart';
+import 'package:drift/drift.dart';
 import "package:flutter/material.dart";
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
-import 'package:sembast/sembast.dart';
 
 import '../../../widgets/cover_placeholder.dart';
 
@@ -16,16 +15,24 @@ class AlbumLibraryList extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return StreamBuilder<void>(
-      builder: (context, snapshot) {
+      stream: db.select(db.albumTable).watch(),
+      builder: (context, _) {
         return FutureBuilder<int>(
-          future: albumStore.count(db),
+          future: (db.selectOnly(db.albumTable)..addColumns([db.albumTable.name])).get().then((value) => value.length),
           builder: (context, snapshot) {
             if (snapshot.connectionState != ConnectionState.done) return Container();
             return ListView.builder(
-              itemBuilder: (context, index) => FutureBuilder<Map<String, dynamic>?>(
-                future: albumStore.findFirst(db, finder: Finder(offset: index, limit: 1, sortOrders: [SortOrder('year', false), SortOrder('name')])).then((value) => value?.value),
+              itemBuilder: (context, index) => FutureBuilder<AlbumMetadata>(
+                future: (
+                  db.select(db.albumTable)
+                  ..orderBy([
+                    (tbl) => OrderingTerm.desc(tbl.year),
+                    (tbl) => OrderingTerm.asc(tbl.name)
+                  ])
+                  ..limit(1, offset: index)
+                ).getSingle(),
                 builder: (context, snapshot) {
-                  final album = AlbumMetadata.fromJson(snapshot.data ?? {"name": "Unknown album", "artistName": "Unknown artist"});
+                  final album = snapshot.data ?? const AlbumMetadata(artistName: "", name: "Loading...");
                   return SizedBox(
                     height: 72.0,
                     child: ListTile(
