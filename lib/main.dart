@@ -5,6 +5,7 @@ import 'dart:io';
 
 import 'package:audio_service/audio_service.dart';
 import 'package:bodacious/drift/database.dart';
+import 'package:bodacious/models/album_data.dart';
 import 'package:bodacious/models/track_data.dart';
 import 'package:bodacious/src/config.dart';
 import 'package:bodacious/src/library/indexer.dart';
@@ -12,6 +13,7 @@ import 'package:bodacious/src/media/audio_service.dart';
 import 'package:bodacious/src/metadata/provider.dart';
 import 'package:bodacious/src/navigate_observer.dart';
 import 'package:bodacious/views/home.dart';
+import 'package:bodacious/views/library/details/album.dart';
 import 'package:bodacious/views/library/root.dart';
 import 'package:bodacious/views/main_menu.dart';
 import 'package:bodacious/views/now_playing.dart';
@@ -270,7 +272,9 @@ class OuterFrame extends ConsumerWidget {
     //initialLocation: "/",
     routes: [
       GoRoute(path: "/", builder: (context, state) => const HomeView()),
-      GoRoute(path: "/library", builder: (context, state) => const LibraryRootView()),
+      GoRoute(path: "/library", builder: (context, state) => const LibraryRootView(), routes: [
+        GoRoute(path: "albums/:artistName/:name", builder: (context, state) => AlbumDetailsView(album: state.extra as AlbumMetadata))
+      ]),
       GoRoute(path: "/menu", builder: (context, state) => const MobileMainMenu()),
       GoRoute(path: "/now_playing", builder: (context, state) => const NowPlayingView()),
       GoRoute(path: "/settings", builder: (context, state) => const SettingsHome(), routes: [

@@ -151,8 +151,14 @@ class VlcAudioHandler extends BodaciousAudioHandler {
       if (event.media != null) {
         mediaItem.add(MediaItem(
           id: event.media!.resource,
-          title: event.media!.metas["Title"] ?? event.media!.metas["title"] ?? "test"
+          title: event.media!.metas["Title"] ?? event.media!.metas["title"] ?? Uri.parse(event.media!.resource).pathSegments.lastOrNull ?? "Nothing is playing"
         ));
+        if (event.isPlaylist) {
+          queue.add(event.medias.map((e) => MediaItem(
+            id: e.resource,
+            title: e.metas["Title"] ?? e.metas["title"] ?? Uri.parse(e.resource).pathSegments.lastOrNull ?? "Unknown track"
+          )).toList());
+        }
         // TrackMetadata? _record;
         // try {
         //   TrackMetadata.fromJson((await songStore.findFirst(db, finder: Finder(filter: Filter.and([
@@ -192,14 +198,41 @@ class VlcAudioHandler extends BodaciousAudioHandler {
 
   @override
   play() => Future.sync(() => player.play());
+  //.then((value) => playbackState.add(playbackState.value.copyWith(playing: true)));
   @override
-  pause() => Future.sync(() => player.pause());
+  pause() => Future.sync(() => player.pause())
+  .then((value) => playbackState.add(playbackState.value.copyWith(playing: false)));
   @override
-  seek(Duration position) => Future.sync(() => player.seek(position));
+  seek(Duration position) => Future.sync(() => player.seek(position))
+  .then((value) => playbackState.add(playbackState.value.copyWith(updatePosition: position)));
   @override
   skipToNext() => Future.sync(() => player.next());
   @override
   skipToPrevious() => Future.sync(() => player.back());
   @override
-  stop() => Future.sync(() => player.stop());
+  stop() => Future.sync(() => player.stop()).then((_) => super.stop());
+
+  @override
+  addQueueItem(MediaItem mediaItem) async {
+    if (player.current.isPlaylist) {
+      player.current.medias.add(vlc.Media.file(File(mediaItem.id)));
+      // a more complex solution may be needed
+      // when network resources come into play
+    } else {
+      await updateQueue([mediaItem]);
+    }
+    return super.addQueueItem(mediaItem);
+  }
+  @override
+  updateQueue(List<MediaItem> queue) async {
+    player.open(vlc.Playlist(
+      medias: queue.map((e) => vlc.Media.file(File.fromUri(Uri.parse(e.id)))).toList()
+    ));
+    return super.updateQueue(queue);
+  }
+  @override
+  skipToQueueItem(int index) {
+    player.jump(index);
+    return super.skipToQueueItem(index);
+  }
 }

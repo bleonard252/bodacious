@@ -58,7 +58,6 @@ class SongLibraryList extends ConsumerWidget {
                           ),
                         );
                       },
-                    
                     ),
                     childCount: snapshot.data ?? 0
                   )

@@ -5,6 +5,7 @@ import 'package:bodacious/models/album_data.dart';
 import 'package:drift/drift.dart';
 import "package:flutter/material.dart";
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 import '../../../widgets/cover_placeholder.dart';
@@ -63,7 +64,7 @@ class AlbumLibraryList extends ConsumerWidget {
                               if (album.year != null) TextSpan(text: album.year.toString())
                             ])),
                             onTap: () {
-                              // TODO: open the details page, show the songs on the album
+                              context.go("/library/albums/"+Uri.encodeComponent(album.artistName)+"/"+Uri.encodeComponent(album.name), extra: album);
                             },
                           ),
                         );
