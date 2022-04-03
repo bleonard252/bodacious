@@ -20,52 +20,59 @@ class AlbumLibraryList extends ConsumerWidget {
         return FutureBuilder<int>(
           future: (db.selectOnly(db.albumTable)..addColumns([db.albumTable.name])).get().then((value) => value.length),
           builder: (context, snapshot) {
-            if (snapshot.connectionState != ConnectionState.done) return Container();
-            return ListView.builder(
-              itemBuilder: (context, index) => FutureBuilder<AlbumMetadata>(
-                future: (
-                  db.select(db.albumTable)
-                  ..orderBy([
-                    (tbl) => OrderingTerm.desc(tbl.year),
-                    (tbl) => OrderingTerm.asc(tbl.name)
-                  ])
-                  ..limit(1, offset: index)
-                ).getSingle(),
-                builder: (context, snapshot) {
-                  final album = snapshot.data ?? const AlbumMetadata(artistName: "", name: "Loading...");
-                  return SizedBox(
-                    height: 72.0,
-                    child: ListTile(
-                      leading: album.coverUri?.scheme == "file" ? Image(
-                        image: (album.coverUri?.scheme == "file" ? FileImage(File.fromUri(album.coverUri!))
-                          : NetworkImage(album.coverUri.toString())) as ImageProvider,
-                        width: 48,
-                        height: 48,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, e, s) => const CoverPlaceholder(size: 48, iconSize: 24),
-                      ) : const CoverPlaceholder(size: 48, iconSize: 24),
-                      title: Text.rich(TextSpan(children: [
-                        WidgetSpan(
-                          child: Icon(MdiIcons.album, size: Theme.of(context).textTheme.subtitle1?.fontSize),
-                          alignment: PlaceholderAlignment.middle
-                        ),
-                        const WidgetSpan(child: SizedBox(width: 6)),
-                        TextSpan(text: album.name)
-                      ])),
-                      subtitle: Text.rich(TextSpan(children: [
-                        // const WidgetSpan(child: Icon(MdiIcons.spotify)),
-                        // const WidgetSpan(child: SizedBox(width: 6)),
-                        TextSpan(text: album.artistName),
-                        if (album.year != null) TextSpan(text: album.year.toString())
-                      ])),
-                      onTap: () {
-                        // TODO: open the details page, show the songs on the album
+            return CustomScrollView(
+              slivers: [
+                if (snapshot.connectionState != ConnectionState.done) SliverToBoxAdapter(child: Container())
+                else SliverList(
+                  //itemExtent: 72.0,
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) => FutureBuilder<AlbumMetadata>(
+                      future: (
+                        db.select(db.albumTable)
+                        ..orderBy([
+                          (tbl) => OrderingTerm.desc(tbl.year),
+                          (tbl) => OrderingTerm.asc(tbl.name)
+                        ])
+                        ..limit(1, offset: index)
+                      ).getSingle(),
+                      builder: (context, snapshot) {
+                        final album = snapshot.data ?? const AlbumMetadata(artistName: "", name: "Loading...");
+                        return SizedBox(
+                          height: 72.0,
+                          child: ListTile(
+                            leading: album.coverUri?.scheme == "file" ? Image(
+                              image: (album.coverUri?.scheme == "file" ? FileImage(File.fromUri(album.coverUri!))
+                                : NetworkImage(album.coverUri.toString())) as ImageProvider,
+                              width: 48,
+                              height: 48,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, e, s) => const CoverPlaceholder(size: 48, iconSize: 24),
+                            ) : const CoverPlaceholder(size: 48, iconSize: 24),
+                            title: Text.rich(TextSpan(children: [
+                              WidgetSpan(
+                                child: Icon(MdiIcons.album, size: Theme.of(context).textTheme.subtitle1?.fontSize),
+                                alignment: PlaceholderAlignment.middle
+                              ),
+                              const WidgetSpan(child: SizedBox(width: 6)),
+                              TextSpan(text: album.name)
+                            ])),
+                            subtitle: Text.rich(TextSpan(children: [
+                              // const WidgetSpan(child: Icon(MdiIcons.spotify)),
+                              // const WidgetSpan(child: SizedBox(width: 6)),
+                              TextSpan(text: album.artistName),
+                              if (album.year != null) TextSpan(text: album.year.toString())
+                            ])),
+                            onTap: () {
+                              // TODO: open the details page, show the songs on the album
+                            },
+                          ),
+                        );
                       },
                     ),
-                  );
-                },
-              ),
-              itemCount: snapshot.data
+                    childCount: snapshot.data ?? 0
+                  )
+                )
+              ]
             );
           }
         );

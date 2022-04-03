@@ -27,8 +27,8 @@ abstract class TheIndexer {
   // Isolate main logic
   static final ReceivePort progressReceiver = ReceivePort("The Indexer's Progress Receiver");
   static dynamic _progress;
-  static ValueConnectableStream<dynamic> get progress => _progress ??=
-  progressReceiver.publishValue();
+  static ValueConnectableStream<IndexerProgressReport> get progress => _progress ??=
+  progressReceiver.cast<IndexerProgressReport>().publishValue();
 
   //static late final Isolate indexerIsolate;
   
@@ -233,7 +233,7 @@ class _IndexerIsolate {
         ? file.uri.pathSegments.last
         : record.artistName! +" - "+ record.title!;
       //await tr_rec.put(db, record.toJson());
-      db.into(db.trackTable).insert(record);
+      db.into(db.trackTable).insertOnConflictUpdate(record);
       await registerAlbumMetadata(record);
       await registerArtistMetadata(record);
     }
@@ -248,10 +248,12 @@ class _IndexerIsolate {
         ));
         final albumCount = (await (
           db.selectOnly(db.albumTable)
+          ..addColumns([db.albumTable.artistName])
           ..where(db.albumTable.artistName.equals(artist))
          ).get()).length;
         final trackCount = (await (
           db.selectOnly(db.trackTable)
+          ..addColumns([db.trackTable.artistName])
           ..where(db.trackTable.artistName.equals(artist))
          ).get()).length;
         await (
@@ -320,7 +322,7 @@ class _IndexerIsolate {
       name: track.albumName!,
       coverUri: track.coverUri
     );
-    await db.albumTable.insert().insert(_record);
+    await db.albumTable.insert().insertOnConflictUpdate(_record);
   }
 
   Future<void> registerArtistMetadata(TrackMetadata track) async {
@@ -332,7 +334,7 @@ class _IndexerIsolate {
     var _record = ArtistMetadata(
       name: track.artistName!
     );
-    await db.artistTable.insert().insert(_record);
+    await db.artistTable.insert().insertOnConflictUpdate(_record);
   }
 
 }

@@ -16,73 +16,81 @@ class ArtistLibraryList extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return StreamBuilder<void>(
-      builder: (context, snapshot) {
+      stream: db.select(db.artistTable).watch(),
+      builder: (context, _) {
         return FutureBuilder<int>(
-          future: db.selectOnly(db.artistTable).get().then((value) => value.length),
+          future: (db.selectOnly(db.artistTable)..addColumns([db.artistTable.name])).get().then((value) => value.length),
           builder: (context, snapshot) {
-            if (snapshot.connectionState != ConnectionState.done) return Container();
-            return ListView.builder(
-              itemBuilder: (context, index) => FutureBuilder<ArtistMetadata>(
-                future: (
-                  db.select(db.artistTable)
-                  ..orderBy([
-                    (tbl) => OrderingTerm.asc(tbl.name)
-                  ])
-                  ..limit(1, offset: index)
-                ).getSingle(),
-                builder: (context, snapshot) {
-                  final artist = snapshot.data ?? const ArtistMetadata(name: "Loading...");
-                  return ListTile(
-                    leading: ClipOval(child: FutureBuilder<TypedResult?>(
+            return CustomScrollView(
+              slivers: [
+                if (snapshot.connectionState != ConnectionState.done) SliverToBoxAdapter(child: Container())
+                else SliverList(
+                  //itemExtent: 72.0,
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) => FutureBuilder<ArtistMetadata>(
                       future: (
-                        db.selectOnly(db.albumTable)
-                        ..where(db.albumTable.artistName.equals(artist.name))
+                        db.select(db.artistTable)
                         ..orderBy([
-                          OrderingTerm.desc(db.albumTable.releaseDate),
-                          OrderingTerm.desc(db.albumTable.year),
+                          (tbl) => OrderingTerm.asc(tbl.name)
                         ])
-                        ..limit(1)
-                        ..addColumns([db.albumTable.coverUri])
-                      ).getSingleOrNull(),
-                      // albumStore.findFirst(db, finder: Finder(
-                      //   filter: Filter.matches('artistName', artist.name),
-                      //   sortOrders: [SortOrder('releaseDate', false), SortOrder('year', false)]
-                      // )),
+                        ..limit(1, offset: index)
+                      ).getSingle(),
                       builder: (context, snapshot) {
-                        //final album = AlbumMetadata.fromJson((snapshot.data as dynamic)?.value ?? {"name": "Unknown album", "artistName": "Unknown artist"});
-                        final coverUri = snapshot.data?.read<Uri>(db.albumTable.coverUri.dartCast());
-                        return coverUri?.scheme == "file" ? Image(
-                          image: (coverUri?.scheme == "file" ? FileImage(File.fromUri(coverUri!))
-                            : NetworkImage(coverUri.toString())) as ImageProvider,
-                          width: 48,
-                          height: 48,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, e, s) => const CoverPlaceholder(size: 48, iconSize: 24),
-                        ): const CoverPlaceholder(size: 48, iconSize: 24);
-                      })
+                        final artist = snapshot.data ?? const ArtistMetadata(name: "Loading...");
+                        return ListTile(
+                          leading: ClipOval(child: FutureBuilder<TypedResult?>(
+                            future: (
+                              db.selectOnly(db.albumTable)
+                              ..addColumns([db.albumTable.coverUri])
+                              ..where(db.albumTable.artistName.equals(artist.name))
+                              ..orderBy([
+                                OrderingTerm.desc(db.albumTable.releaseDate),
+                                OrderingTerm.desc(db.albumTable.year),
+                              ])
+                              ..limit(1)
+                            ).getSingleOrNull(),
+                            // albumStore.findFirst(db, finder: Finder(
+                            //   filter: Filter.matches('artistName', artist.name),
+                            //   sortOrders: [SortOrder('releaseDate', false), SortOrder('year', false)]
+                            // )),
+                            builder: (context, snapshot) {
+                              //final album = AlbumMetadata.fromJson((snapshot.data as dynamic)?.value ?? {"name": "Unknown album", "artistName": "Unknown artist"});
+                              final coverUri = snapshot.data?.readTableOrNull(db.albumTable)?.coverUri;
+                              return coverUri?.scheme == "file" ? Image(
+                                image: (coverUri?.scheme == "file" ? FileImage(File.fromUri(coverUri!))
+                                  : NetworkImage(coverUri.toString())) as ImageProvider,
+                                width: 48,
+                                height: 48,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, e, s) => const CoverPlaceholder(size: 48, iconSize: 24),
+                              ): const CoverPlaceholder(size: 48, iconSize: 24);
+                            })
+                          ),
+                          title: Text.rich(TextSpan(children: [
+                            // WidgetSpan(
+                            //   child: Icon(MdiIcons.album, size: Theme.of(context).textTheme.subtitle1?.fontSize),
+                            //   alignment: PlaceholderAlignment.middle
+                            // ),
+                            // const WidgetSpan(child: SizedBox(width: 6)),
+                            TextSpan(text: artist.name)
+                          ])),
+                          subtitle: Text.rich(TextSpan(
+                            children: [
+                              // const WidgetSpan(child: Icon(MdiIcons.spotify)),
+                              // const WidgetSpan(child: SizedBox(width: 6)),
+                              if (artist.albumCount != null) TextSpan(text: artist.albumCount!.toString()+" album"+(artist.albumCount!=1?"s":""), style: const TextStyle(fontStyle: FontStyle.italic))
+                            ],
+                          )),
+                          onTap: () {
+                            // TODO: open the details page, show the albums by the artist
+                          },
+                        );
+                      },
                     ),
-                    title: Text.rich(TextSpan(children: [
-                      // WidgetSpan(
-                      //   child: Icon(MdiIcons.album, size: Theme.of(context).textTheme.subtitle1?.fontSize),
-                      //   alignment: PlaceholderAlignment.middle
-                      // ),
-                      // const WidgetSpan(child: SizedBox(width: 6)),
-                      TextSpan(text: artist.name)
-                    ])),
-                    subtitle: Text.rich(TextSpan(
-                      children: [
-                        // const WidgetSpan(child: Icon(MdiIcons.spotify)),
-                        // const WidgetSpan(child: SizedBox(width: 6)),
-                        if (artist.albumCount != null) TextSpan(text: artist.albumCount!.toString()+" album"+(artist.albumCount!=1?"s":""), style: const TextStyle(fontStyle: FontStyle.italic))
-                      ],
-                    )),
-                    onTap: () {
-                      // TODO: open the details page, show the albums by the artist
-                    },
-                  );
-                },
-              ),
-              itemCount: snapshot.data
+                    childCount: snapshot.data ?? 0
+                  )
+                ),
+              ],
             );
           }
         );

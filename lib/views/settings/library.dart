@@ -65,7 +65,7 @@ class _LibrarySettingsViewState extends State<LibrarySettingsView> {
               );
               if (library?.isNotEmpty != true) return;
               libraryDirs.add(library!);
-              await config.setLibraries(libraryDirs);
+              config.libraries = libraryDirs;
               setState(() {});
             },
           )

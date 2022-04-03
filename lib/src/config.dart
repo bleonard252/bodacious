@@ -8,7 +8,7 @@ class Config {
   /// the Bodacious library.
   /// This should turn off the indexer and 
   bool get useSystemLibrary => _prefs.getBool("use-system-library") ?? false;
-  Future<void> setUseSystemLibrary(bool to) => _prefs.setBool("use-system-library", to);
+  set useSystemLibrary(bool to) => _prefs.setBool("use-system-library", to);
   /// **NOTE: This is an unmodifiable list!**
   /// To change it:
   /// ```dart
@@ -16,7 +16,7 @@ class Config {
   /// ..add("string");
   /// ```
   List<String> get libraries => List.unmodifiable(_prefs.getStringList("libraries") ?? []);
-  Future<void> setLibraries(List<String> to) => _prefs.setStringList("librarieslibrary", to);
+  set libraries(List<String> to) => _prefs.setStringList("libraries", to);
 }
 
 class ROConfig implements Config {
@@ -32,12 +32,4 @@ class ROConfig implements Config {
   ROConfig(Config config) :
     libraries = config.libraries,
     useSystemLibrary = config.useSystemLibrary;
-    
-  @override
-  noSuchMethod(Invocation invocation) {
-    if (invocation.isMethod) {
-      throw UnsupportedError("Cannot modify read-only config");
-    }
-    return super.noSuchMethod(invocation);
-  }
 }

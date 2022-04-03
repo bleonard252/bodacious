@@ -56,7 +56,13 @@ class IndexerProgressWidget extends StatelessWidget {
           if (report?.state != IndexerState.FINISHED) Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              if (report?.max != null && report!.max > 0) Text(report.value.toString() + " / " + report.max.toString())
+              if (report?.max != null && report!.max > 0) Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  report.value.toString() + " / " + report.max.toString(),
+                  style: Theme.of(context).textTheme.bodyText2,
+                ),
+              )
             ],
           ),
           if (report != null && report.state != IndexerState.FINISHED) LinearProgressIndicator(
