@@ -175,7 +175,7 @@ class MyApp extends ConsumerWidget {
       home: Builder(
         builder: (context) {
           return FrameSize(
-            largeFrame: MediaQuery.of(context).size.width >= 480,
+            largeFrame: MediaQuery.of(context).size.width >= 512,
             child: OuterFrame(),
             //metadataProvider: NowPlayingNotifier(),
           );

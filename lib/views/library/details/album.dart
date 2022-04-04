@@ -93,6 +93,12 @@ class AlbumDetailsViewState extends State<AlbumDetailsView> {
                 ),
                 //title: Text(album.name),
               ),
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                  child: Text("Songs", style: Theme.of(context).textTheme.headline6),
+                ),
+              ),
               FutureBuilder<List<TrackMetadata>>(
                 future: (
                   db.select(db.trackTable)
@@ -123,7 +129,7 @@ class AlbumDetailsViewState extends State<AlbumDetailsView> {
                                   fit: BoxFit.cover,
                                   errorBuilder: (context, e, s) => const CoverPlaceholder(size: 48, iconSize: 24),
                                 ) : const CoverPlaceholder(size: 48, iconSize: 24)),
-                                if (track.trackNo != null) ...[
+                                if (track.trackNo != null && track.trackNo != 0) ...[
                                   Positioned.fill(child: Container(color: Colors.black54)),
                                   Positioned.fill(child: Center(child: Text(track.trackNo!.toString().padLeft(2, '0')))),
                                 ],
