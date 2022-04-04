@@ -112,6 +112,15 @@ class JustAudioHandler extends BodaciousAudioHandler {
 class VlcAudioHandler extends BodaciousAudioHandler {
   late final vlc.Player player;
   bool _shuffling = false;
+  AudioServiceRepeatMode _repeating = AudioServiceRepeatMode.none;
+
+  static const Map<AudioServiceRepeatMode, vlc.PlaylistMode> repeatModes = {
+    AudioServiceRepeatMode.all: vlc.PlaylistMode.repeat,
+    AudioServiceRepeatMode.one: vlc.PlaylistMode.single,
+    AudioServiceRepeatMode.none: vlc.PlaylistMode.loop
+  };
+
+
   VlcAudioHandler() {
     player = vlc.Player(id: 0xb0da, commandlineArguments: ['--no-video']);
     // pipe the events from this player to the audio handler's events
@@ -129,10 +138,11 @@ class VlcAudioHandler extends BodaciousAudioHandler {
     } else if (event is vlc.PlaybackState) {
       playbackState.add(playbackState.value.copyWith(
         playing: event.isPlaying,
-        repeatMode: player.current.media is vlc.Playlist ?
-        (player.current.media as vlc.Playlist).playlistMode == vlc.PlaylistMode.loop ? AudioServiceRepeatMode.all
-        : (player.current.media as vlc.Playlist).playlistMode == vlc.PlaylistMode.repeat ? AudioServiceRepeatMode.one
-        : AudioServiceRepeatMode.none : AudioServiceRepeatMode.none,
+        repeatMode: _repeating,
+        //repeatMode: player.current.isPlaylist ?
+        // (player.current.media as vlc.Playlist).playlistMode == vlc.PlaylistMode.loop ? AudioServiceRepeatMode.all
+        // : (player.current.media as vlc.Playlist).playlistMode == vlc.PlaylistMode.repeat ? AudioServiceRepeatMode.one
+        // : AudioServiceRepeatMode.none : AudioServiceRepeatMode.none,
         shuffleMode: _shuffling ? AudioServiceShuffleMode.all : AudioServiceShuffleMode.none,
       ));
       if (player.current.media is vlc.Playlist) {
@@ -234,5 +244,25 @@ class VlcAudioHandler extends BodaciousAudioHandler {
   skipToQueueItem(int index) {
     player.jump(index);
     return super.skipToQueueItem(index);
+  }
+  @override
+  Future<void> removeQueueItemAt(int index) {
+    player.remove(index);
+    return super.removeQueueItemAt(index);
+  }
+
+  @override
+  Future<void> setShuffleMode(AudioServiceShuffleMode shuffleMode) {
+    throw UnsupportedError("You cannot set shuffle on this device.");
+    return super.setShuffleMode(shuffleMode);
+  }
+  @override
+  Future<void> setRepeatMode(AudioServiceRepeatMode repeatMode) async {
+    if (repeatMode == AudioServiceRepeatMode.group) throw UnsupportedError("Group repeat is not supported");
+    _repeating = repeatMode;
+    playbackState.add(playbackState.value.copyWith(
+      repeatMode: _repeating,
+    ));
+    return player.setPlaylistMode(repeatModes[repeatMode]!);
   }
 }

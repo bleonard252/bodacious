@@ -9,8 +9,6 @@ import 'package:flac_metadata/flacstream.dart';
 import 'package:flac_metadata/metadata.dart';
 import 'package:flutter/foundation.dart';
 import 'package:id3/id3.dart';
-import 'package:image/image.dart' as img;
-import 'dart:ui' as ui;
 
 import 'package:mime/mime.dart';
 
@@ -57,6 +55,10 @@ Future<TrackMetadata> loadID3FromBytes(List<int> bytes, File file, {String? cach
           if (element.startsWith("TITLE=")) flacdata.putIfAbsent("title", () => element.replaceFirst("TITLE=", ""));
           if (element.startsWith("ARTIST=")) flacdata.putIfAbsent("artist", () => element.replaceFirst("ARTIST=", ""));
           if (element.startsWith("ALBUM=")) flacdata.putIfAbsent("album", () => element.replaceFirst("ALBUM=", ""));
+          if (element.startsWith("TRACKNUMBER=")) flacdata.putIfAbsent("track", () => element.replaceFirst("TRACKNUMBER=", ""));
+          if (element.startsWith("DISCNUMBER=")) flacdata.putIfAbsent("disc", () => element.replaceFirst("DISCNUMBER=", ""));
+          //if (element.startsWith("ORIGINALDATE=")) flacdata.putIfAbsent("date", () => element.replaceFirst("ORIGINALDATE=", ""));
+          if (element.startsWith("ORIGINALYEAR=")) flacdata.putIfAbsent("year", () => element.replaceFirst("ORIGINALYEAR=", ""));
         }
         break;
       case BlockType.PICTURE:
@@ -99,8 +101,10 @@ Future<TrackMetadata> loadID3FromBytes(List<int> bytes, File file, {String? cach
     title: flacdata["title"] ?? rawTags["Title"],
     artistName: flacdata["artist"] ?? rawTags["Artist"],
     albumName: flacdata["album"] ?? rawTags["Album"],
-    year: int.tryParse(flacdata["year"]?.toString() ?? rawTags["Year"]?.toString() ?? ""),
+    year: int.tryParse(flacdata["year"] ?? rawTags["Year"] ?? ""),
     //coverData: descriptor,
+    trackNo: int.tryParse((flacdata["track"] ?? rawTags["Track"] ?? "").replaceFirst(RegExp(r"\/[0-9]*"), "")),
+    discNo: int.tryParse((flacdata["disc"]?.toString() ?? rawTags["Disc"] ?? "").replaceFirst(RegExp(r"\/[0-9]*"), "")) ?? 0,
     uri: file.absolute.uri,
     coverBytes: coverBytes2, //?? coverBytes?.buffer.asUint8List(),
     coverUri: coverFile?.absolute.uri

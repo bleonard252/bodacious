@@ -17,19 +17,25 @@ class Config {
   /// ```
   List<String> get libraries => List.unmodifiable(_prefs.getStringList("libraries") ?? []);
   set libraries(List<String> to) => _prefs.setStringList("libraries", to);
+  /// Whether to show Now Playing on the sidebar (`true`) or across the bottom
+  /// (default, `false`). This only applies when using the large frame.
+  bool get wideCompactNowPlaying => _prefs.getBool("wide-compact-now-playing") ?? false;
+  set wideCompactNowPlaying(bool to) => _prefs.setBool("wide-compact-now-playing", to);
 }
 
 class ROConfig implements Config {
   @override
   List<String> libraries;
-
   @override
   bool useSystemLibrary;
+  @override
+  bool wideCompactNowPlaying;
 
   @override
   SharedPreferences get _prefs => throw UnsupportedError("Not necessary");
 
   ROConfig(Config config) :
     libraries = config.libraries,
-    useSystemLibrary = config.useSystemLibrary;
+    useSystemLibrary = config.useSystemLibrary,
+    wideCompactNowPlaying = config.wideCompactNowPlaying;
 }

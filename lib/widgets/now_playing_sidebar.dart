@@ -11,8 +11,8 @@ import 'package:material_design_icons_flutter/material_design_icons_flutter.dart
 
 import 'frame_size.dart';
 
-class NowPlayingBar extends ConsumerWidget {
-  const NowPlayingBar({ Key? key }) : super(key: key);
+class NowPlayingSidebar extends ConsumerWidget {
+  const NowPlayingSidebar({ Key? key }) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -20,42 +20,47 @@ class NowPlayingBar extends ConsumerWidget {
     return Material(
       elevation: 8, 
       color: Theme.of(context).colorScheme.surface,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
         crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisSize: MainAxisSize.max,
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Expanded(child: buildTrackInfo(context)),
-          FrameSize.of(context) ? SizedBox(
+          SizedBox(
             width: 240,
             child: Column(
               mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
+                buildTrackInfo(context),
+                // This is where the seekbar should go
                 StreamBuilder(
                   stream: player.playbackState,
                   builder: (context, snapshot) {
-                    return Row(children: [
-                      Tooltip(
-                        message: "Previous",
-                        child: IconButton(
-                          onPressed: () => player.skipToPrevious(),
-                          icon: const Icon(MdiIcons.skipBackward)
-                        )
-                      ),
-                      buildPlayPauseButton(),
-                      Tooltip(
-                        message: "Next",
-                        child: IconButton(
-                          onPressed: () => player.skipToNext(),
-                          icon: const Icon(MdiIcons.skipForward)
-                        )
-                      ),
-                    ]);
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Tooltip(
+                          message: "Previous",
+                          child: IconButton(
+                            onPressed: () => player.skipToPrevious(),
+                            icon: const Icon(MdiIcons.skipBackward)
+                          )
+                        ),
+                        buildPlayPauseButton(),
+                        Tooltip(
+                          message: "Next",
+                          child: IconButton(
+                            onPressed: () => player.skipToNext(),
+                            icon: const Icon(MdiIcons.skipForward)
+                          )
+                        ),
+                      ]
+                    );
                   }
                 )
               ],
             ),
-          ) : buildPlayPauseButton(),
+          )
         ],
       )
     );
@@ -93,7 +98,7 @@ class NowPlayingBar extends ConsumerWidget {
           ];
           return Row(
             mainAxisAlignment: MainAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
+            mainAxisSize: MainAxisSize.max,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Padding(
@@ -117,7 +122,7 @@ class NowPlayingBar extends ConsumerWidget {
                   children: [
                     Text(meta.title ?? (meta.uri.pathSegments.isEmpty ? "" : meta.uri.pathSegments.last), maxLines: 1, overflow: TextOverflow.fade),
                     if (secondRow.isNotEmpty) Text.rich(TextSpan(children: secondRow), 
-                      style: Theme.of(context).textTheme.caption
+                      style: Theme.of(context).textTheme.caption, maxLines: 1, overflow: TextOverflow.fade
                     )
                   ],
                 ),

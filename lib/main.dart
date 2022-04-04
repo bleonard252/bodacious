@@ -18,9 +18,11 @@ import 'package:bodacious/views/library/root.dart';
 import 'package:bodacious/views/main_menu.dart';
 import 'package:bodacious/views/now_playing.dart';
 import 'package:bodacious/views/settings/library.dart';
+import 'package:bodacious/views/settings/personalization.dart';
 import 'package:bodacious/views/settings/root.dart';
 import 'package:bodacious/widgets/now_playing.dart';
-import 'package:bodacious/widgets/now_playing_data.dart';
+import 'package:bodacious/widgets/frame_size.dart';
+import 'package:bodacious/widgets/now_playing_sidebar.dart';
 import 'package:dart_vlc/dart_vlc.dart' show DartVLC;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -100,6 +102,38 @@ void main() async {
       }
     }
   });
+  queueProvider = StreamProvider<List<TrackMetadata>>((ref) async* {
+    final stream = player.queue;
+    final nothingPlaying = TrackMetadata.empty();
+    yield [];
+    await for (final update in stream) {
+      if (update.isEmpty) yield [];
+      
+      if (listEquals(update,ref.state.value?.map((value) => value.asMediaItem()).toList())) continue;
+        // if the update is the same as 
+      final List<Future<TrackMetadata?>> futures = [];
+      for (final update in update) {
+        if (update.id.contains("://") && !update.id.startsWith("file:///")) {
+          if (kDebugMode) {
+            print(update.id+" is not a supported URI.");
+          }
+          continue;
+        }
+        // final _dbEntry = await songStore.findFirst(db, finder: Finder(filter: Filter.equals('uri', Uri.file(update.id).toString())));
+        // if (kDebugMode) {
+        //   final value = (await songStore.find(db)).map((e) => e.value);
+        // }
+
+        final Future<TrackMetadata?> _dbEntry = (db.select(db.trackTable)
+        ..where((tbl) => tbl.uri.equalsValue(Uri.file(update.id)))
+        ..limit(1)
+        ).getSingleOrNull();
+        futures.add(_dbEntry);
+      }
+      
+      yield (await Future.wait<TrackMetadata?>(futures)).whereType<TrackMetadata>().toList();
+    }
+  });
 
   unawaited(TheIndexer.spawn());
 
@@ -116,6 +150,7 @@ void main() async {
 
 //final nowPlayingProvider = StateNotifierProvider<NowPlayingNotifier, TrackMetadata>((ref) => NowPlayingNotifier());
 late final StreamProvider<TrackMetadata> nowPlayingProvider;
+late final StreamProvider<List<TrackMetadata>> queueProvider;
 
 class MyApp extends ConsumerWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -128,29 +163,36 @@ class MyApp extends ConsumerWidget {
       theme: ThemeData.light().copyWith(
         colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.amber),
         //useMaterial3: false,
+        applyElevationOverlayColor: false,
+
       ),
-      darkTheme: ThemeData.dark().copyWith(
-        colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.amber, brightness: Brightness.dark),
+      darkTheme: ThemeData.from(
+        colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.amber, backgroundColor: ThemeData.dark().scaffoldBackgroundColor, primaryColorDark: Colors.amber, brightness: Brightness.dark),
+      ).copyWith(
+        applyElevationOverlayColor: false,
         //useMaterial3: false,
       ),
-      home: NowPlayingData(
-        child: OuterFrame(),
-        //metadataProvider: NowPlayingNotifier(),
+      home: Builder(
+        builder: (context) {
+          return FrameSize(
+            largeFrame: MediaQuery.of(context).size.width >= 480,
+            child: OuterFrame(),
+            //metadataProvider: NowPlayingNotifier(),
+          );
+        }
       )
     );
   }
 }
 
-ProviderBase<bool>? usingLargeFrameProvider;
-class OuterFrame extends ConsumerWidget {
+class OuterFrame extends StatelessWidget {
   OuterFrame({ Key? key }) : super(key: key);
 
   final GlobalKey<State<Router>> navigatorKey = GlobalKey(debugLabel: "Nested Router key");
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    usingLargeFrameProvider ??= Provider((ref) => MediaQuery.of(context).size.width > 480);
-    if (ref.read(usingLargeFrameProvider!)) {
+  Widget build(BuildContext context) {
+    if (FrameSize.of(context)) {
       return Column(
         children: [
           Expanded(
@@ -161,35 +203,45 @@ class OuterFrame extends ConsumerWidget {
                     width: 240,
                     child: Material(
                       color: Theme.of(context).colorScheme.surface,
-                      child: NestedScrollView(
-                        headerSliverBuilder: (context, what) => [
-                          SliverToBoxAdapter(
-                            child: SafeArea(
-                              bottom: false,
-                              child: ListTile(
-                                leading: const Icon(MdiIcons.home, size: 36),
-                                title: const Text("Home"),
-                                selected: goRouter.location == "/",
-                                onTap: () {
-                                  goRouter.go("/");
-                                  setState(() {});
-                                },
-                              ),
-                            )
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.max,
+                        children: [
+                          Expanded(
+                            child: CustomScrollView(
+                              slivers: [
+                                SliverToBoxAdapter(
+                                  child: SafeArea(
+                                    bottom: false,
+                                    child: ListTile(
+                                      leading: const Icon(MdiIcons.home, size: 36),
+                                      title: const Text("Home"),
+                                      selected: goRouter.location == "/",
+                                      onTap: () {
+                                        goRouter.go("/");
+                                        setState(() {});
+                                      },
+                                    ),
+                                  )
+                                ),
+                                SliverToBoxAdapter(
+                                  child: ListTile(
+                                    leading: const Icon(MdiIcons.musicBoxMultiple, size: 36),
+                                    title: const Text("Library"),
+                                    selected: goRouter.location.startsWith("/library"),
+                                    onTap: () {
+                                      goRouter.go("/library");
+                                      setState(() {});
+                                    },
+                                  )
+                                ),
+                                const SliverList(delegate: SliverChildListDelegate.fixed([])),
+                              ]
+                            ),
                           ),
-                          SliverToBoxAdapter(
-                            child: ListTile(
-                              leading: const Icon(MdiIcons.musicBoxMultiple, size: 36),
-                              title: const Text("Library"),
-                              selected: goRouter.location.startsWith("/library"),
-                              onTap: () {
-                                goRouter.go("/library");
-                                setState(() {});
-                              },
-                            )
-                          )
+                          if (config.wideCompactNowPlaying) const NowPlayingSidebar()
                         ],
-                        body: ListView()
                       ),
                     )
                   );
@@ -202,7 +254,7 @@ class OuterFrame extends ConsumerWidget {
               )
             ]),
           ),
-          const SafeArea(top: false, child: NowPlayingBar())
+          if (!config.wideCompactNowPlaying) const SafeArea(top: false, child: NowPlayingBar())
         ],
       );
     } else {
@@ -279,6 +331,7 @@ class OuterFrame extends ConsumerWidget {
       GoRoute(path: "/now_playing", builder: (context, state) => const NowPlayingView()),
       GoRoute(path: "/settings", builder: (context, state) => const SettingsHome(), routes: [
         GoRoute(path: "library", builder: (context, state) => const LibrarySettingsView()),
+        GoRoute(path: "personalization", builder: (context, state) => const PersonalizationSettingsView()),
       ])
     ],
     observers: [

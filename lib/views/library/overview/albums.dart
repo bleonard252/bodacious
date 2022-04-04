@@ -32,7 +32,7 @@ class AlbumLibraryList extends ConsumerWidget {
                         db.select(db.albumTable)
                         ..orderBy([
                           (tbl) => OrderingTerm.desc(tbl.year),
-                          (tbl) => OrderingTerm.asc(tbl.name)
+                          (tbl) => OrderingTerm.asc(tbl.name),
                         ])
                         ..limit(1, offset: index)
                       ).getSingle(),

@@ -108,7 +108,7 @@ class HomeView extends StatelessWidget {
                     )
                   ],
                 ),
-                if (TheIndexer.progress.valueOrNull?.state != null) SliverToBoxAdapter(
+                SliverToBoxAdapter(
                   child: Padding(
                     padding: const EdgeInsets.all(12.0),
                     child: DecoratedBox(

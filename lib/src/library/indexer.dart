@@ -33,7 +33,7 @@ abstract class TheIndexer {
   //static late final Isolate indexerIsolate;
   
   /// Don't try to touch the isolate before this aight
-  static Future<void> spawn() async {
+  static Future<void> spawn({bool force = false}) async {
     final _dbPath = await () async {
       late final String dbPath;
       try {
@@ -50,9 +50,23 @@ abstract class TheIndexer {
     progress.connect(); // invoke the getter
     final _cacheDir = await getCacheDirectory();
     try {
+      // This seemingly-redundant messaging nonsense is actually necessary.
+      // It's passing variables into a separate variable scope from
+      // the main app. It's the power of Isolates!
       await compute<Map, dynamic>((message) {
-        return _IndexerIsolate(dbPath: message["dbDir"], cacheDir: message["cacheDir"], config: message["config"])(message["sendPort"]);
-      }, {"sendPort": progressReceiver.sendPort, "dbDir": _dbPath, "cacheDir": _cacheDir, "config": ROConfig(config)});
+        return _IndexerIsolate(
+          dbPath: message["dbDir"],
+          cacheDir: message["cacheDir"],
+          config: message["config"],
+          force: message["force"]
+        )(message["sendPort"]);
+      }, {
+        "sendPort": progressReceiver.sendPort,
+        "dbDir": _dbPath,
+        "cacheDir": _cacheDir,
+        "config": ROConfig(config),
+        "force": force
+      });
     } catch(e, st) {
       // ignore: avoid_print
       print(e);
@@ -159,12 +173,14 @@ class _IndexerIsolate {
       //   // Find this file in the database.
       //   (record) => record.value.uri == file.absolute.uri.toString()
       // )));
-      final _matches = await (
-        db.select(db.trackTable)
-        ..where((tbl) => tbl.uri.equalsValue(file.absolute.uri))
-      ).get();
-      // Skip processing files that have already been processed
-      if (_matches.isNotEmpty) continue;
+      if (!force) {
+        final _matches = await (
+          db.select(db.trackTable)
+          ..where((tbl) => tbl.uri.equalsValue(file.absolute.uri))
+        ).get();
+        // Skip processing files that have already been processed
+        if (_matches.isNotEmpty) continue;
+      }
       var metaBytes = <int>[], _class = "none";
       final _metaByteReader = file.openRead().listen(null);
       //double? targetLength;

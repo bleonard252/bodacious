@@ -1,6 +1,9 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:bodacious/main.dart';
+import 'package:bodacious/src/library/indexer.dart';
+import 'package:bodacious/widgets/indexer_progress.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import "package:flutter/material.dart";
@@ -27,6 +30,7 @@ class _LibrarySettingsViewState extends State<LibrarySettingsView> {
       ),
       body: ListView(
         children: [
+          const IndexerProgressWidget(),
           if (Platform.isAndroid) SwitchListTile(
             title: const Text("Use Android media library"),
             subtitle: const Text("Import your phone's music library automatically. "
@@ -38,6 +42,20 @@ class _LibrarySettingsViewState extends State<LibrarySettingsView> {
             // (value) async {
             //   setState(() => useSystemLibrary = value);
             // },
+          ),
+          StreamBuilder<IndexerProgressReport>(
+            stream: TheIndexer.progress,
+            initialData: TheIndexer.progress.valueOrNull,
+            builder: (context, snapshot) {
+              return ListTile(
+                enabled: snapshot.data?.state == IndexerState.FINISHED || snapshot.data == null,
+                title: const Text("Force re-scan"),
+                subtitle: const Text("Scan your library again to update tags on existing files."),
+                onTap: snapshot.data?.state == IndexerState.FINISHED || snapshot.data == null ? () async {
+                  unawaited(TheIndexer.spawn(force: true));
+                } : null,
+              );
+            }
           ),
           for (final dir in config.libraries) Row(
             mainAxisSize: MainAxisSize.max,

@@ -113,19 +113,20 @@ class AlbumDetailsViewState extends State<AlbumDetailsView> {
                             height: 48,
                             width: 48,
                             child: Stack(
+                              fit: StackFit.expand,
                               children: [
-                                if (track.trackNo != null) ...[
-                                  Positioned.fill(child: Center(child: Text(track.trackNo!.toString().padLeft(2, '0')))),
-                                  Positioned.fill(child: Container(color: Colors.black54))
-                                ],
-                                track.coverBytes != null || track.coverUri?.scheme == "file" ? Image(
+                                Positioned.fill(child: track.coverBytes != null || track.coverUri?.scheme == "file" ? Image(
                                   image: (track.coverUri?.scheme == "file" ? FileImage(File.fromUri(track.coverUri!))
                                     : NetworkImage(track.coverUri.toString())) as ImageProvider,
                                   width: 48,
                                   height: 48,
                                   fit: BoxFit.cover,
                                   errorBuilder: (context, e, s) => const CoverPlaceholder(size: 48, iconSize: 24),
-                                ) : const CoverPlaceholder(size: 48, iconSize: 24),
+                                ) : const CoverPlaceholder(size: 48, iconSize: 24)),
+                                if (track.trackNo != null) ...[
+                                  Positioned.fill(child: Container(color: Colors.black54)),
+                                  Positioned.fill(child: Center(child: Text(track.trackNo!.toString().padLeft(2, '0')))),
+                                ],
                               ]
                             ),
                           ),
