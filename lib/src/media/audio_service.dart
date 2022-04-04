@@ -19,6 +19,8 @@ abstract class BodaciousAudioHandler extends BaseAudioHandler with SeekHandler {
   Duration? get duration => mediaItem.value?.duration;
   bool get hasPrevious => false;
   bool get hasNext => false;
+  /// The position of the playing item in the queue.
+  int? get currentIndex => 0;
 
   Future<void> prepareFromTrackMetadata(TrackMetadata trackMetadata) async {
     queue.add([
@@ -65,6 +67,9 @@ class JustAudioHandler extends BodaciousAudioHandler {
       ));
     });
   }
+
+  @override
+  int? get currentIndex => player.currentIndex;
 
   @override
   prepareFromUri(uri, [extras]) => player.setAudioSource(just.ConcatenatingAudioSource(children: [
@@ -186,6 +191,8 @@ class VlcAudioHandler extends BodaciousAudioHandler {
     }
   }
 
+  @override
+  int? get currentIndex => player.current.index;
 
   @override
   prepareFromUri(uri, [extras]) => Future.sync(() => player.open(

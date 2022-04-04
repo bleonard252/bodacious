@@ -68,22 +68,22 @@ class NowPlayingSidebar extends ConsumerWidget {
 
   // [mdi:play Play button] and [mdi:pause Pause button]
   Widget buildPlayPauseButton() {
-  return StreamBuilder<bool>(
-    stream: player.playbackState.map((event) => event.playing),
-      initialData: player.playbackState.valueOrNull?.playing,
-      builder: (context, snap) => snap.data == true ? Tooltip(
-      message: "Pause",
-      child: IconButton(onPressed: () {
-        player.pause();
-      }, icon: const Icon(MdiIcons.pause))
-    ) : Tooltip(
-      message: "Play",
-      child: IconButton(onPressed: () {
-        player.play();
-      }, icon: const Icon(MdiIcons.play))
-    ),
-  );
-}
+    return StreamBuilder<bool>(
+      stream: player.playbackState.map((event) => event.playing),
+        initialData: player.playbackState.valueOrNull?.playing,
+        builder: (context, snap) => snap.data == true ? Tooltip(
+        message: "Pause",
+        child: IconButton(onPressed: () {
+          player.pause();
+        }, icon: const Icon(MdiIcons.pause))
+      ) : Tooltip(
+        message: "Play",
+        child: IconButton(onPressed: () {
+          player.play();
+        }, icon: const Icon(MdiIcons.play))
+      ),
+    );
+  }
 
   Widget buildTrackInfo(BuildContext context) {
     return InkWell(

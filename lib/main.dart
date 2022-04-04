@@ -102,14 +102,14 @@ void main() async {
       }
     }
   });
-  queueProvider = StreamProvider<List<TrackMetadata>>((ref) async* {
+  queueProvider = StreamProvider<Queue<TrackMetadata>>((ref) async* {
     final stream = player.queue;
     final nothingPlaying = TrackMetadata.empty();
-    yield [];
+    yield Queue(entries: []);
     await for (final update in stream) {
-      if (update.isEmpty) yield [];
+      if (update.isEmpty) yield Queue(entries: []);
       
-      if (listEquals(update,ref.state.value?.map((value) => value.asMediaItem()).toList())) continue;
+      if (listEquals(update,ref.state.value?.entries.map((value) => value.asMediaItem()).toList())) continue;
         // if the update is the same as 
       final List<Future<TrackMetadata?>> futures = [];
       for (final update in update) {
@@ -131,7 +131,7 @@ void main() async {
         futures.add(_dbEntry);
       }
       
-      yield (await Future.wait<TrackMetadata?>(futures)).whereType<TrackMetadata>().toList();
+      yield Queue(entries: (await Future.wait<TrackMetadata?>(futures)).whereType<TrackMetadata>().toList(), position: player.currentIndex);
     }
   });
 
@@ -150,7 +150,7 @@ void main() async {
 
 //final nowPlayingProvider = StateNotifierProvider<NowPlayingNotifier, TrackMetadata>((ref) => NowPlayingNotifier());
 late final StreamProvider<TrackMetadata> nowPlayingProvider;
-late final StreamProvider<List<TrackMetadata>> queueProvider;
+late final StreamProvider<Queue<TrackMetadata>> queueProvider;
 
 class MyApp extends ConsumerWidget {
   const MyApp({Key? key}) : super(key: key);

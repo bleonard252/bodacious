@@ -4,9 +4,11 @@ import 'package:bodacious/main.dart';
 import 'package:bodacious/models/album_data.dart';
 import 'package:bodacious/models/track_data.dart';
 import 'package:bodacious/widgets/cover_placeholder.dart';
+import 'package:bodacious/widgets/item/song.dart';
 import 'package:drift/drift.dart' hide Column;
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class AlbumDetailsView extends StatefulWidget {
   final AlbumMetadata album;
@@ -114,37 +116,20 @@ class AlbumDetailsViewState extends State<AlbumDetailsView> {
                       final track = snapshot.data?[index] ?? TrackMetadata(uri: Uri(), title: "Loading...");
                       return SizedBox(
                         height: 72.0,
-                        child: ListTile(
-                          leading: SizedBox(
-                            height: 48,
-                            width: 48,
-                            child: Stack(
-                              fit: StackFit.expand,
-                              children: [
-                                Positioned.fill(child: track.coverBytes != null || track.coverUri?.scheme == "file" ? Image(
-                                  image: (track.coverUri?.scheme == "file" ? FileImage(File.fromUri(track.coverUri!))
-                                    : NetworkImage(track.coverUri.toString())) as ImageProvider,
-                                  width: 48,
-                                  height: 48,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, e, s) => const CoverPlaceholder(size: 48, iconSize: 24),
-                                ) : const CoverPlaceholder(size: 48, iconSize: 24)),
-                                if (track.trackNo != null && track.trackNo != 0) ...[
-                                  Positioned.fill(child: Container(color: Colors.black54)),
-                                  Positioned.fill(child: Center(child: Text(track.trackNo!.toString().padLeft(2, '0')))),
-                                ],
-                              ]
-                            ),
-                          ),
-                          title: Text(track.title ?? (track.uri.pathSegments.isEmpty ? "Unknown track" : track.uri.pathSegments.last)),
-                          subtitle: track.artistName?.isEmpty == false ? Text(track.artistName!) : null,
-                          onTap: track.uri == Uri() ? null : () {
-                            player.stop();
-                            player.updateQueue(snapshot.data!.map((e) => e.asMediaItem()).toList());
-                            //ref.read(nowPlayingProvider.notifier).changeTrack(track);
-                            player.skipToQueueItem(index);
-                            player.play();
-                          },
+                        child: Consumer(
+                          builder: (context, ref, _) {
+                            return SongWidget(
+                              track,
+                              showTrackNo: true,
+                              selected: ref.watch(nowPlayingProvider).value?.uri == track.uri,
+                              onTap: track.uri == Uri() ? null : () {
+                                player.stop();
+                                player.updateQueue(snapshot.data!.map((e) => e.asMediaItem()).toList());
+                                player.skipToQueueItem(index);
+                                player.play();
+                              },
+                            );
+                          }
                         ),
                       );
                     },

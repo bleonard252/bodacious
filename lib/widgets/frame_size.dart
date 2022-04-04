@@ -19,3 +19,15 @@ class FrameSize extends InheritedWidget {
   }
   
 }
+
+class Queue<T> {
+  /// The entries in this queue.
+  final List<T> entries;
+  /// The current position of the queue.
+  final int? position;
+
+  Queue({
+    required this.entries,
+    this.position
+  }) : assert((position == null || position < entries.length || position == 0) && (position == null || position >= 0), "Queue position out of range");
+}
