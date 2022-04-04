@@ -2,10 +2,12 @@ import 'dart:io';
 
 import 'package:bodacious/main.dart';
 import 'package:bodacious/models/album_data.dart';
+import 'package:bodacious/models/artist_data.dart';
 import 'package:bodacious/models/track_data.dart';
 import 'package:bodacious/widgets/cover_placeholder.dart';
+import 'package:bodacious/widgets/item/artist.dart';
 import 'package:bodacious/widgets/item/song.dart';
-import 'package:drift/drift.dart' hide Column;
+import 'package:drift/drift.dart' hide Column, Table;
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -94,6 +96,27 @@ class AlbumDetailsViewState extends State<AlbumDetailsView> {
                   ),
                 ),
                 //title: Text(album.name),
+              ),
+              FutureBuilder<ArtistMetadata?>(
+                future: db.tryGetArtist(album.artistName),
+                builder: (context, snapshot) => snapshot.hasData ? SliverToBoxAdapter(child: ArtistWidget(snapshot.data!, hideDetails: true)) 
+                : SliverToBoxAdapter(child: Container())
+              ),
+              if (album.year != null || album.trackCount != null) SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                    child: Text.rich(TextSpan(children: [
+                      TextSpan(text: "Details", style: Theme.of(context).textTheme.headline6),
+                      if (album.year != null) TextSpan(children: [
+                        const TextSpan(text: "\nYear: ", style: TextStyle(fontWeight: FontWeight.bold)),
+                        TextSpan(text: album.year.toString())
+                      ]),
+                      if (album.trackCount != null) TextSpan(children: [
+                        const TextSpan(text: "\nNumber of tracks: ", style: TextStyle(fontWeight: FontWeight.bold)),
+                        TextSpan(text: album.trackCount.toString())
+                      ]),
+                    ]))
+                ),
               ),
               SliverToBoxAdapter(
                 child: Padding(

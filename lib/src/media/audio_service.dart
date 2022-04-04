@@ -100,6 +100,17 @@ class JustAudioHandler extends BodaciousAudioHandler {
     );
   }
   @override
+  insertQueueItem(int index, MediaItem mediaItem) async {
+    if (player.audioSource is! just.ConcatenatingAudioSource) {
+      player.setAudioSource(just.ConcatenatingAudioSource(children: []));
+    }
+    await (player.audioSource as just.ConcatenatingAudioSource).insert(
+      index,
+      mediaItem is BodaciousMediaItem ? mediaItem.parent.asAudioSource()
+      : just.AudioSource.uri(Uri.file(mediaItem.id))
+    );
+  }
+  @override
   removeQueueItemAt(int index) async {
     if (player.audioSource is! just.ConcatenatingAudioSource) {
       return;
@@ -223,9 +234,9 @@ class VlcAudioHandler extends BodaciousAudioHandler {
   seek(Duration position) => Future.sync(() => player.seek(position))
   .then((value) => playbackState.add(playbackState.value.copyWith(updatePosition: position)));
   @override
-  skipToNext() => Future.sync(() => player.next());
+  skipToNext() => Future.sync(() => player.current.index == null ? player.next() : player.jump(player.current.index!+1));
   @override
-  skipToPrevious() => Future.sync(() => player.back());
+  skipToPrevious() => Future.sync(() => player.current.index == null ? player.back() : player.jump(player.current.index!-1));
   @override
   stop() => Future.sync(() => player.stop()).then((_) => super.stop());
 
@@ -233,6 +244,17 @@ class VlcAudioHandler extends BodaciousAudioHandler {
   addQueueItem(MediaItem mediaItem) async {
     if (player.current.isPlaylist) {
       player.current.medias.add(vlc.Media.file(File(mediaItem.id)));
+      // a more complex solution may be needed
+      // when network resources come into play
+    } else {
+      await updateQueue([mediaItem]);
+    }
+    return super.addQueueItem(mediaItem);
+  }
+  @override
+  insertQueueItem(int index, MediaItem mediaItem) async {
+    if (player.current.isPlaylist) {
+      player.insert(index, vlc.Media.file(File(Uri.parse(mediaItem.id).toFilePath())));
       // a more complex solution may be needed
       // when network resources come into play
     } else {

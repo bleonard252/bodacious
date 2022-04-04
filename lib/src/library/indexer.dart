@@ -296,14 +296,13 @@ class _IndexerIsolate {
         //   Filter.equals('albumName', _record.name)
         // ])));
         final trackCount = (await (
-          db.selectOnly(db.trackTable)
-          ..addColumns([db.trackTable.year])
-          ..where(db.trackTable.artistName.equals(_album[0]) & db.trackTable.albumName.equals(_album[1]))
+          db.select(db.trackTable)
+          ..where((tbl) => tbl.artistName.equals(_album[0]) & tbl.albumName.equals(_album[1]))
          ).get());
         //print(await songStore.find(db, finder: Finder()));
-        if (trackCount.isEmpty) {
-          trackCount.sort((a, b) => (a.read(db.trackTable.year)?.compareTo(b.read(db.trackTable.year)??0)??0));
-          final year = trackCount.last.read(db.trackTable.year);
+        if (trackCount.isNotEmpty) {
+          trackCount.sort((a, b) => (a.year)?.compareTo(b.year??0)??0);
+          final year = trackCount.last.year;
           await (
             db.albumTable.update()
             ..where((tbl) => tbl.name.equals(_album[1]) & tbl.artistName.equals(_album[0]))
@@ -329,9 +328,10 @@ class _IndexerIsolate {
   }
 
   Future<void> registerAlbumMetadata(TrackMetadata track) async {
+    assert(track.artistName != null && track.albumName != null);
     if (track.artistName == null || track.albumName == null) return;
     final record = await db.tryGetAlbum(track.albumName!, by: track.albumName!);
-    if (newArtists.contains(track.artistName!+" - "+track.albumName!) || record != null) return;
+    if (newArtists.contains(track.artistName!+" - "+track.albumName!) || (record != null && !force)) return;
     newAlbums.add(track.artistName!+" - "+track.albumName!);
     var _record = AlbumMetadata(
       artistName: track.artistName!,
@@ -342,10 +342,11 @@ class _IndexerIsolate {
   }
 
   Future<void> registerArtistMetadata(TrackMetadata track) async {
+    assert(track.artistName != null);
     if (track.artistName == null) return;
     //final record = artistStore.record(track.artistName!);
     final record = await db.tryGetArtist(track.albumName!);
-    if (newArtists.contains(track.albumName!) || record != null) return;
+    if (newArtists.contains(track.albumName!) || (record != null && !force)) return;
     newArtists.add(track.albumName!);
     var _record = ArtistMetadata(
       name: track.artistName!
