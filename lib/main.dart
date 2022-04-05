@@ -26,6 +26,7 @@ import 'package:bodacious/widgets/now_playing.dart';
 import 'package:bodacious/widgets/frame_size.dart';
 import 'package:bodacious/widgets/now_playing_sidebar.dart';
 import 'package:dart_vlc/dart_vlc.dart' show DartVLC;
+import 'package:drift/drift.dart' hide Column;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -45,10 +46,6 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   db = BoDatabase();
   config = Config(await SharedPreferences.getInstance());
-
-  runApp(const ProviderScope(
-    child: MyApp(),
-  ));
 
   try {
     player = await AudioService.init<BodaciousAudioHandler>(
@@ -80,6 +77,10 @@ void main() async {
     yield nothingPlaying;
     await for (final update in stream) {
       if (update == null) continue;
+      if (update is BodaciousMediaItem) {
+        yield update.parent;
+        continue;
+      }
       if (update.id.contains("://") && !update.id.startsWith("file:///")) {
         if (kDebugMode) {
           print(update.id+" is not a supported URI.");
@@ -93,11 +94,12 @@ void main() async {
       // }
 
       final TrackMetadata? _dbEntry = await (db.select(db.trackTable)
-      ..where((tbl) => tbl.uri.equalsValue(Uri.file(update.id)))
+      ..where((tbl) => tbl.uri.equalsValue(Uri.file(update.id)) | tbl.uri.equalsValue(Uri.parse(update.id)))
       ..limit(1)
       ).getSingleOrNull();
       
       if (_dbEntry != null) {
+        player.mediaItem.add(_dbEntry.copyWith(duration: update.duration).asMediaItem());
         yield _dbEntry;
       } else {
         yield nothingPlaying.copyWith(uri: Uri.file(update.id));
@@ -106,15 +108,18 @@ void main() async {
   });
   queueProvider = StreamProvider<Queue<TrackMetadata>>((ref) async* {
     final stream = player.queue;
-    final nothingPlaying = TrackMetadata.empty();
     yield Queue(entries: []);
     await for (final update in stream) {
       if (update.isEmpty) yield Queue(entries: []);
       
       if (listEquals(update,ref.state.value?.entries.map((value) => value.asMediaItem()).toList())) continue;
-        // if the update is the same as 
+        // if the update is the same as the existing queue, don't update it
       final List<Future<TrackMetadata?>> futures = [];
       for (final update in update) {
+        if (update is BodaciousMediaItem) {
+          futures.add(Future.value(update.parent));
+          continue;
+        }
         if (update.id.contains("://") && !update.id.startsWith("file:///")) {
           if (kDebugMode) {
             print(update.id+" is not a supported URI.");
@@ -127,7 +132,7 @@ void main() async {
         // }
 
         final Future<TrackMetadata?> _dbEntry = (db.select(db.trackTable)
-        ..where((tbl) => tbl.uri.equalsValue(Uri.file(update.id)))
+        ..where((tbl) => tbl.uri.equalsValue(Uri.file(update.id)) | tbl.uri.equalsValue(Uri.parse(update.id)))
         ..limit(1)
         ).getSingleOrNull();
         futures.add(_dbEntry);
@@ -136,6 +141,10 @@ void main() async {
       yield Queue(entries: (await Future.wait<TrackMetadata?>(futures)).whereType<TrackMetadata>().toList(), position: player.currentIndex);
     }
   });
+
+  runApp(const ProviderScope(
+    child: MyApp(),
+  ));
 
   unawaited(TheIndexer.spawn());
 

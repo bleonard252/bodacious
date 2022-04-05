@@ -105,8 +105,8 @@ class BodaciousMediaItem extends MediaItem {
   @override
   String? get artist => parent.artistName;
 
-  @override
-  MediaItemCopyWith get copyWith => throw UnimplementedError("Check for BodaciousMediaItem before trying to copyWith!");
+  // @override
+  // MediaItemCopyWith get copyWith => super.copyWith; //throw UnimplementedError("Check for BodaciousMediaItem before trying to copyWith!");
 
   @override
   String? get displayDescription => null;

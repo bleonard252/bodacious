@@ -72,23 +72,25 @@ class AlbumDetailsViewState extends State<AlbumDetailsView> {
                           )
                           else const CoverPlaceholder(size: 72)
                         ],
-                        Padding(
-                          padding: (controller.positions.isEmpty || controller.offset <= 48) ? const EdgeInsets.all(8.0) : EdgeInsets.zero,
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                album.name, 
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              if (controller.positions.isEmpty || controller.offset <= 48) Text(album.artistName, 
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: Theme.of(context).textTheme.caption
-                              )
-                            ],
+                        Expanded(
+                          child: Padding(
+                            padding: (controller.positions.isEmpty || controller.offset <= 48) ? const EdgeInsets.all(8.0) : EdgeInsets.zero,
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  album.name, 
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                if (controller.positions.isEmpty || controller.offset <= 48) Text(album.artistName, 
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: Theme.of(context).textTheme.caption
+                                )
+                              ],
+                            ),
                           ),
                         )
                       ]

@@ -92,20 +92,22 @@ class _NowPlayingViewState extends ConsumerState<NowPlayingView> {
                         children: [
                           Expanded(
                             child: ConstrainedBox(
-                              constraints: BoxConstraints.loose(MediaQuery.of(context).size/2),
+                              constraints: BoxConstraints.loose(Size.fromHeight(MediaQuery.of(context).size.height)),
                               child: Padding(
                                 padding: const EdgeInsets.all(16.0),
-                                child: ClipRRect(
-                                  borderRadius: const BorderRadius.all(Radius.circular(12)),
-                                  child: AspectRatio(
-                                    aspectRatio: 1/1,
-                                    child: meta.coverBytes != null || meta.coverUri?.scheme == "file" ? Image(
-                                      image: (meta.coverBytes != null ? MemoryImage(Uint8List.fromList(meta.coverBytes!))
-                                        : meta.coverUri?.scheme == "file" ? FileImage(File.fromUri(meta.coverUri!))
-                                        : NetworkImage(meta.coverUri.toString())) as ImageProvider,
-                                      fit: BoxFit.cover,
-                                      errorBuilder: (context, e, s) => const CoverPlaceholder(size: null, iconSize: 64)
-                                    ) : const CoverPlaceholder(size: null, iconSize: 64),
+                                child: AspectRatio(
+                                  aspectRatio: 1,
+                                  child: Center(
+                                    child: ClipRRect(
+                                      borderRadius: const BorderRadius.all(Radius.circular(12)),
+                                      child: meta.coverBytes != null || meta.coverUri?.scheme == "file" ? Image(
+                                        image: (meta.coverBytes != null ? MemoryImage(Uint8List.fromList(meta.coverBytes!))
+                                          : meta.coverUri?.scheme == "file" ? FileImage(File.fromUri(meta.coverUri!))
+                                          : NetworkImage(meta.coverUri.toString())) as ImageProvider,
+                                        fit: BoxFit.cover,
+                                        errorBuilder: (context, e, s) => const CoverPlaceholder(size: null, iconSize: 64)
+                                      ) : const CoverPlaceholder(size: null, iconSize: 64),
+                                    ),
                                   ),
                                 ),
                               ),
@@ -256,9 +258,9 @@ class _NowPlayingViewState extends ConsumerState<NowPlayingView> {
                                       stream: player.playbackState,
                                       initialData: player.playbackState.valueOrNull,
                                       builder: (context, snapshot) => Tooltip(
-                                        message: snapshot.data?.repeatMode == AudioServiceRepeatMode.all ? "Repeating all. Press to repeat this track" 
+                                        message: snapshot.error?.toString() ?? (snapshot.data?.repeatMode == AudioServiceRepeatMode.all ? "Repeating all. Press to repeat this track" 
                                           : snapshot.data?.repeatMode == AudioServiceRepeatMode.one ? "Repeating this track. Press to turn off repeat" 
-                                          : "Repeating off. Press to repeat all",
+                                          : "Repeating off. Press to repeat all"),
                                         child: IconButton(
                                           onPressed: () => player.setRepeatMode(
                                             (snapshot.data?.repeatMode == AudioServiceRepeatMode.none) ? AudioServiceRepeatMode.all
@@ -266,8 +268,8 @@ class _NowPlayingViewState extends ConsumerState<NowPlayingView> {
                                             : AudioServiceRepeatMode.none
                                           ),
                                           icon: Icon(
-                                            snapshot.data?.repeatMode == LoopMode.all ? MdiIcons.repeat 
-                                            : snapshot.data?.repeatMode == LoopMode.one ? MdiIcons.repeatOnce
+                                            snapshot.data?.repeatMode == AudioServiceRepeatMode.all ? MdiIcons.repeat 
+                                            : snapshot.data?.repeatMode == AudioServiceRepeatMode.one ? MdiIcons.repeatOnce
                                             : MdiIcons.repeatOff
                                           ),
                                         ),

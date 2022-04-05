@@ -83,19 +83,21 @@ class ArtistDetailsViewState extends State<ArtistDetailsView> {
                             return coverUri?.scheme == "file" ? Image(
                               image: (coverUri?.scheme == "file" ? FileImage(File.fromUri(coverUri!))
                                 : NetworkImage(coverUri.toString())) as ImageProvider,
-                              width: 48,
-                              height: 48,
+                              width: 72,
+                              height: 72,
                               fit: BoxFit.cover,
-                              errorBuilder: (context, e, s) => const CoverPlaceholder(size: 48, iconSize: 24),
-                            ): const CoverPlaceholder(size: 48, iconSize: 24);
+                              errorBuilder: (context, e, s) => const CoverPlaceholder(size: 72),
+                            ): const CoverPlaceholder(size: 72);
                           })
                         ),
-                        Padding(
-                          padding: (controller.positions.isEmpty || controller.offset <= 48) ? const EdgeInsets.all(8.0) : EdgeInsets.zero,
-                          child: Text(
-                            artist.name, 
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
+                        Expanded(
+                          child: Padding(
+                            padding: (controller.positions.isEmpty || controller.offset <= 48) ? const EdgeInsets.all(8.0) : EdgeInsets.zero,
+                            child: Text(
+                              artist.name, 
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
                         )
                       ]
