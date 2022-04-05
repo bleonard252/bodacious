@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:bodacious/main.dart';
 import 'package:bodacious/models/track_data.dart';
@@ -17,13 +18,15 @@ class SongWidget extends ConsumerWidget {
   final bool showTrackNo;
   /// Good for artist pages.
   final bool useAlbumName;
+  final bool showVariations;
   const SongWidget(this.track, {
     Key? key,
     this.onTap,
     this.showTrackNo = false,
     this.selected = false,
     this.inQueue = false,
-    this.useAlbumName = false
+    this.useAlbumName = false,
+    this.showVariations = false
   }) : super(key: key);
 
   @override
@@ -42,14 +45,24 @@ class SongWidget extends ConsumerWidget {
               child: Stack(
                 fit: StackFit.expand,
                 children: [
-                  Positioned.fill(child: track.coverBytes != null || track.coverUri?.scheme == "file" ? Image(
-                    image: (track.coverUri?.scheme == "file" ? FileImage(File.fromUri(track.coverUri!))
-                      : NetworkImage(track.coverUri.toString())) as ImageProvider,
-                    width: 48,
-                    height: 48,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, e, s) => const CoverPlaceholder(size: 48, iconSize: 24),
-                  ) : const CoverPlaceholder(size: 48, iconSize: 24)),
+                  Positioned.fill(
+                    child: Container(
+                      foregroundDecoration: track.available ? null : BoxDecoration(
+                        color: Colors.black.withAlpha(127),
+                        backgroundBlendMode: BlendMode.srcOver
+                      ),
+                      child: track.coverBytes != null || track.coverUri?.scheme == "file" ? Image(
+                      image: (track.coverUri?.scheme == "file" ? FileImage(File.fromUri(track.coverUri!))
+                        : NetworkImage(track.coverUri.toString())) as ImageProvider,
+                      width: 48,
+                      height: 48,
+                      color: track.available ? null : Colors.black,
+                      colorBlendMode: track.available ? BlendMode.srcIn : BlendMode.saturation,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, e, s) => const CoverPlaceholder(size: 48, iconSize: 24),
+                    ) : const CoverPlaceholder(size: 48, iconSize: 24),
+                    ),
+                  ),
                   if (selected) ...[
                     Positioned.fill(child: Container(color: Colors.black54)),
                     const Positioned.fill(child: Center(child: Icon(MdiIcons.equalizer))),
@@ -62,8 +75,9 @@ class SongWidget extends ConsumerWidget {
               ),
             ),
             title: Text(track.title ?? (track.uri.pathSegments.isEmpty ? "Unknown track" : track.uri.pathSegments.last)),
-            subtitle: track.artistName?.isEmpty == false ? Text(track.artistName!) : null,
-            onTap: onTap,
+            subtitle: !track.available ? const Text("Track unavailable") : track.artistName?.isEmpty == false ? Text(track.artistName!) : null,
+            onTap: !track.available ? null : onTap,
+            enabled: track.available,
             trailing: Builder(
               builder: (context) {
                 return IconButton(
@@ -84,7 +98,7 @@ class SongWidget extends ConsumerWidget {
                         child: Text("Track info"),
                         value: "trackinfo",
                       ),
-                      const PopupMenuItem(
+                      if (track.available) const PopupMenuItem(
                         child: Text("Play next"),
                         value: "playnext",
                       ),

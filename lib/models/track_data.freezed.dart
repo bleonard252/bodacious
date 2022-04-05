@@ -34,7 +34,8 @@ class _$TrackMetadataTearOff {
       Uri? coverUri,
       Duration? duration,
       int? year,
-      DateTime? releaseDate}) {
+      DateTime? releaseDate,
+      bool available = true}) {
     return _TrackMetadata(
       title: title,
       artistName: artistName,
@@ -48,6 +49,7 @@ class _$TrackMetadataTearOff {
       duration: duration,
       year: year,
       releaseDate: releaseDate,
+      available: available,
     );
   }
 
@@ -98,6 +100,7 @@ mixin _$TrackMetadata {
 
   /// The release date of this track.
   DateTime? get releaseDate => throw _privateConstructorUsedError;
+  bool get available => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -122,7 +125,8 @@ abstract class $TrackMetadataCopyWith<$Res> {
       Uri? coverUri,
       Duration? duration,
       int? year,
-      DateTime? releaseDate});
+      DateTime? releaseDate,
+      bool available});
 }
 
 /// @nodoc
@@ -148,6 +152,7 @@ class _$TrackMetadataCopyWithImpl<$Res>
     Object? duration = freezed,
     Object? year = freezed,
     Object? releaseDate = freezed,
+    Object? available = freezed,
   }) {
     return _then(_value.copyWith(
       title: title == freezed
@@ -198,6 +203,10 @@ class _$TrackMetadataCopyWithImpl<$Res>
           ? _value.releaseDate
           : releaseDate // ignore: cast_nullable_to_non_nullable
               as DateTime?,
+      available: available == freezed
+          ? _value.available
+          : available // ignore: cast_nullable_to_non_nullable
+              as bool,
     ));
   }
 }
@@ -221,7 +230,8 @@ abstract class _$TrackMetadataCopyWith<$Res>
       Uri? coverUri,
       Duration? duration,
       int? year,
-      DateTime? releaseDate});
+      DateTime? releaseDate,
+      bool available});
 }
 
 /// @nodoc
@@ -249,6 +259,7 @@ class __$TrackMetadataCopyWithImpl<$Res>
     Object? duration = freezed,
     Object? year = freezed,
     Object? releaseDate = freezed,
+    Object? available = freezed,
   }) {
     return _then(_TrackMetadata(
       title: title == freezed
@@ -299,6 +310,10 @@ class __$TrackMetadataCopyWithImpl<$Res>
           ? _value.releaseDate
           : releaseDate // ignore: cast_nullable_to_non_nullable
               as DateTime?,
+      available: available == freezed
+          ? _value.available
+          : available // ignore: cast_nullable_to_non_nullable
+              as bool,
     ));
   }
 }
@@ -318,7 +333,8 @@ class _$_TrackMetadata extends _TrackMetadata with DiagnosticableTreeMixin {
       this.coverUri,
       this.duration,
       this.year,
-      this.releaseDate})
+      this.releaseDate,
+      this.available = true})
       : super._();
 
   factory _$_TrackMetadata.fromJson(Map<String, dynamic> json) =>
@@ -375,10 +391,13 @@ class _$_TrackMetadata extends _TrackMetadata with DiagnosticableTreeMixin {
 
   /// The release date of this track.
   final DateTime? releaseDate;
+  @JsonKey()
+  @override
+  final bool available;
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'TrackMetadata(title: $title, artistName: $artistName, albumName: $albumName, trackNo: $trackNo, discNo: $discNo, coverData: $coverData, uri: $uri, coverBytes: $coverBytes, coverUri: $coverUri, duration: $duration, year: $year, releaseDate: $releaseDate)';
+    return 'TrackMetadata(title: $title, artistName: $artistName, albumName: $albumName, trackNo: $trackNo, discNo: $discNo, coverData: $coverData, uri: $uri, coverBytes: $coverBytes, coverUri: $coverUri, duration: $duration, year: $year, releaseDate: $releaseDate, available: $available)';
   }
 
   @override
@@ -397,7 +416,8 @@ class _$_TrackMetadata extends _TrackMetadata with DiagnosticableTreeMixin {
       ..add(DiagnosticsProperty('coverUri', coverUri))
       ..add(DiagnosticsProperty('duration', duration))
       ..add(DiagnosticsProperty('year', year))
-      ..add(DiagnosticsProperty('releaseDate', releaseDate));
+      ..add(DiagnosticsProperty('releaseDate', releaseDate))
+      ..add(DiagnosticsProperty('available', available));
   }
 
   @override
@@ -419,7 +439,8 @@ class _$_TrackMetadata extends _TrackMetadata with DiagnosticableTreeMixin {
             const DeepCollectionEquality().equals(other.duration, duration) &&
             const DeepCollectionEquality().equals(other.year, year) &&
             const DeepCollectionEquality()
-                .equals(other.releaseDate, releaseDate));
+                .equals(other.releaseDate, releaseDate) &&
+            const DeepCollectionEquality().equals(other.available, available));
   }
 
   @override
@@ -436,7 +457,8 @@ class _$_TrackMetadata extends _TrackMetadata with DiagnosticableTreeMixin {
       const DeepCollectionEquality().hash(coverUri),
       const DeepCollectionEquality().hash(duration),
       const DeepCollectionEquality().hash(year),
-      const DeepCollectionEquality().hash(releaseDate));
+      const DeepCollectionEquality().hash(releaseDate),
+      const DeepCollectionEquality().hash(available));
 
   @JsonKey(ignore: true)
   @override
@@ -462,7 +484,8 @@ abstract class _TrackMetadata extends TrackMetadata {
       Uri? coverUri,
       Duration? duration,
       int? year,
-      DateTime? releaseDate}) = _$_TrackMetadata;
+      DateTime? releaseDate,
+      bool available}) = _$_TrackMetadata;
   const _TrackMetadata._() : super._();
 
   factory _TrackMetadata.fromJson(Map<String, dynamic> json) =
@@ -518,6 +541,8 @@ abstract class _TrackMetadata extends TrackMetadata {
 
   /// The release date of this track.
   DateTime? get releaseDate;
+  @override
+  bool get available;
   @override
   @JsonKey(ignore: true)
   _$TrackMetadataCopyWith<_TrackMetadata> get copyWith =>

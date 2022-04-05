@@ -44,6 +44,7 @@ class TrackMetadata with _$TrackMetadata implements Insertable<TrackMetadata> {
     int? year,
     /// The release date of this track.
     DateTime? releaseDate,
+    @Default(true) bool available
   }) = _TrackMetadata;
 
   factory TrackMetadata.fromJson(Map<String, dynamic> json) => _$TrackMetadataFromJson(json);

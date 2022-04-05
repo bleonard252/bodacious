@@ -111,6 +111,14 @@ class $AlbumTableTable extends AlbumTable
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
   $AlbumTableTable(this.attachedDatabase, [this._alias]);
+  final VerificationMeta __idMeta = const VerificationMeta('_id');
+  @override
+  late final GeneratedColumn<String?> _id = GeneratedColumn<String?>(
+      'id', aliasedName, false,
+      type: const StringType(),
+      requiredDuringInsert: false,
+      generatedAs:
+          GeneratedAs(artistName + const Constant(" - ") + name, false));
   final VerificationMeta _nameMeta = const VerificationMeta('name');
   @override
   late final GeneratedColumn<String?> name = GeneratedColumn<String?>(
@@ -145,7 +153,7 @@ class $AlbumTableTable extends AlbumTable
           type: const IntType(), requiredDuringInsert: false);
   @override
   List<GeneratedColumn> get $columns =>
-      [name, artistName, coverUri, trackCount, year, releaseDate];
+      [_id, name, artistName, coverUri, trackCount, year, releaseDate];
   @override
   String get aliasedName => _alias ?? 'album_table';
   @override
@@ -155,6 +163,10 @@ class $AlbumTableTable extends AlbumTable
       {bool isInserting = false}) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(
+          __idMeta, _id.isAcceptableOrUnknown(data['id']!, __idMeta));
+    }
     if (data.containsKey('name')) {
       context.handle(
           _nameMeta, name.isAcceptableOrUnknown(data['name']!, _nameMeta));
@@ -190,7 +202,7 @@ class $AlbumTableTable extends AlbumTable
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => {name, artistName};
+  Set<GeneratedColumn> get $primaryKey => {_id};
   @override
   AlbumMetadata map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
@@ -390,6 +402,7 @@ class TrackTableCompanion extends UpdateCompanion<TrackMetadata> {
   final Value<Duration?> duration;
   final Value<int?> year;
   final Value<DateTime?> releaseDate;
+  final Value<bool> available;
   const TrackTableCompanion({
     this.title = const Value.absent(),
     this.artistName = const Value.absent(),
@@ -401,6 +414,7 @@ class TrackTableCompanion extends UpdateCompanion<TrackMetadata> {
     this.duration = const Value.absent(),
     this.year = const Value.absent(),
     this.releaseDate = const Value.absent(),
+    this.available = const Value.absent(),
   });
   TrackTableCompanion.insert({
     this.title = const Value.absent(),
@@ -413,6 +427,7 @@ class TrackTableCompanion extends UpdateCompanion<TrackMetadata> {
     this.duration = const Value.absent(),
     this.year = const Value.absent(),
     this.releaseDate = const Value.absent(),
+    this.available = const Value.absent(),
   }) : uri = Value(uri);
   static Insertable<TrackMetadata> custom({
     Expression<String?>? title,
@@ -425,6 +440,7 @@ class TrackTableCompanion extends UpdateCompanion<TrackMetadata> {
     Expression<Duration?>? duration,
     Expression<int?>? year,
     Expression<DateTime?>? releaseDate,
+    Expression<bool>? available,
   }) {
     return RawValuesInsertable({
       if (title != null) 'title': title,
@@ -437,6 +453,7 @@ class TrackTableCompanion extends UpdateCompanion<TrackMetadata> {
       if (duration != null) 'duration': duration,
       if (year != null) 'year': year,
       if (releaseDate != null) 'release_date': releaseDate,
+      if (available != null) 'available': available,
     });
   }
 
@@ -450,7 +467,8 @@ class TrackTableCompanion extends UpdateCompanion<TrackMetadata> {
       Value<Uri?>? coverUri,
       Value<Duration?>? duration,
       Value<int?>? year,
-      Value<DateTime?>? releaseDate}) {
+      Value<DateTime?>? releaseDate,
+      Value<bool>? available}) {
     return TrackTableCompanion(
       title: title ?? this.title,
       artistName: artistName ?? this.artistName,
@@ -462,6 +480,7 @@ class TrackTableCompanion extends UpdateCompanion<TrackMetadata> {
       duration: duration ?? this.duration,
       year: year ?? this.year,
       releaseDate: releaseDate ?? this.releaseDate,
+      available: available ?? this.available,
     );
   }
 
@@ -501,6 +520,9 @@ class TrackTableCompanion extends UpdateCompanion<TrackMetadata> {
     if (releaseDate.present) {
       map['release_date'] = Variable<DateTime?>(releaseDate.value);
     }
+    if (available.present) {
+      map['available'] = Variable<bool>(available.value);
+    }
     return map;
   }
 
@@ -516,7 +538,8 @@ class TrackTableCompanion extends UpdateCompanion<TrackMetadata> {
           ..write('coverUri: $coverUri, ')
           ..write('duration: $duration, ')
           ..write('year: $year, ')
-          ..write('releaseDate: $releaseDate')
+          ..write('releaseDate: $releaseDate, ')
+          ..write('available: $available')
           ..write(')'))
         .toString();
   }
@@ -586,6 +609,14 @@ class $TrackTableTable extends TrackTable
   late final GeneratedColumn<DateTime?> releaseDate =
       GeneratedColumn<DateTime?>('release_date', aliasedName, true,
           type: const IntType(), requiredDuringInsert: false);
+  final VerificationMeta _availableMeta = const VerificationMeta('available');
+  @override
+  late final GeneratedColumn<bool?> available = GeneratedColumn<bool?>(
+      'available', aliasedName, false,
+      type: const BoolType(),
+      requiredDuringInsert: false,
+      defaultConstraints: 'CHECK (available IN (0, 1))',
+      defaultValue: const Constant(true));
   @override
   List<GeneratedColumn> get $columns => [
         title,
@@ -597,7 +628,8 @@ class $TrackTableTable extends TrackTable
         coverUri,
         duration,
         year,
-        releaseDate
+        releaseDate,
+        available
       ];
   @override
   String get aliasedName => _alias ?? 'track_table';
@@ -643,6 +675,10 @@ class $TrackTableTable extends TrackTable
           releaseDate.isAcceptableOrUnknown(
               data['release_date']!, _releaseDateMeta));
     }
+    if (data.containsKey('available')) {
+      context.handle(_availableMeta,
+          available.isAcceptableOrUnknown(data['available']!, _availableMeta));
+    }
     return context;
   }
 
@@ -672,6 +708,8 @@ class $TrackTableTable extends TrackTable
           .mapFromDatabaseResponse(data['${effectivePrefix}year']),
       releaseDate: const DateTimeType()
           .mapFromDatabaseResponse(data['${effectivePrefix}release_date']),
+      available: const BoolType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}available'])!,
     );
   }
 

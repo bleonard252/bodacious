@@ -24,6 +24,7 @@ _$_TrackMetadata _$$_TrackMetadataFromJson(Map<String, dynamic> json) =>
       releaseDate: json['releaseDate'] == null
           ? null
           : DateTime.parse(json['releaseDate'] as String),
+      available: json['available'] as bool? ?? true,
     );
 
 Map<String, dynamic> _$$_TrackMetadataToJson(_$_TrackMetadata instance) =>
@@ -38,4 +39,5 @@ Map<String, dynamic> _$$_TrackMetadataToJson(_$_TrackMetadata instance) =>
       'duration': instance.duration?.inMicroseconds,
       'year': instance.year,
       'releaseDate': instance.releaseDate?.toIso8601String(),
+      'available': instance.available,
     };

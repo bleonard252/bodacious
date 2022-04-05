@@ -22,7 +22,7 @@ class BoDatabase extends _$BoDatabase {
 
   // you should bump this number whenever you change or add a table definition
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   Future<TrackMetadata?> tryGetTrackFromUri(Uri uri) {
     return (
@@ -42,6 +42,14 @@ class BoDatabase extends _$BoDatabase {
       ..where((tbl) => tbl.name.equals(albumName) & tbl.artistName.equals(by))
     ).getSingleOrNull();
   }
+
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+    onUpgrade: (m, from, to) async {
+      if (from > to) throw UnsupportedError("Downgrades are not supported");
+      if (to == 2) m.addColumn(trackTable, trackTable.available);
+    },
+  );
 }
 
 LazyDatabase _openConnection() {

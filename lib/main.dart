@@ -78,7 +78,7 @@ void main() async {
     await for (final update in stream) {
       if (update == null) continue;
       if (update is BodaciousMediaItem) {
-        yield update.parent;
+        //yield update.parent;
         continue;
       }
       if (update.id.contains("://") && !update.id.startsWith("file:///")) {
@@ -278,7 +278,7 @@ class OuterFrame extends StatelessWidget {
             builder: (context, snapshot) {
               final shouldBeSelected = goRouter.location == "/menu" || goRouter.location == "/" || goRouter.location.startsWith("/library");
               return Column(children: [
-                if (goRouter.location != "/now_playing") const NowPlayingBar(),
+                if (!goRouter.location.startsWith("/now_playing")) const NowPlayingBar(),
                 BottomNavigationBar(
                   backgroundColor: Theme.of(context).colorScheme.surface,
                   elevation: 0,

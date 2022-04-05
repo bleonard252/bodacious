@@ -15,6 +15,7 @@ class TrackTable extends Table {
   IntColumn get duration => integer().map(DurationConverter()).nullable()();
   IntColumn get year => integer().nullable()();
   DateTimeColumn get releaseDate => dateTime().nullable()();
+  BoolColumn get available => boolean().withDefault(const Constant(true))();
 }
 class UriConverter extends TypeConverter<Uri, String> {
   @override

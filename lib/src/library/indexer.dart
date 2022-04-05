@@ -67,7 +67,21 @@ abstract class TheIndexer {
         "config": ROConfig(config),
         "force": force
       });
+      if (progress.valueOrNull?.state != IndexerState.FINISHED) {
+        progressReceiver.sendPort.send(IndexerProgressReport(
+          state: IndexerState.STOPPED,
+          currentFilename: progress.valueOrNull?.currentFilename,
+          max: progress.valueOrNull?.max ?? 1,
+          value: progress.valueOrNull?.value ?? 0
+        ));
+      }
     } catch(e, st) {
+      progressReceiver.sendPort.send(IndexerProgressReport(
+        state: IndexerState.STOPPED,
+        currentFilename: progress.valueOrNull?.currentFilename,
+        max: progress.valueOrNull?.max ?? 1,
+        value: progress.valueOrNull?.value ?? 0
+      ));
       // ignore: avoid_print
       print(e);
       // ignore: avoid_print
@@ -117,213 +131,228 @@ class _IndexerIsolate {
     // }
     db = BoDatabase.connect(DatabaseConnection.fromExecutor(NativeDatabase(File(dbPath))));
     sendProgressReport.send(const IndexerProgressReport(state: IndexerState.STARTING, max: 0));
-    // == STARTING PHASE == //
-    if (preclean) {
-      throw UnimplementedError("Pre-clean is not currently supported");
-      // await db.delete();
-      // await albumStore.drop(db);
-      // await artistStore.drop(db);
-    }
-    List<File> validFiles = [];
-    final List<String> _dbfolders = List.castFrom<dynamic, String>(config.libraries);
-    for (final f in _dbfolders) {
-      if (!await Directory(f).exists()) {
-        if (kDebugMode) {print("INDEXER ERROR: `"+f+"` does not exist!");}
-        continue; //we're in a for loop. so go to the next thing (or break if you're at the end)
+    await db.transaction<void>(() async {
+      // == STARTING PHASE == //
+      if (preclean) {
+        throw UnimplementedError("Pre-clean is not currently supported");
+        // await db.delete();
+        // await albumStore.drop(db);
+        // await artistStore.drop(db);
       }
-      await for (final d in Directory(f).list(recursive: true)) {
-        if (d is! File) continue;
-        if (MimeTypeResolver().lookup(d.uri.pathSegments.last)?.startsWith("audio/") != true) continue;
-        validFiles.add(d);
-        sendProgressReport.send(IndexerProgressReport(
-          state: IndexerState.STARTING,
-          max: validFiles.length,
-          currentFilename: f
-        ));
-      }
-    }
-    sendProgressReport.send(IndexerProgressReport(
-      state: IndexerState.SCANNING,
-      max: validFiles.length,
-      value: 0
-    ));
-    
-    // == GET THE METADATA == //
-    // The plan for this is to read the metadata,
-    // including covers and lyrics, for each file.
-    // This includes checking adjacent files under
-    // .lrc or .mse extensions, or `cover.png` for
-    // cover art.
-    // It'll check for MSEs first, but if it can't
-    // find the file it'll then check for tags in
-    // the file, then the file's context (filename
-    // and parent dir names).
-    // The metadata will be partial as it will be
-    // stored as JSON in the database, which drops
-    // some values, such as artist and album, data
-    // for the cover itself, and album tracklists.
-    for (final file in validFiles) {
-      sendProgressReport.send(IndexerProgressReport(
-        state: IndexerState.SCANNING,
-        max: validFiles.length,
-        value: validFiles.indexOf(file),
-        currentFilename: file.uri.pathSegments.last
-      ));
-      // final _matches = await songStore.find(db, finder: Finder(filter: Filter.custom(
-      //   // Find this file in the database.
-      //   (record) => record.value.uri == file.absolute.uri.toString()
-      // )));
-      if (!force) {
-        final _matches = await (
-          db.select(db.trackTable)
-          ..where((tbl) => tbl.uri.equalsValue(file.absolute.uri))
-        ).get();
-        // Skip processing files that have already been processed
-        if (_matches.isNotEmpty) continue;
-      }
-      var metaBytes = <int>[], _class = "none";
-      final _metaByteReader = file.openRead().listen(null);
-      //double? targetLength;
-      final c = Completer();
-      _metaByteReader.onData((data) {
-        metaBytes.addAll(data);
-        if (_class == "none") {
-          if (metaBytes.length >= 4 && String.fromCharCodes(metaBytes.getRange(0, 4)) == 'fLaC') {_class = "flac";}
-          else if (metaBytes.length >= 3 && listEquals(metaBytes.getRange(0, 3).toList(), [73, 68, 51])) {_class = "id3";}
-        }
-        if (metaBytes.length >= 10*1000000 /* 10MB */) {
-          _metaByteReader.cancel();
-          /* Really I have no idea why you'd need more than 10MB of TAGS in a file...
-             If there is a case I might be able to bump it */
-          metaBytes = metaBytes.take(10*1000000).toList();
-          c.complete();
-          /* Trust me though, I did try to figure out when the id3 tags ended
-             so I could get ONLY the tags.
-             I don't want to rely on id3 being only in mp3 form, and I wanted
-             to reduce the amount of data looked at to only the necessary data,
-             so that the library could scan faster.
-          */
-        }
-        if (_class == "flac") {
-          _metaByteReader.cancel();
-          c.complete();
-          metaBytes.clear();
-          // the FLAC metadata reader reads the file itself
-          // so gathering the bytes for it is not important
-        } else if (_class == "id3" && metaBytes.length > 10) {
-          // Determine the length of the id3 segment
-          try {
-            //targetLength ??= (i32.parse(metaBytes.sublist(6,10).join(""), radix: 16)).roundToDouble()+10;
-            // if (metaBytes.length >= targetLength!) {
-            //   _metaByteReader.cancel();
-            //   c.complete();
-            // }
-          } catch(e) {
-            if (kDebugMode) {print(e);}
-            _metaByteReader.cancel();
-            c.complete();
-            metaBytes.clear();
-            _class = "none";
-            return;
-          }
-        }
-        if (metaBytes.length > 20 && _class == "none") {
-          c.complete();
-          _metaByteReader.cancel();
-          metaBytes.clear();
-        }
-      });
-      _metaByteReader.onDone(() {c.complete();});
-      _metaByteReader.onError((_) {_metaByteReader.cancel().then((_)=>c.complete());});
-      await Future.any([c.future, _metaByteReader.asFuture()]);
-
-      //final _mseFile = File(file.path.replaceFirst(fileExtensionRegex, ".mse"));
-      // final _mse = (await _mseFile.exists()) ? await parseMseFile(_mseFile.openRead()) : null;
-      final TrackMetadata? _id3 = (/* _mse == null && */ _class == "id3" || _class == "flac") ? await loadID3FromBytes(metaBytes, file, cacheDir: cacheDir) : null;
-      final TrackMetadata? _ctxmeta = (/* _mse == null && */ _id3 == null) ? inferMetadataFromContext(file.absolute.uri)
-      .copyWith(coverUri: (await inferCoverFile(file))?.absolute.uri) : null;
-      final TrackMetadata record = (/*_mse ??*/ _id3 ?? _ctxmeta ?? TrackMetadata.empty()).copyWith(
-        uri: file.absolute.uri
-      );
-      final tr_rec = record.artistName?.isEmpty != false || record.title?.isEmpty != false
-        ? file.uri.pathSegments.last
-        : record.artistName! +" - "+ record.title!;
-      //await tr_rec.put(db, record.toJson());
-      db.into(db.trackTable).insertOnConflictUpdate(record);
-      await registerAlbumMetadata(record);
-      await registerArtistMetadata(record);
-    }
-
-    if (newArtists.isNotEmpty) {
-      for (final artist in newArtists) {
-        sendProgressReport.send(IndexerProgressReport(
-          state: IndexerState.ANALYZING,
-          max: newArtists.length,
-          value: newArtists.indexOf(artist),
-          currentFilename: artist
-        ));
-        final albumCount = (await (
-          db.selectOnly(db.albumTable)
-          ..addColumns([db.albumTable.artistName])
-          ..where(db.albumTable.artistName.equals(artist))
-         ).get()).length;
-        final trackCount = (await (
-          db.selectOnly(db.trackTable)
-          ..addColumns([db.trackTable.artistName])
-          ..where(db.trackTable.artistName.equals(artist))
-         ).get()).length;
-        await (
-          db.artistTable.update()
-          ..where((tbl) => tbl.name.equals(artist))
-        ).write(ArtistTableCompanion(
-          trackCount: Value(trackCount),
-          albumCount: Value(albumCount)
-        ));
-      }
-    }
-    if (newAlbums.isNotEmpty) {
-      for (final album in newAlbums) {
-        sendProgressReport.send(IndexerProgressReport(
-          state: IndexerState.ANALYZING,
-          max: newAlbums.length,
-          value: newAlbums.indexOf(album),
-          currentFilename: album
-        ));
-        final _album = album.split(" - ");
-        //await songStore.find(db, finder: Finder(filter: Filter.matches('albumName', _record.name))); //just re-something-whatever this???
-        // final trackCount = await songStore.find(db, finder: Finder(filter: Filter.and([
-        //   Filter.equals('artistName', _record.artistName),
-        //   Filter.equals('albumName', _record.name)
-        // ])));
-        final trackCount = (await (
-          db.select(db.trackTable)
-          ..where((tbl) => tbl.artistName.equals(_album[0]) & tbl.albumName.equals(_album[1]))
-         ).get());
-        //print(await songStore.find(db, finder: Finder()));
-        if (trackCount.isNotEmpty) {
-          trackCount.sort((a, b) => (a.year)?.compareTo(b.year??0)??0);
-          final year = trackCount.last.year;
+      List<File> validFiles = [];
+      final List<String> _dbfolders = List.castFrom<dynamic, String>(config.libraries);
+      for (final f in _dbfolders) {
+        if (!await Directory(f).exists()) {
+          if (kDebugMode) {print("INDEXER ERROR: `"+f+"` does not exist!");}
           await (
-            db.albumTable.update()
-            ..where((tbl) => tbl.name.equals(_album[1]) & tbl.artistName.equals(_album[0]))
-          ).write(AlbumTableCompanion(
-            trackCount: Value(trackCount.length),
-            year: Value(year)
+            db.update(db.trackTable)
+            ..where((tbl) => tbl.uri.like(Uri.file(f).toString()+"%"))
+          ).write(const TrackTableCompanion(
+            available: Value(false)
+          ));
+          continue; //we're in a for loop. so go to the next thing (or break if you're at the end)
+        } else {
+          // Mark these as available again
+          await (
+            db.update(db.trackTable)
+            ..where((tbl) => tbl.uri.like(Uri.file(f).toString()+"%"))
+          ).write(const TrackTableCompanion(
+            available: Value(true)
+          ));
+        }
+        await for (final d in Directory(f).list(recursive: true)) {
+          if (d is! File) continue;
+          if (MimeTypeResolver().lookup(d.uri.pathSegments.last)?.startsWith("audio/") != true) continue;
+          validFiles.add(d);
+          sendProgressReport.send(IndexerProgressReport(
+            state: IndexerState.STARTING,
+            max: validFiles.length,
+            currentFilename: f
           ));
         }
       }
-    }
+      sendProgressReport.send(IndexerProgressReport(
+        state: IndexerState.SCANNING,
+        max: validFiles.length,
+        value: 0
+      ));
 
+      // == GET THE METADATA == //
+      // The plan for this is to read the metadata,
+      // including covers and lyrics, for each file.
+      // This includes checking adjacent files under
+      // .lrc or .mse extensions, or `cover.png` for
+      // cover art.
+      // It'll check for MSEs first, but if it can't
+      // find the file it'll then check for tags in
+      // the file, then the file's context (filename
+      // and parent dir names).
+      // The metadata will be partial as it will be
+      // stored as JSON in the database, which drops
+      // some values, such as artist and album, data
+      // for the cover itself, and album tracklists.
+      for (final file in validFiles) {
+        sendProgressReport.send(IndexerProgressReport(
+          state: IndexerState.SCANNING,
+          max: validFiles.length,
+          value: validFiles.indexOf(file),
+          currentFilename: file.uri.pathSegments.last
+        ));
+        // final _matches = await songStore.find(db, finder: Finder(filter: Filter.custom(
+        //   // Find this file in the database.
+        //   (record) => record.value.uri == file.absolute.uri.toString()
+        // )));
+        if (!force) {
+          final _matches = await (
+            db.select(db.trackTable)
+            ..where((tbl) => tbl.uri.equalsValue(file.absolute.uri))
+          ).get();
+          // Skip processing files that have already been processed
+          if (_matches.isNotEmpty) continue;
+        }
+        var metaBytes = <int>[], _class = "none";
+        final _metaByteReader = file.openRead().listen(null);
+        //double? targetLength;
+        final c = Completer();
+        _metaByteReader.onData((data) {
+          metaBytes.addAll(data);
+          if (_class == "none") {
+            if (metaBytes.length >= 4 && String.fromCharCodes(metaBytes.getRange(0, 4)) == 'fLaC') {_class = "flac";}
+            else if (metaBytes.length >= 3 && listEquals(metaBytes.getRange(0, 3).toList(), [73, 68, 51])) {_class = "id3";}
+          }
+          if (metaBytes.length >= 10*1000000 /* 10MB */) {
+            _metaByteReader.cancel();
+            /* Really I have no idea why you'd need more than 10MB of TAGS in a file...
+              If there is a case I might be able to bump it */
+            metaBytes = metaBytes.take(10*1000000).toList();
+            c.complete();
+            /* Trust me though, I did try to figure out when the id3 tags ended
+              so I could get ONLY the tags.
+              I don't want to rely on id3 being only in mp3 form, and I wanted
+              to reduce the amount of data looked at to only the necessary data,
+              so that the library could scan faster.
+            */
+          }
+          if (_class == "flac") {
+            _metaByteReader.cancel();
+            c.complete();
+            metaBytes.clear();
+            // the FLAC metadata reader reads the file itself
+            // so gathering the bytes for it is not important
+          } else if (_class == "id3" && metaBytes.length > 10) {
+            // Determine the length of the id3 segment
+            try {
+              //targetLength ??= (i32.parse(metaBytes.sublist(6,10).join(""), radix: 16)).roundToDouble()+10;
+              // if (metaBytes.length >= targetLength!) {
+              //   _metaByteReader.cancel();
+              //   c.complete();
+              // }
+            } catch(e) {
+              if (kDebugMode) {print(e);}
+              _metaByteReader.cancel();
+              c.complete();
+              metaBytes.clear();
+              _class = "none";
+              return;
+            }
+          }
+          if (metaBytes.length > 20 && _class == "none") {
+            c.complete();
+            _metaByteReader.cancel();
+            metaBytes.clear();
+          }
+        });
+        _metaByteReader.onDone(() {c.complete();});
+        _metaByteReader.onError((_) {_metaByteReader.cancel().then((_)=>c.complete());});
+        await Future.any([c.future, _metaByteReader.asFuture()]);
+
+        //final _mseFile = File(file.path.replaceFirst(fileExtensionRegex, ".mse"));
+        // final _mse = (await _mseFile.exists()) ? await parseMseFile(_mseFile.openRead()) : null;
+        final TrackMetadata? _id3 = (/* _mse == null && */ _class == "id3" || _class == "flac") ? await loadID3FromBytes(metaBytes, file, cacheDir: cacheDir) : null;
+        final TrackMetadata? _ctxmeta = (/* _mse == null && */ _id3 == null) ? inferMetadataFromContext(file.absolute.uri)
+        .copyWith(coverUri: (await inferCoverFile(file))?.absolute.uri) : null;
+        final TrackMetadata record = (/*_mse ??*/ _id3 ?? _ctxmeta ?? TrackMetadata.empty()).copyWith(
+          uri: file.absolute.uri
+        );
+        final tr_rec = record.artistName?.isEmpty != false || record.title?.isEmpty != false
+          ? file.uri.pathSegments.last
+          : record.artistName! +" - "+ record.title!;
+        //await tr_rec.put(db, record.toJson());
+        db.into(db.trackTable).insertOnConflictUpdate(record);
+        await registerAlbumMetadata(record);
+        await registerArtistMetadata(record);
+      }
+
+      if (newArtists.isNotEmpty) {
+        for (final artist in newArtists) {
+          sendProgressReport.send(IndexerProgressReport(
+            state: IndexerState.ANALYZING,
+            max: newArtists.length,
+            value: newArtists.indexOf(artist),
+            currentFilename: artist
+          ));
+          final albumCount = (await (
+            db.selectOnly(db.albumTable)
+            ..addColumns([db.albumTable.artistName])
+            ..where(db.albumTable.artistName.equals(artist))
+          ).get()).length;
+          final trackCount = (await (
+            db.selectOnly(db.trackTable)
+            ..addColumns([db.trackTable.artistName])
+            ..where(db.trackTable.artistName.equals(artist))
+          ).get()).length;
+          await (
+            db.artistTable.update()
+            ..where((tbl) => tbl.name.equals(artist))
+          ).write(ArtistTableCompanion(
+            trackCount: Value(trackCount),
+            albumCount: Value(albumCount)
+          ));
+        }
+      }
+      if (newAlbums.isNotEmpty) {
+        for (final album in newAlbums) {
+          sendProgressReport.send(IndexerProgressReport(
+            state: IndexerState.ANALYZING,
+            max: newAlbums.length,
+            value: newAlbums.indexOf(album),
+            currentFilename: album
+          ));
+          final _album = album.split(" - ");
+          //await songStore.find(db, finder: Finder(filter: Filter.matches('albumName', _record.name))); //just re-something-whatever this???
+          // final trackCount = await songStore.find(db, finder: Finder(filter: Filter.and([
+          //   Filter.equals('artistName', _record.artistName),
+          //   Filter.equals('albumName', _record.name)
+          // ])));
+          final trackCount = (await (
+            db.select(db.trackTable)
+            ..where((tbl) => tbl.artistName.equals(_album[0]) & tbl.albumName.equals(_album[1]))
+          ).get());
+          //print(await songStore.find(db, finder: Finder()));
+          if (trackCount.isNotEmpty) {
+            trackCount.sort((a, b) => (a.year)?.compareTo(b.year??0)??0);
+            final year = trackCount.last.year;
+            await (
+              db.albumTable.update()
+              ..where((tbl) => tbl.name.equals(_album[1]) & tbl.artistName.equals(_album[0]))
+            ).write(AlbumTableCompanion(
+              trackCount: Value(trackCount.length),
+              year: Value(year)
+            ));
+          }
+        }
+      }
+
+      sendProgressReport.send(const IndexerProgressReport(
+        state: IndexerState.FINISHING,
+        max: 0,
+        value: 0
+      ));
+    });
     sendProgressReport.send(const IndexerProgressReport(
-      state: IndexerState.FINISHING,
-      max: 0,
-      value: 0
-    ));
-    await db.close();
-    sendProgressReport.send(IndexerProgressReport(
       state: IndexerState.FINISHED,
-      max: validFiles.length,
-      value: validFiles.length
+      max: 1,
+      value: 1
     ));
   }
 
