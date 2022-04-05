@@ -6,9 +6,10 @@ class VlcAudioHandler extends BodaciousAudioHandler {
   AudioServiceRepeatMode _repeating = AudioServiceRepeatMode.none;
 
   static const Map<AudioServiceRepeatMode, vlc.PlaylistMode> repeatModes = {
-    AudioServiceRepeatMode.all: vlc.PlaylistMode.repeat,
-    AudioServiceRepeatMode.one: vlc.PlaylistMode.single,
-    AudioServiceRepeatMode.none: vlc.PlaylistMode.loop
+    // my god what the fuck are these playlist modes
+    AudioServiceRepeatMode.all: vlc.PlaylistMode.loop,
+    AudioServiceRepeatMode.one: vlc.PlaylistMode.repeat,
+    AudioServiceRepeatMode.none: vlc.PlaylistMode.single
   };
 
 

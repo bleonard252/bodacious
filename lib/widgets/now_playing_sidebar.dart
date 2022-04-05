@@ -113,18 +113,20 @@ class NowPlayingSidebar extends ConsumerWidget {
                   errorBuilder: (context, e, s) => const CoverPlaceholder(size: 64, iconSize: 36),
                 ) : const CoverPlaceholder(size: 64, iconSize: 36),
               ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(meta.title ?? (meta.uri.pathSegments.isEmpty ? "" : meta.uri.pathSegments.last), maxLines: 1, overflow: TextOverflow.fade),
-                    if (secondRow.isNotEmpty) Text.rich(TextSpan(children: secondRow), 
-                      style: Theme.of(context).textTheme.caption, maxLines: 1, overflow: TextOverflow.fade
-                    )
-                  ],
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(meta.title ?? (meta.uri.pathSegments.isEmpty ? "" : meta.uri.pathSegments.last), maxLines: 1, overflow: TextOverflow.ellipsis),
+                      if (secondRow.isNotEmpty) Text.rich(TextSpan(children: secondRow), 
+                        style: Theme.of(context).textTheme.caption, maxLines: 1, overflow: TextOverflow.fade
+                      )
+                    ],
+                  ),
                 ),
               )
             ],
