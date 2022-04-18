@@ -22,7 +22,7 @@ class BoDatabase extends _$BoDatabase {
 
   // you should bump this number whenever you change or add a table definition
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   Future<TrackMetadata?> tryGetTrackFromUri(Uri uri) {
     return (
@@ -48,6 +48,15 @@ class BoDatabase extends _$BoDatabase {
     onUpgrade: (m, from, to) async {
       if (from > to) throw UnsupportedError("Downgrades are not supported");
       if (to == 2) m.addColumn(trackTable, trackTable.available);
+      if (to == 3) {
+        /// Reset the database.
+        /// This clears customizations but forces the database to rescan.
+        /// Thankfully there are no customizations yet so there's nothing
+        /// too bad about doing this.
+        m.drop(albumTable);
+        m.drop(trackTable);
+        m.drop(artistTable);
+      }
     },
   );
 }

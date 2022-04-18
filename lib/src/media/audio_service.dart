@@ -32,6 +32,7 @@ abstract class BodaciousAudioHandler extends BaseAudioHandler with SeekHandler {
       trackMetadata.asMediaItem()
     ]);
   }
+
   @override
   Future<BodaciousMediaItem?> getMediaItem(String mediaId) async {
     try {

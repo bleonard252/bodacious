@@ -5,8 +5,7 @@ import 'package:drift/drift.dart';
 @UseRowClass(AlbumMetadata)
 class AlbumTable extends Table {
   @override
-  get primaryKey => {_id};
-  TextColumn get _id => text().generatedAs(artistName + const Constant(" - ") + name)();
+  get primaryKey => {artistName, name};
   TextColumn get name => text()();
   TextColumn get artistName => text()();
   TextColumn get coverUri => text().map(UriConverter()).nullable()();

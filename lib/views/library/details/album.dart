@@ -147,11 +147,11 @@ class AlbumDetailsViewState extends State<AlbumDetailsView> {
                               track,
                               showTrackNo: true,
                               selected: ref.watch(nowPlayingProvider).value?.uri == track.uri,
-                              onTap: track.uri == Uri() ? null : () {
+                              onTap: track.uri == Uri() ? null : () async {
                                 player.stop();
-                                player.updateQueue(snapshot.data!.map((e) => e.asMediaItem()).toList());
-                                player.skipToQueueItem(index);
-                                player.play();
+                                await player.updateQueue(snapshot.data!.map((e) => e.asMediaItem()).toList());
+                                await player.skipToQueueItem(index);
+                                await player.play();
                               },
                             );
                           }

@@ -4,12 +4,19 @@ class JustAudioHandler extends BodaciousAudioHandler {
   late final just.AudioPlayer player;
   JustAudioHandler() {
     player = just.AudioPlayer();
-    void playlist(just.AudioSource current, dynamic output) {
+    void playlist(just.AudioSource current, dynamic output, [int? index]) {
       if (current is just.UriAudioSource) {
-        output.add(MediaItem(
-          id: current.uri.toString(),
-          title: Uri.decodeComponent(current.uri.pathSegments.lastOrNull ?? "Unknown track")
-        ));
+        if (index != player.currentIndex) {
+          output.add(MediaItem(
+            id: current.uri.toString(),
+            title: Uri.decodeComponent(current.uri.pathSegments.lastOrNull ?? "Unknown track")
+          ));
+        } else {
+          output.add(mediaItem.valueOrNull?.copyWith(id: current.uri.toString()) ?? MediaItem(
+            id: current.uri.toString(),
+            title: current.uri.pathSegments.lastOrNull ?? "Unknown track"
+          ));
+        }
         // db.tryGetTrackFromUri(current.uri)
         // .then((value) => value == null ? null : output.add(value.asMediaItem()));
       } else {
@@ -20,24 +27,27 @@ class JustAudioHandler extends BodaciousAudioHandler {
     player.playbackEventStream.listen((event) {
       //final now = _ref.read(nowPlayingProvider).asData!.value;
       if (player.audioSource is just.UriAudioSource) {
-        mediaItem.add(MediaItem(id: (player.audioSource as just.UriAudioSource).uri.toString(), title: (player.audioSource as just.UriAudioSource).uri.pathSegments.lastOrNull ?? "Unknown track"));
+        //mediaItem.add(MediaItem(id: (player.audioSource as just.UriAudioSource).uri.toString(), title: (player.audioSource as just.UriAudioSource).uri.pathSegments.lastOrNull ?? "Unknown track"));
+        mediaItem.add(mediaItem.valueOrNull?.copyWith(id: (player.audioSource as just.UriAudioSource).uri.toString()) ?? MediaItem(
+          id: (player.audioSource as just.UriAudioSource).uri.toString(),
+          title: (player.audioSource as just.UriAudioSource).uri.pathSegments.lastOrNull ?? "Unknown track"
+        ));
         // db.tryGetTrackFromUri((player.audioSource as just.UriAudioSource).uri)
         // .then((value) => value == null ? null : mediaItem.add(value.asMediaItem()));
         queue.add([mediaItem.value!]);
       } else if (player.audioSource is just.ConcatenatingAudioSource) {
         final current = (player.audioSource as just.ConcatenatingAudioSource).children.elementAt(player.currentIndex ?? 0);
-        playlist(current, mediaItem);
+        playlist(current, mediaItem, player.currentIndex);
         final List<MediaItem> _queue = [];
         for (final mediaItem in (player.audioSource as just.ConcatenatingAudioSource).children) {
           playlist(mediaItem, _queue);
         }
         queue.add(_queue);
-      } else if (player.audioSource == null) {} else {
-        print("How did I get here?");
-      }
+      } else if (player.audioSource == null) {}
       if (mediaItem.valueOrNull != null) mediaItem.add(mediaItem.value!.copyWith(duration: player.duration));
       playbackState.add(PlaybackState(
         playing: player.playing,
+        processingState: AudioProcessingState.ready,
         controls: [
           //MediaControl(androidIcon: "drawable/ic_action_shuffle", label: "Shuffle", action: MediaAction.setShuffleMode)
           MediaControl.skipToPrevious,
@@ -58,6 +68,7 @@ class JustAudioHandler extends BodaciousAudioHandler {
           MediaAction.skipToNext,
         }
       ));
+      mediaItem.add(mediaItem.value?.copyWith(duration: event.duration));
     });
     player.sequenceStream.listen((event) {
       final List<MediaItem> _queue = [];

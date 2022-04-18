@@ -68,9 +68,11 @@ class _LibrarySettingsViewState extends State<LibrarySettingsView> {
               ),
               Tooltip(
                 message: "Remove from library",
-                child: IconButton(onPressed: () => setState(() {
+                child: IconButton(onPressed: () {
                   libraryDirs.remove(dir);
-                }), icon: const Icon(MdiIcons.close)),
+                  config.libraries = libraryDirs;
+                  setState(() {});
+                }, icon: const Icon(MdiIcons.close)),
               )
             ],
           ),

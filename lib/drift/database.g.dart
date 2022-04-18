@@ -111,14 +111,6 @@ class $AlbumTableTable extends AlbumTable
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
   $AlbumTableTable(this.attachedDatabase, [this._alias]);
-  final VerificationMeta __idMeta = const VerificationMeta('_id');
-  @override
-  late final GeneratedColumn<String?> _id = GeneratedColumn<String?>(
-      'id', aliasedName, false,
-      type: const StringType(),
-      requiredDuringInsert: false,
-      generatedAs:
-          GeneratedAs(artistName + const Constant(" - ") + name, false));
   final VerificationMeta _nameMeta = const VerificationMeta('name');
   @override
   late final GeneratedColumn<String?> name = GeneratedColumn<String?>(
@@ -153,7 +145,7 @@ class $AlbumTableTable extends AlbumTable
           type: const IntType(), requiredDuringInsert: false);
   @override
   List<GeneratedColumn> get $columns =>
-      [_id, name, artistName, coverUri, trackCount, year, releaseDate];
+      [name, artistName, coverUri, trackCount, year, releaseDate];
   @override
   String get aliasedName => _alias ?? 'album_table';
   @override
@@ -163,10 +155,6 @@ class $AlbumTableTable extends AlbumTable
       {bool isInserting = false}) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
-    if (data.containsKey('id')) {
-      context.handle(
-          __idMeta, _id.isAcceptableOrUnknown(data['id']!, __idMeta));
-    }
     if (data.containsKey('name')) {
       context.handle(
           _nameMeta, name.isAcceptableOrUnknown(data['name']!, _nameMeta));
@@ -202,7 +190,7 @@ class $AlbumTableTable extends AlbumTable
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => {_id};
+  Set<GeneratedColumn> get $primaryKey => {artistName, name};
   @override
   AlbumMetadata map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';

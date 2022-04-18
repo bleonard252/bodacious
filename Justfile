@@ -18,7 +18,7 @@ run: prebuild
   flutter run
 
 _generate:
-  flutter pub run build_runner build
+  flutter pub run build_runner build --delete-conflicting-outputs
 _check:
   set need_api := false
   if [ "$SPOTIFY_API_KEY" -eq "" ]; then echo "Spotify API key not set."; set need_api := true; fi
