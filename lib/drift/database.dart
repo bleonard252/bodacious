@@ -18,6 +18,8 @@ class BoDatabase extends _$BoDatabase {
   // we tell the database where to store the data with this constructor
   BoDatabase() : super(_openConnection());
 
+  BoDatabase.fromExecutor(QueryExecutor e) : super(e);
+
   BoDatabase.connect(DatabaseConnection connection) : super.connect(connection);
 
   // you should bump this number whenever you change or add a table definition

@@ -17,7 +17,7 @@ part 'track_data.g.dart';
 @freezed
 class TrackMetadata with _$TrackMetadata implements Insertable<TrackMetadata> {
   const TrackMetadata._();
-  factory TrackMetadata.empty() => TrackMetadata(uri: Uri());
+  factory TrackMetadata.empty() => TrackMetadata(uri: Uri(), available: false);
   const factory TrackMetadata({
     /// The song's title.
     String? title,

@@ -75,7 +75,8 @@ class SongWidget extends ConsumerWidget {
               ),
             ),
             title: Text(track.title ?? (track.uri.pathSegments.isEmpty ? "Unknown track" : track.uri.pathSegments.last)),
-            subtitle: !track.available ? const Text("Track unavailable") : track.artistName?.isEmpty == false ? Text(track.artistName!) : null,
+            subtitle: !track.available ? const Text("Track unavailable") : 
+              useAlbumName ? track.albumName?.isEmpty == false ? Text(track.albumName!) : null : track.artistName?.isEmpty == false ? Text(track.artistName!) : null,
             onTap: !track.available ? null : onTap,
             enabled: track.available,
             trailing: Builder(

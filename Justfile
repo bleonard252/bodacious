@@ -27,9 +27,12 @@ _check:
   if [ "$GENIUS_API_KEY" -eq "" ]; then echo "Genius API key not set."; set need_api := true; fi
   if need_api == false; then echo "All API keys are set! You are ready to go."; fi
 
-# Run metadata inference tests
-test-infer:
-  flutter test test/metadata_readers/infer.dart
+# Run metadata gathering tests
+test-metadata:
+  flutter test test/metadata_readers
+# Run widget tests
+test-widgets:
+  flutter test test/widgets
 # Run all tests
-test-all: test-infer
+test-all: test-metadata test-widgets
   echo 'All tests done'
