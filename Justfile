@@ -2,10 +2,10 @@ set dotenv-load
 set positional-arguments
 
 # Build the app in debug mode
-build *TARGETS='appbundle':
+build *TARGETS='appbundle': _generate
   for target in {{TARGETS}}; do flutter build $target --debug; done
 # Build the app in release mode
-release *TARGETS='apk': test-all
+release *TARGETS='apk': test-all prebuild
   for target in {{TARGETS}}; do flutter build $target --release; done
 # Run pre-build checks
 prebuild: _generate && _check
@@ -20,12 +20,15 @@ run: prebuild
 _generate:
   flutter pub run build_runner build --delete-conflicting-outputs
 _check:
-  set need_api := false
-  if [ "$SPOTIFY_API_KEY" -eq "" ]; then echo "Spotify API key not set."; set need_api := true; fi
-  if [ "$LASTFM_API_KEY" -eq "" ]; then echo "Last.fm API key not set."; set need_api := true; fi
-  if [ "$LASTFM_SECRET" -eq "" ]; then echo "Last.fm secret not set."; set need_api := true; fi
-  if [ "$GENIUS_API_KEY" -eq "" ]; then echo "Genius API key not set."; set need_api := true; fi
-  if need_api == false; then echo "All API keys are set! You are ready to go."; fi
+  #!/usr/bin/env bash
+  NEED_API=false
+  if [[ "$SPOTIFY_API_KEY" == "" ]]; then echo "Spotify API key not set."; NEED_API=true; fi
+  if [[ "$LASTFM_API_KEY" == "" ]]; then echo "Last.fm API key not set."; NEED_API=true; fi
+  if [[ "$LASTFM_SECRET" == "" ]]; then echo "Last.fm secret not set."; NEED_API=true; fi
+  if [[ "$GENIUS_API_KEY" == "" ]]; then echo "Genius API key not set."; NEED_API=true; fi
+  if [[ "$DISCORD_APP_ID" == "" ]]; then echo "Discord App ID not set."; NEED_API=true; fi
+  #
+  if [[ "$NEED_API" == "false" ]]; then echo "All API keys are set! You are ready to go."; fi
 
 # Run metadata gathering tests
 test-metadata:

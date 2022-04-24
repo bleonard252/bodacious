@@ -25,6 +25,7 @@ import 'package:bodacious/views/settings/root.dart';
 import 'package:bodacious/widgets/now_playing.dart';
 import 'package:bodacious/widgets/frame_size.dart';
 import 'package:bodacious/widgets/now_playing_sidebar.dart';
+import 'package:dart_discord_rpc/dart_discord_rpc.dart';
 import 'package:dart_vlc/dart_vlc.dart' show DartVLC;
 import 'package:drift/drift.dart' hide Column;
 import 'package:flutter/foundation.dart';
@@ -40,10 +41,14 @@ late final BoDatabase db;
 late final Config config;
 
 late final BodaciousAudioHandler player;
+late final DiscordRPC discord;
 
 void main() async {
   try {DartVLC.initialize();} finally {}
   WidgetsFlutterBinding.ensureInitialized();
+  DiscordRPC.initialize();
+  discord = DiscordRPC(applicationId: const String.fromEnvironment("DISCORD_APP_ID"));
+  discord.start(autoRegister: true);
   db = BoDatabase();
   config = Config(await SharedPreferences.getInstance());
 
@@ -100,8 +105,16 @@ void main() async {
       
       if (_dbEntry != null) {
         player.mediaItem.add(_dbEntry.copyWith(duration: update.duration).asMediaItem());
+        discord.updatePresence(DiscordPresence(
+          details: _dbEntry.title,
+          state: _dbEntry.artistName,
+          largeImageText: _dbEntry.albumName,
+          //largeImageKey: "BoUnknown", // someday we're gonna get public URLs for these album covers
+          endTimeStamp: _dbEntry.duration != null ? DateTime.now().add(_dbEntry.duration ?? Duration.zero).millisecondsSinceEpoch : null
+        ));
         yield _dbEntry;
       } else {
+        discord.clearPresence();
         yield nothingPlaying.copyWith(uri: Uri.file(update.id));
       }
     }
