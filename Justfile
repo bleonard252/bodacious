@@ -14,8 +14,9 @@ prebuild: _generate && _check
 install:
   flutter install
 # Build, install, and run. Powered by `flutter run`
-run: prebuild
-  flutter run
+run: prebuild _run
+_run:
+  flutter run --dart-define DISCORD_APP_ID=$DISCORD_APP_ID
 
 _generate:
   flutter pub run build_runner build --delete-conflicting-outputs

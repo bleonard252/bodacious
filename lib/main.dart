@@ -105,18 +105,23 @@ void main() async {
       
       if (_dbEntry != null) {
         player.mediaItem.add(_dbEntry.copyWith(duration: update.duration).asMediaItem());
-        discord.updatePresence(DiscordPresence(
-          details: _dbEntry.title,
-          state: _dbEntry.artistName,
-          largeImageText: _dbEntry.albumName,
-          //largeImageKey: "BoUnknown", // someday we're gonna get public URLs for these album covers
-          endTimeStamp: _dbEntry.duration != null ? DateTime.now().add(_dbEntry.duration ?? Duration.zero).millisecondsSinceEpoch : null
-        ));
         yield _dbEntry;
       } else {
-        discord.clearPresence();
         yield nothingPlaying.copyWith(uri: Uri.file(update.id));
       }
+    }
+  });
+  player.mediaItem.listen((value) {
+    if (value == null) {
+      discord.clearPresence();
+    } else {
+      discord.updatePresence(DiscordPresence(
+        details: value.title,
+        state: value.artist,
+        largeImageText: value.album,
+        //largeImageKey: "BoUnknown", // someday we're gonna get public URLs for these album covers
+        endTimeStamp: value.duration != null ? DateTime.now().add(value.duration ?? Duration.zero).add(-player.position).millisecondsSinceEpoch : null
+      ));
     }
   });
   queueProvider = StreamProvider<Queue<TrackMetadata>>((ref) async* {
