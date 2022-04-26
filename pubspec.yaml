@@ -35,13 +35,13 @@ dependencies:
   json_annotation: ^4.4.0
   path_provider: ^2.0.9
   rxdart: ^0.27.3
-  lastfm: ^0.0.5
   url_launcher: ^6.1.0
 
   # Service Deps
   dart_discord_rpc:
     git: https://github.com/alexmercerind/dart_discord_rpc
   xml: ^5.1.2
+  lastfm: ^0.0.5
 
   # Library & Metadata Deps
   file_picker: ^4.5.1 # for picking directories (and files in early versions)

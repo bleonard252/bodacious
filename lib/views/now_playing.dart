@@ -5,13 +5,13 @@ import 'dart:ui';
 import 'package:audio_service/audio_service.dart';
 import 'package:bodacious/main.dart';
 import 'package:bodacious/src/media/audio_service.dart';
+import 'package:bodacious/src/time.dart';
 import 'package:bodacious/views/queue.dart';
 import 'package:bodacious/widgets/cover_placeholder.dart';
 import 'package:bodacious/widgets/frame_size.dart';
 import "package:flutter/material.dart";
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:just_audio/just_audio.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:palette_generator/palette_generator.dart';
 
@@ -135,11 +135,36 @@ class _NowPlayingViewState extends ConsumerState<NowPlayingView> {
                                   color: vtheme.onPrimary//color: vibrant?.bodyTextColor
                                 ),
                                 maxLines: 1, overflow: TextOverflow.ellipsis
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 36.0),
+                                child: StreamBuilder<Duration>(
+                                  stream: player.playbackState.map((event) => event.position),
+                                  initialData: player.position,
+                                  builder: (context, _snapshot) => Row(
+                                    mainAxisSize: MainAxisSize.max,
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(formatPlaybackTime(player.position),
+                                        style: Theme.of(context).textTheme.subtitle1?.copyWith(
+                                          color: vtheme.onPrimary//color: vibrant?.bodyTextColor
+                                        ),
+                                        maxLines: 1, overflow: TextOverflow.ellipsis
+                                      ),
+                                      Text(formatPlaybackTime(player.duration ?? Duration.zero),
+                                        style: Theme.of(context).textTheme.subtitle1?.copyWith(
+                                          color: vtheme.onPrimary//color: vibrant?.bodyTextColor
+                                        ),
+                                        maxLines: 1, overflow: TextOverflow.ellipsis
+                                      ),
+                                    ],
+                                  )
+                                ),
                               )
                             ]
                           ),
                           Padding(
-                            padding: const EdgeInsets.all(12.0),
+                            padding: const EdgeInsets.all(12.0) - const EdgeInsets.only(top: 12.0),
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
                               crossAxisAlignment: CrossAxisAlignment.center,
