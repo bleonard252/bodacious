@@ -21,6 +21,11 @@ class MobileMainMenu extends StatelessWidget {
             ),
             const IndexerProgressWidget(),
             ListTile(
+              leading: const Icon(MdiIcons.alertOctagonOutline),
+              title: const Text("Errors"),
+              onTap: () => context.push("/error_list"),
+            ),
+            ListTile(
               leading: const Icon(MdiIcons.informationOutline),
               title: const Text("About"),
               onTap: () => context.push("/about"),

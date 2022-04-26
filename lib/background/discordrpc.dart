@@ -3,7 +3,7 @@ import 'package:dart_discord_rpc/dart_discord_rpc.dart';
 import '../main.dart';
 
 Future<void> startDiscordRpc() async {
-  player.mediaItem.listen((value) {
+  await player.mediaItem.listen((value) {
     if (value == null) {
       discord.clearPresence();
     } else {
@@ -15,5 +15,5 @@ Future<void> startDiscordRpc() async {
         endTimeStamp: value.duration != null ? DateTime.now().add(value.duration ?? Duration.zero).add(-player.position).millisecondsSinceEpoch : null
       ));
     }
-  }, onError: (error) => errors.add(error.toString()));
+  }).asFuture();
 }

@@ -91,12 +91,26 @@ class HomeView extends StatelessWidget {
                                   PopupMenuItem(
                                     child: Text("Settings"),
                                     value: "settings"
+                                  ),
+                                  PopupMenuItem(
+                                    child: Text("Errors"),
+                                    value: "error_list"
+                                  ),
+                                  PopupMenuItem(
+                                    child: Text("About"),
+                                    value: "about"
                                   )
                                 ],
                               ).then((value) {
                                 switch (value) {
                                   case "settings":
                                     context.go("/settings");
+                                    break;
+                                  case "error_list":
+                                    context.go("/error_list");
+                                    break;
+                                  case "about":
+                                    context.go("/about");
                                     break;
                                   default:
                                 }

@@ -5,6 +5,7 @@ import 'dart:io';
 
 import 'package:audio_service/audio_service.dart';
 import 'package:bodacious/background/discordrpc.dart';
+import 'package:bodacious/background/scrobble.dart';
 import 'package:bodacious/drift/database.dart';
 import 'package:bodacious/models/album_data.dart';
 import 'package:bodacious/models/artist_data.dart';
@@ -14,6 +15,8 @@ import 'package:bodacious/src/library/indexer.dart';
 import 'package:bodacious/src/media/audio_service.dart';
 import 'package:bodacious/src/metadata/provider.dart';
 import 'package:bodacious/src/navigate_observer.dart';
+import 'package:bodacious/src/online/lastfm.dart';
+import 'package:bodacious/views/errorlist.dart';
 import 'package:bodacious/views/home.dart';
 import 'package:bodacious/views/library/details/album.dart';
 import 'package:bodacious/views/library/details/artist.dart';
@@ -23,6 +26,7 @@ import 'package:bodacious/views/now_playing.dart';
 import 'package:bodacious/views/settings/library.dart';
 import 'package:bodacious/views/settings/personalization.dart';
 import 'package:bodacious/views/settings/root.dart';
+import 'package:bodacious/views/settings/services.dart';
 import 'package:bodacious/views/splash.dart';
 import 'package:bodacious/widgets/now_playing.dart';
 import 'package:bodacious/widgets/frame_size.dart';
@@ -35,6 +39,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:lastfm/lastfm.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -45,8 +50,9 @@ late final Config config;
 
 late final BodaciousAudioHandler player;
 late final DiscordRPC discord;
+final APIKeys apiKeys = APIKeys();
 
-late final ReplaySubject<String> errors;
+late final ReplaySubject<String> errors = ReplaySubject();
 
 void main() async {
   runApp(const SplashScreen());
@@ -117,6 +123,8 @@ void main() async {
     }
   });
   startDiscordRpc().catchError((error) {errors.add(error.toString());}); // this just runs in the background
+  startLastFmNowPlaying().catchError((error) {errors.add(error.toString());});
+  startScrobbling().catchError((error) {errors.add(error.toString());});
   queueProvider = StreamProvider<Queue<TrackMetadata>>((ref) async* {
     final stream = player.queue;
     yield Queue(entries: []);
@@ -159,6 +167,10 @@ void main() async {
 
   TheIndexer.spawn().catchError((error) => errors.add(error));
 
+  if (config.lastFmToken != null) {
+    lastfm = LastFMAuthorized(apiKeys.lastfmApiKey!, secret: apiKeys.lastfmSecret!, sessionKey: config.lastFmToken!, username: config.lastFmUsername!);
+  }
+
   // doWhenWindowReady(() {
   //   const initialSize = Size(600, 450);
   //   appWindow.minSize = initialSize;
@@ -186,11 +198,18 @@ class MyApp extends ConsumerWidget {
         colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.amber),
         //useMaterial3: false,
         applyElevationOverlayColor: false,
-
+        switchTheme: SwitchThemeData(
+          thumbColor: MaterialStateColor.resolveWith((states) => states.contains(MaterialState.selected) ? Colors.amber : states.contains(MaterialState.disabled) ? ThemeData.dark().disabledColor : Colors.grey),
+          trackColor: MaterialStateColor.resolveWith((states) => states.contains(MaterialState.selected) ? Colors.amber.shade400 : states.contains(MaterialState.disabled) ? ThemeData.dark().disabledColor.withOpacity(0.8) : Colors.grey.shade400)
+        ),
       ),
       darkTheme: ThemeData.from(
         colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.amber, backgroundColor: ThemeData.dark().scaffoldBackgroundColor, primaryColorDark: Colors.amber, brightness: Brightness.dark),
       ).copyWith(
+        switchTheme: SwitchThemeData(
+          thumbColor: MaterialStateColor.resolveWith((states) => states.contains(MaterialState.selected) ? Colors.amber : states.contains(MaterialState.disabled) ? ThemeData.dark().disabledColor : Colors.grey),
+          trackColor: MaterialStateColor.resolveWith((states) => states.contains(MaterialState.selected) ? Colors.amber.shade400 : states.contains(MaterialState.disabled) ? ThemeData.dark().disabledColor.withOpacity(0.8) : Colors.grey.shade400)
+        ),
         applyElevationOverlayColor: false,
         //useMaterial3: false,
       ),
@@ -351,10 +370,12 @@ class OuterFrame extends StatelessWidget {
         GoRoute(path: "artists/:name", builder: (context, state) => ArtistDetailsView(artist: state.extra as ArtistMetadata))
       ]),
       GoRoute(path: "/menu", builder: (context, state) => const MobileMainMenu()),
+      GoRoute(path: "/error_list", builder: (context, state) => const ErrorListView()),
       GoRoute(path: "/now_playing", builder: (context, state) => const NowPlayingView()),
       GoRoute(path: "/settings", builder: (context, state) => const SettingsHome(), routes: [
         GoRoute(path: "library", builder: (context, state) => const LibrarySettingsView()),
         GoRoute(path: "personalization", builder: (context, state) => const PersonalizationSettingsView()),
+        GoRoute(path: "services", builder: (context, state) => const OnlineServicesSettingsView()),
       ])
     ],
     observers: [

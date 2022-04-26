@@ -27,8 +27,9 @@ abstract class TheIndexer {
   // Isolate main logic
   static final ReceivePort progressReceiver = ReceivePort("The Indexer's Progress Receiver");
   static dynamic _progress;
+  static final StreamController<IndexerProgressReport> _sendPortKinda = StreamController();
   static ValueConnectableStream<IndexerProgressReport> get progress => _progress ??=
-  progressReceiver.cast<IndexerProgressReport>().publishValue();
+  progressReceiver.cast<IndexerProgressReport>().concatWith([_sendPortKinda.stream]).publishValue();
 
   //static late final Isolate indexerIsolate;
   
@@ -68,7 +69,7 @@ abstract class TheIndexer {
         "force": force
       });
       if (progress.valueOrNull?.state != IndexerState.FINISHED) {
-        progressReceiver.sendPort.send(IndexerProgressReport(
+        _sendPortKinda.add(IndexerProgressReport(
           state: IndexerState.STOPPED,
           currentFilename: progress.valueOrNull?.currentFilename,
           max: progress.valueOrNull?.max ?? 1,
@@ -76,7 +77,7 @@ abstract class TheIndexer {
         ));
       }
     } catch(e, st) {
-      progressReceiver.sendPort.send(IndexerProgressReport(
+      _sendPortKinda.add(IndexerProgressReport(
         state: IndexerState.STOPPED,
         currentFilename: progress.valueOrNull?.currentFilename,
         max: progress.valueOrNull?.max ?? 1,

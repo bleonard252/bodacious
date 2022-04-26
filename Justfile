@@ -16,7 +16,8 @@ install:
 # Build, install, and run. Powered by `flutter run`
 run: prebuild _run
 _run:
-  flutter run --dart-define DISCORD_APP_ID=$DISCORD_APP_ID
+  #!/usr/bin/env bash
+  flutter run --dart-define DISCORD_APP_ID=$DISCORD_APP_ID --dart-define LASTFM_API_KEY=$LASTFM_API_KEY --dart-define LASTFM_SECRET=$LASTFM_SECRET
 
 _generate:
   flutter pub run build_runner build --delete-conflicting-outputs

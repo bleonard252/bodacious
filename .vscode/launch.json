@@ -14,7 +14,7 @@
       "request": "launch",
       "type": "dart",
       //"preLaunchTask": "Pre-build app",
-      "toolArgs": ["--multidex"]
+      "toolArgs": ["--multidex"],
     },
     {
       "name": "bodacious (profile mode)",
