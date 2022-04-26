@@ -509,7 +509,7 @@ packages:
       name: lastfm
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.0.3"
+    version: "0.0.5"
   lints:
     dependency: transitive
     description:
