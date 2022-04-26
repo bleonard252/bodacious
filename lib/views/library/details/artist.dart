@@ -181,11 +181,10 @@ class ArtistDetailsViewState extends State<ArtistDetailsView> {
                               track,
                               useAlbumName: true,
                               selected: ref.watch(nowPlayingProvider).value?.uri == track.uri,
-                              onTap: track.uri == Uri() ? null : () {
-                                player.stop();
-                                player.updateQueue(snapshot.data!.map((e) => e.asMediaItem()).toList());
-                                player.skipToQueueItem(index);
-                                player.play();
+                              onTap: track.uri == Uri() ? null : () async {
+                                await player.stop();
+                                await player.updateQueue(snapshot.data!.map((e) => e.asMediaItem()).toList(), index);
+                                await player.play();
                               },
                             );
                           }

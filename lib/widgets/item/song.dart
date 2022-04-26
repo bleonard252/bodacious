@@ -103,11 +103,19 @@ class SongWidget extends ConsumerWidget {
                         child: Text("Play next"),
                         value: "playnext",
                       ),
+                      if (track.available) const PopupMenuItem(
+                        child: Text("Add to Queue"),
+                        value: "queue",
+                      ),
                     ]).then((value) {
                       switch (value) {
                         case "playnext":
                           final q = ref.read(queueProvider).value;
                           player.insertQueueItem((q?.position ?? 0)+1, track.asMediaItem());
+                          //ref.invalidate(queueProvider);
+                          break;
+                        case "queue":
+                          player.addQueueItem(track.asMediaItem());
                           //ref.invalidate(queueProvider);
                           break;
                         default:

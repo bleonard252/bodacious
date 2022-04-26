@@ -42,4 +42,7 @@ abstract class BodaciousAudioHandler extends BaseAudioHandler with SeekHandler {
       return null;
     }
   }
+
+  @override
+  updateQueue(List<MediaItem> queue, [int? index]) async => super.updateQueue(queue);
 }

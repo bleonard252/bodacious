@@ -108,7 +108,7 @@ class VlcAudioHandler extends BodaciousAudioHandler {
   @override
   addQueueItem(MediaItem mediaItem) async {
     if (player.current.isPlaylist) {
-      player.current.medias.add(vlc.Media.file(File(mediaItem.id)));
+      player.add(vlc.Media.file(File(mediaItem.id)));
       // a more complex solution may be needed
       // when network resources come into play
     } else {
@@ -128,11 +128,13 @@ class VlcAudioHandler extends BodaciousAudioHandler {
     return super.addQueueItem(mediaItem);
   }
   @override
-  updateQueue(List<MediaItem> queue) async {
+  updateQueue(List<MediaItem> queue, [int? index]) async {
     player.open(vlc.Playlist(
       medias: queue.map((e) => vlc.Media.file(File.fromUri(Uri.parse(e.id)))).toList()
-    ));
-    return super.updateQueue(queue);
+    ), autoStart: true);
+    if (index != null) player.jump(index);
+    print(index);
+    return super.updateQueue(queue, index);
   }
   @override
   skipToQueueItem(int index) {

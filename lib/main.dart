@@ -57,9 +57,11 @@ late final ReplaySubject<String> errors = ReplaySubject();
 void main() async {
   runApp(const SplashScreen());
   try {DartVLC.initialize();} finally {}
-  DiscordRPC.initialize();
-  discord = DiscordRPC(applicationId: const String.fromEnvironment("DISCORD_APP_ID"));
-  discord.start(autoRegister: true);
+  if (Platform.isWindows || Platform.isLinux) {
+    DiscordRPC.initialize();
+    discord = DiscordRPC(applicationId: const String.fromEnvironment("DISCORD_APP_ID"));
+    discord.start(autoRegister: true);
+  }
   db = BoDatabase();
   config = Config(await SharedPreferences.getInstance());
 
@@ -122,7 +124,7 @@ void main() async {
       }
     }
   });
-  startDiscordRpc().catchError((error) {errors.add(error.toString());}); // this just runs in the background
+  if (Platform.isWindows || Platform.isLinux) startDiscordRpc().catchError((error) {errors.add(error.toString());}); // this just runs in the background
   startLastFmNowPlaying().catchError((error) {errors.add(error.toString());});
   startScrobbling().catchError((error) {errors.add(error.toString());});
   queueProvider = StreamProvider<Queue<TrackMetadata>>((ref) async* {
