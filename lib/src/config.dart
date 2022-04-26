@@ -21,15 +21,21 @@ class Config {
   /// (default, `false`). This only applies when using the large frame.
   bool get wideCompactNowPlaying => _prefs.getBool("wide-compact-now-playing") ?? false;
   set wideCompactNowPlaying(bool to) => _prefs.setBool("wide-compact-now-playing", to);
+
+  String? get lastFmToken => _prefs.getString("token:lastfm");
+  set lastFmToken(String? to) => to == null ? _prefs.remove("token:lastfm") : _prefs.setString("token:lastfm", to);
 }
 
 class ROConfig implements Config {
   @override
-  List<String> libraries;
+  final List<String> libraries;
   @override
-  bool useSystemLibrary;
+  final bool useSystemLibrary;
   @override
-  bool wideCompactNowPlaying;
+  final bool wideCompactNowPlaying;
+  @override
+  // ignore: prefer_void_to_null
+  final Null lastFmToken = null;
 
   @override
   SharedPreferences get _prefs => throw UnsupportedError("Not necessary");
@@ -38,4 +44,12 @@ class ROConfig implements Config {
     libraries = config.libraries,
     useSystemLibrary = config.useSystemLibrary,
     wideCompactNowPlaying = config.wideCompactNowPlaying;
+
+  @override
+  noSuchMethod(Invocation invocation) {
+    if (invocation.isSetter) {
+      return;
+    }
+    return super.noSuchMethod(invocation);
+  }
 }

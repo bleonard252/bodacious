@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:audio_service/audio_service.dart';
+import 'package:bodacious/background/discordrpc.dart';
 import 'package:bodacious/drift/database.dart';
 import 'package:bodacious/models/album_data.dart';
 import 'package:bodacious/models/artist_data.dart';
@@ -22,6 +23,7 @@ import 'package:bodacious/views/now_playing.dart';
 import 'package:bodacious/views/settings/library.dart';
 import 'package:bodacious/views/settings/personalization.dart';
 import 'package:bodacious/views/settings/root.dart';
+import 'package:bodacious/views/splash.dart';
 import 'package:bodacious/widgets/now_playing.dart';
 import 'package:bodacious/widgets/frame_size.dart';
 import 'package:bodacious/widgets/now_playing_sidebar.dart';
@@ -34,6 +36,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:rxdart/rxdart.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 //import 'package:bitsdojo_window/bitsdojo_window.dart';
 
@@ -43,9 +46,11 @@ late final Config config;
 late final BodaciousAudioHandler player;
 late final DiscordRPC discord;
 
+late final ReplaySubject<String> errors;
+
 void main() async {
+  runApp(const SplashScreen());
   try {DartVLC.initialize();} finally {}
-  WidgetsFlutterBinding.ensureInitialized();
   DiscordRPC.initialize();
   discord = DiscordRPC(applicationId: const String.fromEnvironment("DISCORD_APP_ID"));
   discord.start(autoRegister: true);
@@ -111,19 +116,7 @@ void main() async {
       }
     }
   });
-  player.mediaItem.listen((value) {
-    if (value == null) {
-      discord.clearPresence();
-    } else {
-      discord.updatePresence(DiscordPresence(
-        details: value.title,
-        state: value.artist,
-        largeImageText: value.album,
-        //largeImageKey: "BoUnknown", // someday we're gonna get public URLs for these album covers
-        endTimeStamp: value.duration != null ? DateTime.now().add(value.duration ?? Duration.zero).add(-player.position).millisecondsSinceEpoch : null
-      ));
-    }
-  });
+  startDiscordRpc().catchError((error) {errors.add(error.toString());}); // this just runs in the background
   queueProvider = StreamProvider<Queue<TrackMetadata>>((ref) async* {
     final stream = player.queue;
     yield Queue(entries: []);
@@ -164,7 +157,7 @@ void main() async {
     child: MyApp(),
   ));
 
-  unawaited(TheIndexer.spawn());
+  TheIndexer.spawn().catchError((error) => errors.add(error));
 
   // doWhenWindowReady(() {
   //   const initialSize = Size(600, 450);
