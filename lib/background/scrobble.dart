@@ -6,6 +6,7 @@ import 'package:lastfm/lastfm.dart';
 Future<void> startScrobbling() async {
   String? last;
   Future<void> scrobble(Duration position) async {
+    if (config.lastFmScrobbling == false) return await Future.delayed(const Duration(milliseconds: 10000)); // wait 10 seconds so that it doesn't trip again
     if (lastfm is LastFMAuthorized && config.lastFmToken != null) {
       if (player.mediaItem.valueOrNull?.artist == null) return;
       if (player.mediaItem.value?.id == last) return;
@@ -42,6 +43,7 @@ Future<void> startScrobbling() async {
 Future<void> startLastFmNowPlaying() async {
   String? last;
   Future<void> scrobble() async {
+    if (config.lastFmScrobbling == false) return await Future.delayed(const Duration(milliseconds: 10000)); // wait 10 seconds so that it doesn't trip again
     if (lastfm is LastFMAuthorized && config.lastFmToken != null) {
       if (player.mediaItem.value?.id == last) return;
       if (player.mediaItem.valueOrNull?.artist == null) return;
