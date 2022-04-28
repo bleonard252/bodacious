@@ -18,10 +18,12 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart' show WidgetsFlutterBinding;
 import 'package:fuzzywuzzy/fuzzywuzzy.dart';
 import 'package:integer/integer.dart';
+import 'package:lastfm/lastfm.dart';
 import 'package:mime/mime.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:spotify/spotify.dart';
+import 'package:xml/xml.dart';
 
 import '../../drift/database.dart';
 import '../../models/artist_data.dart';
@@ -360,93 +362,142 @@ class _IndexerIsolate {
       ));
     });
     
-    await db.transaction<void>(() async {
-      if (apiKeys.spotifyClientId != null && apiKeys.spotifySecret != null) {
-        final spcred = SpotifyApiCredentials(apiKeys.spotifyClientId, apiKeys.spotifySecret);
-        final spotify = SpotifyApi(spcred);
+    if (config.spotifyIntegration || config.lastFmIntegration) {
+      const smlx = {"small": 1, "medium": 2, "large": 3, "extralarge": 4, "mega": 5, "": 6};
+      await db.transaction<void>(() async {
+        if (apiKeys.lastfmApiKey != null && config.lastFmIntegration) {
+          final lastfm = LastFMUnauthorized(apiKeys.lastfmApiKey!, null, "Bodacious/0.5.0 <https://github.com/bleonard252/bodacious>");
 
-        final _artists = await (db.artistTable.selectOnly()
-          ..addColumns([db.artistTable.name, db.artistTable.coverUri])
-          ..where(db.artistTable.coverUri.isNull())
-        ).get();
-        for (final __artist in _artists) {
-          final artist = __artist.read(db.artistTable.name)!;
-          final cover_ = __artist.read(db.artistTable.coverUri);
-          sendProgressReport.send(IndexerProgressReport(
-            state: IndexerState.FETCHING,
-            currentFilename: "Artist: "+artist,
-            max: _artists.length,
-            value: _artists.indexOf(__artist)
-          ));
-          final _result = await spotify.search.get(artist, types: [SearchType.artist]).first();
-          final Artist? _artist = _result.first.items?.firstWhere((element) => ratio(element.name.toLowerCase(), artist.toLowerCase()) >= 85, orElse: () => null);
-          if (_artist == null) continue;
-          final _cover = _artist.images?.first.url;
-          final _spid = _artist.id;
-          
-          // Write the album cover to disk
-          final _dir = cacheDir+"/album_covers";
-          await Directory(_dir).create();
-          late final File coverFile;
-          if (_cover != null) {
-            coverFile = File(_dir+"/"+base64Encode(artist.codeUnits)+"_spotify.jpg");
-            await Dio().download(_cover, coverFile.absolute.uri.toFilePath());
+          final _albums = await (db.albumTable.selectOnly()
+            ..addColumns([db.albumTable.name, db.albumTable.artistName, db.albumTable.coverUri, db.albumTable.coverUriRemote])
+            ..where(db.albumTable.coverUri.isNull() | db.albumTable.coverUriRemote.isNull())
+          ).get();
+          for (final __album in _albums) {
+            final album = __album.read(db.albumTable.name)!;
+            final artist = __album.read(db.albumTable.artistName)!;
+            final cover_ = __album.read(db.albumTable.coverUri);
+            sendProgressReport.send(IndexerProgressReport(
+              state: IndexerState.FETCHING,
+              currentFilename: "Album: "+album.toString(),
+              max: int.parse(_albums.length.toString()),
+              value: int.parse(_albums.indexOf(__album).toString())
+            ));
+            late final XmlDocument _album;
+            print("0"+album);
+            try {
+              _album = await lastfm.read("album.getInfo", {
+                "artist": artist, "album": album
+              });
+            } on LastFMError {continue;}
+            print("1"+album);
+            final _images = _album.rootElement.firstElementChild?.children.where((p0) => p0 is XmlElement && p0.qualifiedName.toLowerCase() == "image").toList() ?? [];
+            if (_images.isEmpty) continue;
+            _images.sort((a, b) => smlx[a.getAttribute("size")]?.compareTo(smlx[b.getAttribute("size")] ?? 0) ?? 0);
+            final _cover = _images.last.innerText;
+            var output = const AlbumTableCompanion();
+            if (_cover.isNotEmpty && cover_ == null) {
+              final _dir = cacheDir+"/album_covers";
+              await Directory(_dir).create();
+              final coverFile = File(_dir+"/"+base64Encode(utf8.encode(artist))+"."+base64Encode(utf8.encode(album))+"_lastfm.jpg");
+              await Dio().download(_cover, coverFile.absolute.uri.toFilePath());
+              output = output.copyWith(
+                coverUri: Value(coverFile.absolute.uri),
+                coverSource: const Value("lastfm"),
+              );
+            }
+            output.copyWith(coverUriRemote: Value(Uri.parse(_cover)));
+            await (db.albumTable.update()
+              ..where((tbl) => tbl.name.equals(artist))
+            ).write(output);
           }
-          await (db.artistTable.update()
-            ..where((tbl) => tbl.name.equals(artist))
-          ).write((_cover != null) ? ArtistTableCompanion(
-            coverUri: cover_ == null ? Value(coverFile.absolute.uri) : const Value.absent(),
-            coverUriRemote: Value(Uri.parse(_cover)),
-            coverSource: const Value("spotify"),
-            spotifyId: Value(_spid)
-          ) : ArtistTableCompanion(spotifyId: Value(_spid)));
         }
+        if (apiKeys.spotifyClientId != null && apiKeys.spotifySecret != null && config.spotifyIntegration) {
+          final spcred = SpotifyApiCredentials(apiKeys.spotifyClientId, apiKeys.spotifySecret);
+          final spotify = SpotifyApi(spcred);
 
-        final _albums = await (db.albumTable.selectOnly()
-          ..addColumns([db.albumTable.name, db.albumTable.artistName, db.albumTable.coverUri, db.albumTable.coverUriRemote])
-          ..where(db.albumTable.coverUri.isNull() | db.albumTable.coverUriRemote.isNull())
-        ).get();
-        for (final __album in _albums) {
-          final album = __album.read(db.albumTable.name)!;
-          final artist = __album.read(db.albumTable.artistName)!;
-          final cover_ = __album.read(db.albumTable.coverUri);
-          sendProgressReport.send(IndexerProgressReport(
-            state: IndexerState.FETCHING,
-            currentFilename: "Album: "+album,
-            max: _albums.length,
-            value: _albums.indexOf(__album)
-          ));
-          final _result = await spotify.search.get(album+" artist:"+artist, types: [SearchType.album]).first();
-          final AlbumSimple? _album = _result.first.items?.firstWhere((element) => ratio(element.name.toLowerCase(), album.toLowerCase()) >= 85, orElse: () => null);
-          if (_album == null) continue;
-          final _cover = _album.images?.first.url;
-          final _spid = _album.id;
-          
-          // Write the album cover to disk
-          final _dir = cacheDir+"/album_covers";
-          await Directory(_dir).create();
-          late final File coverFile;
-          var output = AlbumTableCompanion(spotifyId: Value(_spid));
-          if (_cover != null && cover_ == null) {
-            coverFile = File(_dir+"/"+base64Encode(utf8.encode(artist))+"."+base64Encode(utf8.encode(album))+"_spotify.jpg");
-            await Dio().download(_cover, coverFile.absolute.uri.toFilePath());
-            output = output.copyWith(
-              coverUri: Value(coverFile.absolute.uri),
-              coverSource: const Value("spotify"),
-            );
-          }
-          if (_cover != null && __album.read(db.albumTable.coverUriRemote) == null) {
-            output = output.copyWith(
+          final _artists = await (db.artistTable.selectOnly()
+            ..addColumns([db.artistTable.name, db.artistTable.coverUri])
+            ..where(db.artistTable.coverUri.isNull())
+          ).get();
+          for (final __artist in _artists) {
+            final artist = __artist.read(db.artistTable.name)!;
+            final cover_ = __artist.read(db.artistTable.coverUri);
+            sendProgressReport.send(IndexerProgressReport(
+              state: IndexerState.FETCHING,
+              currentFilename: "Artist: "+artist,
+              max: _artists.length,
+              value: _artists.indexOf(__artist)
+            ));
+            final _result = await spotify.search.get(artist, types: [SearchType.artist]).first();
+            final Artist? _artist = _result.first.items?.firstWhere((element) => ratio(element.name.toLowerCase(), artist.toLowerCase()) >= 85, orElse: () => null);
+            if (_artist == null) continue;
+            final _cover = _artist.images?.first.url;
+            final _spid = _artist.id;
+            
+            // Write the album cover to disk
+            final _dir = cacheDir+"/album_covers";
+            await Directory(_dir).create();
+            late final File coverFile;
+            if (_cover != null) {
+              coverFile = File(_dir+"/"+base64Encode(artist.codeUnits)+"_spotify.jpg");
+              await Dio().download(_cover, coverFile.absolute.uri.toFilePath());
+            }
+            await (db.artistTable.update()
+              ..where((tbl) => tbl.name.equals(artist))
+            ).write((_cover != null) ? ArtistTableCompanion(
+              coverUri: cover_ == null ? Value(coverFile.absolute.uri) : const Value.absent(),
               coverUriRemote: Value(Uri.parse(_cover)),
-            );
+              coverSource: const Value("spotify"),
+              spotifyId: Value(_spid)
+            ) : ArtistTableCompanion(spotifyId: Value(_spid)));
           }
-          await (db.albumTable.update()
-            ..where((tbl) => tbl.name.equals(album) & tbl.artistName.equals(artist))
-          ).write(output);
+
+          final _albums = await (db.albumTable.selectOnly()
+            ..addColumns([db.albumTable.name, db.albumTable.artistName, db.albumTable.coverUri, db.albumTable.coverUriRemote])
+            ..where(db.albumTable.coverUri.isNull() | db.albumTable.coverUriRemote.isNull())
+          ).get();
+          for (final __album in _albums) {
+            final album = __album.read(db.albumTable.name)!;
+            final artist = __album.read(db.albumTable.artistName)!;
+            final cover_ = __album.read(db.albumTable.coverUri);
+            sendProgressReport.send(IndexerProgressReport(
+              state: IndexerState.FETCHING,
+              currentFilename: "Album: "+album,
+              max: _albums.length,
+              value: _albums.indexOf(__album)
+            ));
+            final _result = await spotify.search.get(album+" artist:"+artist, types: [SearchType.album]).first();
+            final AlbumSimple? _album = _result.first.items?.firstWhere((element) => ratio(element.name.toLowerCase(), album.toLowerCase()) >= 85, orElse: () => null);
+            if (_album == null) continue;
+            final _cover = _album.images?.first.url;
+            final _spid = _album.id;
+            
+            // Write the album cover to disk
+            final _dir = cacheDir+"/album_covers";
+            await Directory(_dir).create();
+            late final File coverFile;
+            var output = AlbumTableCompanion(spotifyId: Value(_spid));
+            if (_cover != null && cover_ == null) {
+              coverFile = File(_dir+"/"+base64Encode(utf8.encode(artist))+"."+base64Encode(utf8.encode(album))+"_spotify.jpg");
+              await Dio().download(_cover, coverFile.absolute.uri.toFilePath());
+              output = output.copyWith(
+                coverUri: Value(coverFile.absolute.uri),
+                coverSource: const Value("spotify"),
+              );
+            }
+            if (_cover != null && __album.read(db.albumTable.coverUriRemote) == null) {
+              output = output.copyWith(
+                coverUriRemote: Value(Uri.parse(_cover)),
+              );
+            }
+            await (db.albumTable.update()
+              ..where((tbl) => tbl.name.equals(album) & tbl.artistName.equals(artist))
+            ).write(output);
+          }
         }
-      }
-    });
-    
+      });
+    }
+
     sendProgressReport.send(const IndexerProgressReport(
       state: IndexerState.FINISHED,
       max: 1,

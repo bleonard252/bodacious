@@ -29,6 +29,9 @@ class Config {
   /// Whether to use Last.fm to fetch metadata for the library.
   bool get lastFmIntegration => _prefs.getBool("lastfm:integrate") ?? false;
   set lastFmIntegration(bool to) => _prefs.setBool("lastfm:integrate", to);
+  /// Whether to use Last.fm to fetch metadata for the library.
+  bool get spotifyIntegration => _prefs.getBool("spotify:integrate") ?? false;
+  set spotifyIntegration(bool to) => _prefs.setBool("spotify:integrate", to);
 
   String? get lastFmToken => _prefs.getString("token:lastfm");
   set lastFmToken(String? to) => to == null ? _prefs.remove("token:lastfm") : _prefs.setString("token:lastfm", to);
@@ -53,6 +56,8 @@ class ROConfig implements Config {
   final bool lastFmIntegration;
   @override
   final bool lastFmScrobbling;
+  @override
+  final bool spotifyIntegration;
 
   @override
   SharedPreferences get _prefs => throw UnsupportedError("Not necessary");
@@ -63,6 +68,7 @@ class ROConfig implements Config {
     wideCompactNowPlaying = config.wideCompactNowPlaying,
     lastFmScrobbling = config.lastFmScrobbling,
     lastFmIntegration = config.lastFmIntegration,
+    spotifyIntegration = config.spotifyIntegration,
     lastFmToken = config.lastFmToken,
     lastFmUsername = config.lastFmUsername;
 

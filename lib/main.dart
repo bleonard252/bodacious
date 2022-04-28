@@ -170,7 +170,13 @@ void main() async {
   TheIndexer.spawn().catchError((error) => errors.add(error));
 
   if (config.lastFmToken != null) {
-    lastfm = LastFMAuthorized(apiKeys.lastfmApiKey!, secret: apiKeys.lastfmSecret!, sessionKey: config.lastFmToken!, username: config.lastFmUsername!);
+    lastfm = LastFMAuthorized(
+      apiKeys.lastfmApiKey!,
+      secret: apiKeys.lastfmSecret!,
+      sessionKey: config.lastFmToken!,
+      username: config.lastFmUsername!,
+      userAgent: "Bodacious/0.5.0 <https://github.com/bleonard252/bodacious>"
+    );
   }
 
   // doWhenWindowReady(() {

@@ -45,9 +45,9 @@ class _OnlineServicesSettingsViewState extends State<OnlineServicesSettingsView>
               title: const Text("Use Last.fm for library information"),
               subtitle: const Text("When this is on, Bodacious checks Last.fm when refreshing the library or when editing the library."),
               value: config.lastFmIntegration,
-              onChanged: null /*(value) async {
+              onChanged: (value) async {
                 setState(() => config.lastFmIntegration = value);
-              },*/
+              },
             ),
             StatefulBuilder(builder: (context, setState) => 
               (config.lastFmToken == null) ? ListTile(
@@ -105,13 +105,13 @@ class _OnlineServicesSettingsViewState extends State<OnlineServicesSettingsView>
             title: Text("Spotify", style: Theme.of(context).textTheme.headline6),
             contentPadding: const EdgeInsets.symmetric(horizontal: 12.0),
           ),
-          const SwitchListTile(
-              title: Text("Use Spotify for library information"),
-              subtitle: Text("When this is on, Bodacious checks Spotify when refreshing the library or when editing the library."),
-              value: false,
-              onChanged: null /*(value) async {
-                setState(() => config.lastFmIntegration = value);
-              },*/
+          SwitchListTile(
+              title: const Text("Use Spotify for library information"),
+              subtitle: const Text("When this is on, Bodacious checks Spotify when refreshing the library or when editing the library."),
+              value: config.spotifyIntegration,
+              onChanged: (value) async {
+                setState(() => config.spotifyIntegration = value);
+              },
             ),
         ],
       )
