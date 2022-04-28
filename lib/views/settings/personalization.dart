@@ -16,7 +16,7 @@ class _PersonalizationSettingsViewState extends State<PersonalizationSettingsVie
       length: 1,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text("Library", style: TextStyle(color: Colors.green)),
+          title: const Text("Personalization", style: TextStyle(color: Colors.green)),
           backgroundColor: Colors.transparent,
           elevation: 0,
           bottom: const TabBar(tabs: [
