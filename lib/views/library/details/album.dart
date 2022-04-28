@@ -9,7 +9,6 @@ import 'package:bodacious/widgets/item/artist.dart';
 import 'package:bodacious/widgets/item/song.dart';
 import 'package:drift/drift.dart' hide Column, Table;
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class AlbumDetailsView extends StatefulWidget {

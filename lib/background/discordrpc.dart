@@ -1,4 +1,3 @@
-import 'package:bodacious/models/track_data.dart';
 import 'package:dart_discord_rpc/dart_discord_rpc.dart';
 
 import '../main.dart';

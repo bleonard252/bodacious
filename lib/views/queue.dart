@@ -1,8 +1,5 @@
-import 'dart:io';
 
 import 'package:bodacious/main.dart';
-import 'package:bodacious/models/track_data.dart';
-import 'package:bodacious/widgets/cover_placeholder.dart';
 import 'package:bodacious/widgets/frame_size.dart';
 import 'package:bodacious/widgets/item/song.dart';
 import 'package:flutter/material.dart';

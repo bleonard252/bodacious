@@ -1,11 +1,6 @@
-import 'dart:io';
 
 import 'package:bodacious/main.dart';
-import 'package:file_picker/file_picker.dart';
-import 'package:flutter/foundation.dart';
 import "package:flutter/material.dart";
-import 'package:go_router/go_router.dart';
-import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 class PersonalizationSettingsView extends StatefulWidget {
   const PersonalizationSettingsView({ Key? key }) : super(key: key);

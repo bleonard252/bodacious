@@ -6,7 +6,6 @@ import 'package:bodacious/widgets/item/song.dart';
 import 'package:flutter/material.dart' show FileImage, ListTile, Material, MaterialApp;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
-import 'package:mocktail/mocktail.dart';
 
 import '../mocks/mock_player.dart';
 

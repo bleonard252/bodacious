@@ -1,16 +1,11 @@
-import 'dart:convert';
-import 'dart:io';
 
 import 'package:bodacious/main.dart';
-import 'package:bodacious/models/album_data.dart';
 import 'package:bodacious/models/artist_data.dart';
 import 'package:bodacious/widgets/item/artist.dart';
 import 'package:drift/drift.dart';
 import "package:flutter/material.dart";
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
-import '../../../widgets/cover_placeholder.dart';
 
 class ArtistLibraryList extends ConsumerWidget {
   const ArtistLibraryList({Key? key}) : super(key: key);

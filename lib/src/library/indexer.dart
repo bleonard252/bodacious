@@ -1,11 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:developer';
 import 'dart:io';
 import 'dart:isolate';
-import 'dart:typed_data';
 
-import 'package:bodacious/drift/track_data.dart';
 import 'package:bodacious/main.dart';
 import 'package:bodacious/models/album_data.dart';
 import 'package:bodacious/src/config.dart';
@@ -15,9 +12,7 @@ import 'package:dio/dio.dart';
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/widgets.dart' show WidgetsFlutterBinding;
 import 'package:fuzzywuzzy/fuzzywuzzy.dart';
-import 'package:integer/integer.dart';
 import 'package:lastfm/lastfm.dart';
 import 'package:mime/mime.dart';
 import 'package:path_provider/path_provider.dart';

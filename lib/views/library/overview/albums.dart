@@ -1,4 +1,3 @@
-import 'dart:io';
 
 import 'package:bodacious/main.dart';
 import 'package:bodacious/models/album_data.dart';
@@ -6,10 +5,7 @@ import 'package:bodacious/widgets/item/album.dart';
 import 'package:drift/drift.dart';
 import "package:flutter/material.dart";
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
-import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
-import '../../../widgets/cover_placeholder.dart';
 
 class AlbumLibraryList extends ConsumerWidget {
   const AlbumLibraryList({Key? key}) : super(key: key);

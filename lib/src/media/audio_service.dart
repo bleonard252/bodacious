@@ -2,14 +2,10 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:audio_service/audio_service.dart';
-import 'package:bodacious/drift/database.dart';
 import 'package:bodacious/main.dart';
 import 'package:dart_vlc/dart_vlc.dart' as vlc;
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:just_audio/just_audio.dart' as just;
-import 'package:mime/mime.dart';
-import 'package:rxdart/src/subjects/behavior_subject.dart';
 
 import '../../models/track_data.dart';
 

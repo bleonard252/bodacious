@@ -1,6 +1,5 @@
 
 import 'dart:async';
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:audio_service/audio_service.dart';
@@ -13,7 +12,6 @@ import 'package:bodacious/models/track_data.dart';
 import 'package:bodacious/src/config.dart';
 import 'package:bodacious/src/library/indexer.dart';
 import 'package:bodacious/src/media/audio_service.dart';
-import 'package:bodacious/src/metadata/provider.dart';
 import 'package:bodacious/src/navigate_observer.dart';
 import 'package:bodacious/src/online/lastfm.dart';
 import 'package:bodacious/views/errorlist.dart';

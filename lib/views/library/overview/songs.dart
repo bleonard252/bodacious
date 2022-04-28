@@ -1,15 +1,11 @@
-import 'dart:io';
 
 import 'package:bodacious/main.dart';
 import 'package:bodacious/models/track_data.dart';
-import 'package:bodacious/src/library/indexer.dart';
-import 'package:bodacious/widgets/indexer_progress.dart';
 import 'package:bodacious/widgets/item/song.dart';
 import 'package:drift/drift.dart';
 import "package:flutter/material.dart";
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../widgets/cover_placeholder.dart';
 
 class SongLibraryList extends ConsumerWidget {
   const SongLibraryList({Key? key}) : super(key: key);

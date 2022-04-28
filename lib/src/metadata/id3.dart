@@ -7,7 +7,6 @@ import 'package:bodacious/src/library/cache_dir.dart';
 import 'package:bodacious/src/metadata/infer.dart';
 import 'package:flac_metadata/flacstream.dart';
 import 'package:flac_metadata/metadata.dart';
-import 'package:flutter/foundation.dart';
 import 'package:id3/id3.dart';
 
 import 'package:mime/mime.dart';

@@ -1,4 +1,3 @@
-import 'package:bodacious/src/library/indexer.dart';
 import 'package:bodacious/widgets/indexer_progress.dart';
 import "package:flutter/material.dart";
 import 'package:go_router/go_router.dart';

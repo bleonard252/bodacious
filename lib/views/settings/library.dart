@@ -5,9 +5,7 @@ import 'package:bodacious/main.dart';
 import 'package:bodacious/src/library/indexer.dart';
 import 'package:bodacious/widgets/indexer_progress.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/foundation.dart';
 import "package:flutter/material.dart";
-import 'package:go_router/go_router.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 class LibrarySettingsView extends StatefulWidget {

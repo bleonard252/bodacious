@@ -23,7 +23,7 @@ class JustAudioHandler extends BodaciousAudioHandler {
         // db.tryGetTrackFromUri(current.uri)
         // .then((value) => value == null ? null : output.add(value.asMediaItem()));
       } else {
-        print("How did we get here?");
+        errors.add("An invalid audio source was found (JustAudio)");
       }
     }
     // Set up the event pipeline

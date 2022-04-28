@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
-import '../src/library/indexer.dart';
 import '../widgets/indexer_progress.dart';
 
 class HomeView extends StatelessWidget {

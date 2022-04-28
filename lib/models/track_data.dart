@@ -1,4 +1,3 @@
-import 'dart:io';
 
 import 'package:audio_service/audio_service.dart';
 import 'package:bodacious/drift/database.dart';
@@ -9,7 +8,6 @@ import 'package:flutter/foundation.dart';
 import 'dart:ui' show ImageDescriptor;
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:audio_service_platform_interface/audio_service_platform_interface.dart';
 
 part 'track_data.freezed.dart';
 part 'track_data.g.dart';

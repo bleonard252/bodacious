@@ -1,7 +1,6 @@
 import 'package:bodacious/main.dart';
 import 'package:bodacious/src/online/lastfm.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
 import 'package:lastfm/lastfm.dart';
 
 Future<void> startScrobbling() async {

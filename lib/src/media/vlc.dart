@@ -133,7 +133,6 @@ class VlcAudioHandler extends BodaciousAudioHandler {
       medias: queue.map((e) => vlc.Media.file(File.fromUri(Uri.parse(e.id)))).toList()
     ), autoStart: true);
     if (index != null) player.jump(index);
-    print(index);
     return super.updateQueue(queue, index);
   }
   @override
@@ -150,7 +149,7 @@ class VlcAudioHandler extends BodaciousAudioHandler {
   @override
   Future<void> setShuffleMode(AudioServiceShuffleMode shuffleMode) {
     throw UnsupportedError("You cannot set shuffle on this device.");
-    return super.setShuffleMode(shuffleMode);
+    //return super.setShuffleMode(shuffleMode);
   }
   @override
   Future<void> setRepeatMode(AudioServiceRepeatMode repeatMode) async {

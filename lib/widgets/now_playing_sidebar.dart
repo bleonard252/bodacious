@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:audio_service/audio_service.dart';
 import 'package:bodacious/main.dart';
 import 'package:bodacious/models/track_data.dart';
 import 'package:bodacious/widgets/cover_placeholder.dart';
@@ -9,7 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
-import 'frame_size.dart';
 
 class NowPlayingSidebar extends ConsumerWidget {
   const NowPlayingSidebar({ Key? key }) : super(key: key);

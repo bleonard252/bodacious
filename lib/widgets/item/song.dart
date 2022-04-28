@@ -1,10 +1,8 @@
 import 'dart:io';
-import 'dart:ui';
 
 import 'package:bodacious/main.dart';
 import 'package:bodacious/models/track_data.dart';
 import 'package:bodacious/widgets/cover_placeholder.dart';
-import 'package:drift/drift.dart' hide Column;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';

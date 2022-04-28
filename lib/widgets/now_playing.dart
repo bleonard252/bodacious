@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:audio_service/audio_service.dart';
 import 'package:bodacious/main.dart';
 import 'package:bodacious/models/track_data.dart';
 import 'package:bodacious/widgets/cover_placeholder.dart';
