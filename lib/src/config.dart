@@ -79,6 +79,8 @@ class APIKeys {
   final String? discordAppId = setNullIfEmpty(const String.fromEnvironment("DISCORD_APP_ID"));
   final String? lastfmApiKey = setNullIfEmpty(const String.fromEnvironment("LASTFM_API_KEY"));
   final String? lastfmSecret = setNullIfEmpty(const String.fromEnvironment("LASTFM_SECRET"));
+  final String? spotifyClientId = setNullIfEmpty(const String.fromEnvironment("SPOTIFY_API_KEY"));
+  final String? spotifySecret = setNullIfEmpty(const String.fromEnvironment("SPOTIFY_SECRET"));
 
   static String? setNullIfEmpty(String value) {
     if (value == "") {

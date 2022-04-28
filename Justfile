@@ -3,10 +3,11 @@ set positional-arguments
 
 # Build the app in debug mode
 build *TARGETS='appbundle': _generate
-  for target in {{TARGETS}}; do flutter build $target --debug; done
+  for target in {{TARGETS}}; do flutter build $target --debug --dart-define DISCORD_APP_ID=$DISCORD_APP_ID --dart-define LASTFM_API_KEY=$LASTFM_API_KEY --dart-define LASTFM_SECRET=$LASTFM_SECRET --dart-define SPOTIFY_API_KEY=$SPOTIFY_API_KEY --dart-define SPOTIFY_SECRET=$SPOTIFY_SECRET; done
 # Build the app in release mode
 release *TARGETS='apk': test-all prebuild
-  for target in {{TARGETS}}; do flutter build $target --release; done
+  @#TODO: set version in version.txt
+  for target in {{TARGETS}}; do flutter build $target --release --dart-define DISCORD_APP_ID=$DISCORD_APP_ID --dart-define LASTFM_API_KEY=$LASTFM_API_KEY --dart-define LASTFM_SECRET=$LASTFM_SECRET --dart-define SPOTIFY_API_KEY=$SPOTIFY_API_KEY --dart-define SPOTIFY_SECRET=$SPOTIFY_SECRET; done
 # Run pre-build checks
 prebuild: _generate && _check
   @# flutter pub run flutter_launcher_icons:main
@@ -17,20 +18,21 @@ install:
 run: prebuild _run
 _run:
   #!/usr/bin/env bash
-  flutter run --dart-define DISCORD_APP_ID=$DISCORD_APP_ID --dart-define LASTFM_API_KEY=$LASTFM_API_KEY --dart-define LASTFM_SECRET=$LASTFM_SECRET
+  flutter run --dart-define DISCORD_APP_ID=$DISCORD_APP_ID --dart-define LASTFM_API_KEY=$LASTFM_API_KEY --dart-define LASTFM_SECRET=$LASTFM_SECRET --dart-define SPOTIFY_API_KEY=$SPOTIFY_API_KEY --dart-define SPOTIFY_SECRET=$SPOTIFY_SECRET
 
 _generate:
   flutter pub run build_runner build --delete-conflicting-outputs
 _check:
   #!/usr/bin/env bash
   NEED_API=false
-  if [[ "$SPOTIFY_API_KEY" == "" ]]; then echo "Spotify API key not set."; NEED_API=true; fi
+  if [[ "$SPOTIFY_API_KEY" == "" ]]; then echo "Spotify client ID not set."; NEED_API=true; fi
+  if [[ "$SPOTIFY_SECRET" == "" ]]; then echo "Spotify client secret not set."; NEED_API=true; fi
   if [[ "$LASTFM_API_KEY" == "" ]]; then echo "Last.fm API key not set."; NEED_API=true; fi
-  if [[ "$LASTFM_SECRET" == "" ]]; then echo "Last.fm secret not set."; NEED_API=true; fi
-  if [[ "$GENIUS_API_KEY" == "" ]]; then echo "Genius API key not set."; NEED_API=true; fi
+  if [[ "$LASTFM_SECRET" == "" ]]; then echo "Last.fm shared secret not set."; NEED_API=true; fi
+  #if [[ "$GENIUS_API_KEY" == "" ]]; then echo "Genius API key not set."; NEED_API=true; fi
   if [[ "$DISCORD_APP_ID" == "" ]]; then echo "Discord App ID not set."; NEED_API=true; fi
   #
-  if [[ "$NEED_API" == "false" ]]; then echo "All API keys are set! You are ready to go."; fi
+  if [[ "$NEED_API" == "false" ]]; then echo "All API keys are set! You are ready to go."; else exit 1; fi
 
 # Run metadata gathering tests
 test-metadata:

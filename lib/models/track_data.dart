@@ -28,6 +28,10 @@ class TrackMetadata with _$TrackMetadata implements Insertable<TrackMetadata> {
     /// The position of the track on the named album.
     int? trackNo,
     @Default(0) int discNo,
+    /// Extra details about a given track, such as its origins and meaning.
+    String? description,
+    /// Where the [description] came from.
+    String? descriptionSource,
     /// Holds the data for a cover image. **DO NOT** STORE THIS IN THE DATABASE!
     //@Deprecated("Don't use this, just use coverBytes or coverFile instead!")
     @JsonKey(ignore: true) ImageDescriptor? coverData,
@@ -38,13 +42,28 @@ class TrackMetadata with _$TrackMetadata implements Insertable<TrackMetadata> {
     @JsonKey(ignore: true) List<int>? coverBytes,
     /// The URI to the cover.
     Uri? coverUri,
+    /// A remote URI to the cover, such as from Spotify.
+    /// Generally the URL used to download the cover from [coverSource].
+    /// This is used with Discord RPC.
+    Uri? coverUriRemote,
+    /// Can be "album" in addition to album cover sources.
+    /// "album" here indicates the cover is the same as the album's.
+    @Default("album") String? coverSource,
     /// The track's duration.
     Duration? duration,
     /// The year the track was released. Prefer to show [releaseDate] wherever given.
     int? year,
     /// The release date of this track.
     DateTime? releaseDate,
-    @Default(true) bool available
+    @Default(true) bool available,
+    String? spotifyId,
+    /// The source of the audio for this track.
+    /// This indicates where the user got a particular file, i.e. if it is
+    /// ripped or bought from Bandcamp or Amazon.
+    /// This can also be "spotify" or "youtube" to indicate the audio should be
+    /// sourced from those services respectively (but it doesn't work yet).
+    @Default("local") String? source,
+    String? metadataSource
   }) = _TrackMetadata;
 
   factory TrackMetadata.fromJson(Map<String, dynamic> json) => _$TrackMetadataFromJson(json);
@@ -62,10 +81,16 @@ class TrackMetadata with _$TrackMetadata implements Insertable<TrackMetadata> {
       trackNo: Value.ofNullable(trackNo),
       discNo: Value.ofNullable(discNo),
       coverUri: Value(coverUri),
+      coverUriRemote: Value(coverUriRemote),
+      coverSource: Value(coverSource),
       duration: Value(duration),
       releaseDate: Value(releaseDate),
       uri: Value(uri),
-      year: Value(year)
+      year: Value(year),
+      available: Value(available),
+      spotifyId: Value(spotifyId),
+      source: Value(source),
+      metadataSource: Value(metadataSource),
     ).toColumns(nullToAbsent);
   }
 }

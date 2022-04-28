@@ -42,6 +42,8 @@ dependencies:
     git: https://github.com/alexmercerind/dart_discord_rpc
   xml: ^5.1.2
   lastfm: ^0.0.5
+  spotify: ^0.7.0
+  dio: ^4.0.6
 
   # Library & Metadata Deps
   file_picker: ^4.5.1 # for picking directories (and files in early versions)
@@ -52,6 +54,7 @@ dependencies:
     git: https://github.com/bleonard252/flac_metadata
   mime: ^1.0.1
   #on_audio_query: ^2.6.0 # for finding songs from Android and iOS system libraries
+  fuzzywuzzy: ^0.2.0
 
   # Database deps
   drift: ^1.5.0

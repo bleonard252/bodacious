@@ -14,10 +14,22 @@ class ArtistMetadata with _$ArtistMetadata implements Insertable<ArtistMetadata>
     required String name,
     /// The URI to the artist icon.
     Uri? coverUri,
+    /// A remote URI to the cover, such as from Spotify.
+    /// Generally the URL used to download the cover from [coverSource].
+    /// This is used with Discord RPC.
+    Uri? coverUriRemote,
+    /// Can be "spotify", "metadata", "neighbor", "mse", "lastfm", "genius", or other sources.
+    String? coverSource,
+    /// A biography for the artist.
+    String? description,
+    /// Where the biography came from.
+    String? descriptionSource,
     /// The total number of albums by this artist (or albums present in the library).
     int? albumCount,
     /// The total number of tracks by this artist (or tracks present in the library).
     int? trackCount,
+    String? spotifyId,
+    String? metadataSource
   }) = _ArtistMetadata;
 
   factory ArtistMetadata.fromJson(Map<String, dynamic> json) => _$ArtistMetadataFromJson(json);
@@ -27,8 +39,13 @@ class ArtistMetadata with _$ArtistMetadata implements Insertable<ArtistMetadata>
     return ArtistTableCompanion(
       name: Value(name),
       coverUri: Value(coverUri),
+      coverUriRemote: Value(coverUriRemote),
+      coverSource: Value(coverSource),
+      description: Value(description),
+      descriptionSource: Value(descriptionSource),
       albumCount: Value(albumCount),
-      trackCount: Value(trackCount)
+      trackCount: Value(trackCount),
+      metadataSource: Value(metadataSource),
     ).toColumns(nullToAbsent);
   }
 }

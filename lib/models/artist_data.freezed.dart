@@ -23,12 +23,27 @@ class _$ArtistMetadataTearOff {
   const _$ArtistMetadataTearOff();
 
   _ArtistMetadata call(
-      {required String name, Uri? coverUri, int? albumCount, int? trackCount}) {
+      {required String name,
+      Uri? coverUri,
+      Uri? coverUriRemote,
+      String? coverSource,
+      String? description,
+      String? descriptionSource,
+      int? albumCount,
+      int? trackCount,
+      String? spotifyId,
+      String? metadataSource}) {
     return _ArtistMetadata(
       name: name,
       coverUri: coverUri,
+      coverUriRemote: coverUriRemote,
+      coverSource: coverSource,
+      description: description,
+      descriptionSource: descriptionSource,
       albumCount: albumCount,
       trackCount: trackCount,
+      spotifyId: spotifyId,
+      metadataSource: metadataSource,
     );
   }
 
@@ -48,11 +63,27 @@ mixin _$ArtistMetadata {
   /// The URI to the artist icon.
   Uri? get coverUri => throw _privateConstructorUsedError;
 
+  /// A remote URI to the cover, such as from Spotify.
+  /// Generally the URL used to download the cover from [coverSource].
+  /// This is used with Discord RPC.
+  Uri? get coverUriRemote => throw _privateConstructorUsedError;
+
+  /// Can be "spotify", "metadata", "neighbor", "mse", "lastfm", "genius", or other sources.
+  String? get coverSource => throw _privateConstructorUsedError;
+
+  /// A biography for the artist.
+  String? get description => throw _privateConstructorUsedError;
+
+  /// Where the biography came from.
+  String? get descriptionSource => throw _privateConstructorUsedError;
+
   /// The total number of albums by this artist (or albums present in the library).
   int? get albumCount => throw _privateConstructorUsedError;
 
   /// The total number of tracks by this artist (or tracks present in the library).
   int? get trackCount => throw _privateConstructorUsedError;
+  String? get spotifyId => throw _privateConstructorUsedError;
+  String? get metadataSource => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -65,7 +96,17 @@ abstract class $ArtistMetadataCopyWith<$Res> {
   factory $ArtistMetadataCopyWith(
           ArtistMetadata value, $Res Function(ArtistMetadata) then) =
       _$ArtistMetadataCopyWithImpl<$Res>;
-  $Res call({String name, Uri? coverUri, int? albumCount, int? trackCount});
+  $Res call(
+      {String name,
+      Uri? coverUri,
+      Uri? coverUriRemote,
+      String? coverSource,
+      String? description,
+      String? descriptionSource,
+      int? albumCount,
+      int? trackCount,
+      String? spotifyId,
+      String? metadataSource});
 }
 
 /// @nodoc
@@ -81,8 +122,14 @@ class _$ArtistMetadataCopyWithImpl<$Res>
   $Res call({
     Object? name = freezed,
     Object? coverUri = freezed,
+    Object? coverUriRemote = freezed,
+    Object? coverSource = freezed,
+    Object? description = freezed,
+    Object? descriptionSource = freezed,
     Object? albumCount = freezed,
     Object? trackCount = freezed,
+    Object? spotifyId = freezed,
+    Object? metadataSource = freezed,
   }) {
     return _then(_value.copyWith(
       name: name == freezed
@@ -93,6 +140,22 @@ class _$ArtistMetadataCopyWithImpl<$Res>
           ? _value.coverUri
           : coverUri // ignore: cast_nullable_to_non_nullable
               as Uri?,
+      coverUriRemote: coverUriRemote == freezed
+          ? _value.coverUriRemote
+          : coverUriRemote // ignore: cast_nullable_to_non_nullable
+              as Uri?,
+      coverSource: coverSource == freezed
+          ? _value.coverSource
+          : coverSource // ignore: cast_nullable_to_non_nullable
+              as String?,
+      description: description == freezed
+          ? _value.description
+          : description // ignore: cast_nullable_to_non_nullable
+              as String?,
+      descriptionSource: descriptionSource == freezed
+          ? _value.descriptionSource
+          : descriptionSource // ignore: cast_nullable_to_non_nullable
+              as String?,
       albumCount: albumCount == freezed
           ? _value.albumCount
           : albumCount // ignore: cast_nullable_to_non_nullable
@@ -101,6 +164,14 @@ class _$ArtistMetadataCopyWithImpl<$Res>
           ? _value.trackCount
           : trackCount // ignore: cast_nullable_to_non_nullable
               as int?,
+      spotifyId: spotifyId == freezed
+          ? _value.spotifyId
+          : spotifyId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      metadataSource: metadataSource == freezed
+          ? _value.metadataSource
+          : metadataSource // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
@@ -112,7 +183,17 @@ abstract class _$ArtistMetadataCopyWith<$Res>
           _ArtistMetadata value, $Res Function(_ArtistMetadata) then) =
       __$ArtistMetadataCopyWithImpl<$Res>;
   @override
-  $Res call({String name, Uri? coverUri, int? albumCount, int? trackCount});
+  $Res call(
+      {String name,
+      Uri? coverUri,
+      Uri? coverUriRemote,
+      String? coverSource,
+      String? description,
+      String? descriptionSource,
+      int? albumCount,
+      int? trackCount,
+      String? spotifyId,
+      String? metadataSource});
 }
 
 /// @nodoc
@@ -130,8 +211,14 @@ class __$ArtistMetadataCopyWithImpl<$Res>
   $Res call({
     Object? name = freezed,
     Object? coverUri = freezed,
+    Object? coverUriRemote = freezed,
+    Object? coverSource = freezed,
+    Object? description = freezed,
+    Object? descriptionSource = freezed,
     Object? albumCount = freezed,
     Object? trackCount = freezed,
+    Object? spotifyId = freezed,
+    Object? metadataSource = freezed,
   }) {
     return _then(_ArtistMetadata(
       name: name == freezed
@@ -142,6 +229,22 @@ class __$ArtistMetadataCopyWithImpl<$Res>
           ? _value.coverUri
           : coverUri // ignore: cast_nullable_to_non_nullable
               as Uri?,
+      coverUriRemote: coverUriRemote == freezed
+          ? _value.coverUriRemote
+          : coverUriRemote // ignore: cast_nullable_to_non_nullable
+              as Uri?,
+      coverSource: coverSource == freezed
+          ? _value.coverSource
+          : coverSource // ignore: cast_nullable_to_non_nullable
+              as String?,
+      description: description == freezed
+          ? _value.description
+          : description // ignore: cast_nullable_to_non_nullable
+              as String?,
+      descriptionSource: descriptionSource == freezed
+          ? _value.descriptionSource
+          : descriptionSource // ignore: cast_nullable_to_non_nullable
+              as String?,
       albumCount: albumCount == freezed
           ? _value.albumCount
           : albumCount // ignore: cast_nullable_to_non_nullable
@@ -150,6 +253,14 @@ class __$ArtistMetadataCopyWithImpl<$Res>
           ? _value.trackCount
           : trackCount // ignore: cast_nullable_to_non_nullable
               as int?,
+      spotifyId: spotifyId == freezed
+          ? _value.spotifyId
+          : spotifyId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      metadataSource: metadataSource == freezed
+          ? _value.metadataSource
+          : metadataSource // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
@@ -158,7 +269,16 @@ class __$ArtistMetadataCopyWithImpl<$Res>
 @JsonSerializable()
 class _$_ArtistMetadata extends _ArtistMetadata with DiagnosticableTreeMixin {
   const _$_ArtistMetadata(
-      {required this.name, this.coverUri, this.albumCount, this.trackCount})
+      {required this.name,
+      this.coverUri,
+      this.coverUriRemote,
+      this.coverSource,
+      this.description,
+      this.descriptionSource,
+      this.albumCount,
+      this.trackCount,
+      this.spotifyId,
+      this.metadataSource})
       : super._();
 
   factory _$_ArtistMetadata.fromJson(Map<String, dynamic> json) =>
@@ -174,16 +294,38 @@ class _$_ArtistMetadata extends _ArtistMetadata with DiagnosticableTreeMixin {
   final Uri? coverUri;
   @override
 
+  /// A remote URI to the cover, such as from Spotify.
+  /// Generally the URL used to download the cover from [coverSource].
+  /// This is used with Discord RPC.
+  final Uri? coverUriRemote;
+  @override
+
+  /// Can be "spotify", "metadata", "neighbor", "mse", "lastfm", "genius", or other sources.
+  final String? coverSource;
+  @override
+
+  /// A biography for the artist.
+  final String? description;
+  @override
+
+  /// Where the biography came from.
+  final String? descriptionSource;
+  @override
+
   /// The total number of albums by this artist (or albums present in the library).
   final int? albumCount;
   @override
 
   /// The total number of tracks by this artist (or tracks present in the library).
   final int? trackCount;
+  @override
+  final String? spotifyId;
+  @override
+  final String? metadataSource;
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'ArtistMetadata(name: $name, coverUri: $coverUri, albumCount: $albumCount, trackCount: $trackCount)';
+    return 'ArtistMetadata(name: $name, coverUri: $coverUri, coverUriRemote: $coverUriRemote, coverSource: $coverSource, description: $description, descriptionSource: $descriptionSource, albumCount: $albumCount, trackCount: $trackCount, spotifyId: $spotifyId, metadataSource: $metadataSource)';
   }
 
   @override
@@ -193,8 +335,14 @@ class _$_ArtistMetadata extends _ArtistMetadata with DiagnosticableTreeMixin {
       ..add(DiagnosticsProperty('type', 'ArtistMetadata'))
       ..add(DiagnosticsProperty('name', name))
       ..add(DiagnosticsProperty('coverUri', coverUri))
+      ..add(DiagnosticsProperty('coverUriRemote', coverUriRemote))
+      ..add(DiagnosticsProperty('coverSource', coverSource))
+      ..add(DiagnosticsProperty('description', description))
+      ..add(DiagnosticsProperty('descriptionSource', descriptionSource))
       ..add(DiagnosticsProperty('albumCount', albumCount))
-      ..add(DiagnosticsProperty('trackCount', trackCount));
+      ..add(DiagnosticsProperty('trackCount', trackCount))
+      ..add(DiagnosticsProperty('spotifyId', spotifyId))
+      ..add(DiagnosticsProperty('metadataSource', metadataSource));
   }
 
   @override
@@ -205,9 +353,20 @@ class _$_ArtistMetadata extends _ArtistMetadata with DiagnosticableTreeMixin {
             const DeepCollectionEquality().equals(other.name, name) &&
             const DeepCollectionEquality().equals(other.coverUri, coverUri) &&
             const DeepCollectionEquality()
+                .equals(other.coverUriRemote, coverUriRemote) &&
+            const DeepCollectionEquality()
+                .equals(other.coverSource, coverSource) &&
+            const DeepCollectionEquality()
+                .equals(other.description, description) &&
+            const DeepCollectionEquality()
+                .equals(other.descriptionSource, descriptionSource) &&
+            const DeepCollectionEquality()
                 .equals(other.albumCount, albumCount) &&
             const DeepCollectionEquality()
-                .equals(other.trackCount, trackCount));
+                .equals(other.trackCount, trackCount) &&
+            const DeepCollectionEquality().equals(other.spotifyId, spotifyId) &&
+            const DeepCollectionEquality()
+                .equals(other.metadataSource, metadataSource));
   }
 
   @override
@@ -215,8 +374,14 @@ class _$_ArtistMetadata extends _ArtistMetadata with DiagnosticableTreeMixin {
       runtimeType,
       const DeepCollectionEquality().hash(name),
       const DeepCollectionEquality().hash(coverUri),
+      const DeepCollectionEquality().hash(coverUriRemote),
+      const DeepCollectionEquality().hash(coverSource),
+      const DeepCollectionEquality().hash(description),
+      const DeepCollectionEquality().hash(descriptionSource),
       const DeepCollectionEquality().hash(albumCount),
-      const DeepCollectionEquality().hash(trackCount));
+      const DeepCollectionEquality().hash(trackCount),
+      const DeepCollectionEquality().hash(spotifyId),
+      const DeepCollectionEquality().hash(metadataSource));
 
   @JsonKey(ignore: true)
   @override
@@ -233,8 +398,14 @@ abstract class _ArtistMetadata extends ArtistMetadata {
   const factory _ArtistMetadata(
       {required String name,
       Uri? coverUri,
+      Uri? coverUriRemote,
+      String? coverSource,
+      String? description,
+      String? descriptionSource,
       int? albumCount,
-      int? trackCount}) = _$_ArtistMetadata;
+      int? trackCount,
+      String? spotifyId,
+      String? metadataSource}) = _$_ArtistMetadata;
   const _ArtistMetadata._() : super._();
 
   factory _ArtistMetadata.fromJson(Map<String, dynamic> json) =
@@ -250,12 +421,34 @@ abstract class _ArtistMetadata extends ArtistMetadata {
   Uri? get coverUri;
   @override
 
+  /// A remote URI to the cover, such as from Spotify.
+  /// Generally the URL used to download the cover from [coverSource].
+  /// This is used with Discord RPC.
+  Uri? get coverUriRemote;
+  @override
+
+  /// Can be "spotify", "metadata", "neighbor", "mse", "lastfm", "genius", or other sources.
+  String? get coverSource;
+  @override
+
+  /// A biography for the artist.
+  String? get description;
+  @override
+
+  /// Where the biography came from.
+  String? get descriptionSource;
+  @override
+
   /// The total number of albums by this artist (or albums present in the library).
   int? get albumCount;
   @override
 
   /// The total number of tracks by this artist (or tracks present in the library).
   int? get trackCount;
+  @override
+  String? get spotifyId;
+  @override
+  String? get metadataSource;
   @override
   @JsonKey(ignore: true)
   _$ArtistMetadataCopyWith<_ArtistMetadata> get copyWith =>

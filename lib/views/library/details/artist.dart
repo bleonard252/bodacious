@@ -62,7 +62,14 @@ class ArtistDetailsViewState extends State<ArtistDetailsView> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       mainAxisSize: MainAxisSize.max,
                       children: [
-                        if (controller.positions.isEmpty || controller.offset <= 48) ClipOval(child: FutureBuilder<AlbumMetadata?>(
+                        if (controller.positions.isEmpty || controller.offset <= 48) ClipOval(child: artist.coverUri != null ? Image(
+                          image: (artist.coverUri?.scheme == "file" ? FileImage(File.fromUri(artist.coverUri!))
+                            : NetworkImage(artist.coverUri.toString())) as ImageProvider,
+                          width: 72,
+                          height: 72,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, e, s) => const CoverPlaceholder(size: 48, iconSize: 24),
+                        ) : FutureBuilder<AlbumMetadata?>(
                           future: (
                             db.select(db.albumTable)
                             //..addColumns([db.albumTable.coverUri, db.albumTable.artistName, db.albumTable.releaseDate, db.albumTable.year])

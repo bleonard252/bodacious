@@ -7,14 +7,14 @@
     {
       "name": "Dart: Attach to Process",
       "type": "dart",
-      "request": "attach"
+      "request": "attach",
     },
     {
       "name": "bodacious",
       "request": "launch",
       "type": "dart",
       //"preLaunchTask": "Pre-build app",
-      "toolArgs": ["--multidex"],
+      "tool": ""
     },
     {
       "name": "bodacious (profile mode)",

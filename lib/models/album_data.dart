@@ -17,12 +17,20 @@ class AlbumMetadata with _$AlbumMetadata implements Insertable<AlbumMetadata> {
     required String name,
     /// The URI to the album cover.
     Uri? coverUri,
+    Uri? coverUriRemote,
+    String? coverSource,
+    /// Extra details about the album.
+    String? description,
+    /// Where the [description] came from.
+    String? descriptionSource,
     /// The total number of tracks on this album (or tracks present in the library).
     int? trackCount,
     /// The year the album was released. Prefer to show [releaseDate] wherever given.
     int? year,
     /// The release date of this album.
     DateTime? releaseDate,
+    String? spotifyId,
+    String? metadataSource
   }) = _AlbumMetadata;
 
   factory AlbumMetadata.fromJson(Map<String, dynamic> json) => _$AlbumMetadataFromJson(json);
@@ -33,9 +41,12 @@ class AlbumMetadata with _$AlbumMetadata implements Insertable<AlbumMetadata> {
       artistName: Value(artistName),
       name: Value(name),
       coverUri: Value(coverUri),
+      coverUriRemote: Value(coverUriRemote),
+      coverSource: Value(coverSource),
       trackCount: Value(trackCount),
       year: Value(year),
-      releaseDate: Value(releaseDate)
+      releaseDate: Value(releaseDate),
+      metadataSource: Value(metadataSource),
     ).toColumns(nullToAbsent);
   }
 }

@@ -10,12 +10,19 @@ class TrackTable extends Table {
   TextColumn get albumName => text().nullable()();
   IntColumn get trackNo => integer().withDefault(const Constant(0))();
   IntColumn get discNo => integer().withDefault(const Constant(0))();
+  TextColumn get description => text().nullable()();
+  TextColumn get descriptionSource => text().nullable()();
   TextColumn get uri => text().map(UriConverter())();
   TextColumn get coverUri => text().map(UriConverter()).nullable()();
+  TextColumn get coverUriRemote => text().map(UriConverter()).nullable()();
+  TextColumn get coverSource => text().nullable()();
   IntColumn get duration => integer().map(DurationConverter()).nullable()();
   IntColumn get year => integer().nullable()();
   DateTimeColumn get releaseDate => dateTime().nullable()();
   BoolColumn get available => boolean().withDefault(const Constant(true))();
+  TextColumn get spotifyId => text().nullable()();
+  TextColumn get source => text().nullable()();
+  TextColumn get metadataSource => text().nullable()();
 }
 class UriConverter extends TypeConverter<Uri, String> {
   @override

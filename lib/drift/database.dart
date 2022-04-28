@@ -24,7 +24,7 @@ class BoDatabase extends _$BoDatabase {
 
   // you should bump this number whenever you change or add a table definition
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 8;
 
   Future<TrackMetadata?> tryGetTrackFromUri(Uri uri) {
     return (
@@ -58,6 +58,30 @@ class BoDatabase extends _$BoDatabase {
         m.drop(albumTable);
         m.drop(trackTable);
         m.drop(artistTable);
+      }
+      if (to == 4) {
+        m.addColumn(trackTable, trackTable.description);
+        m.addColumn(trackTable, trackTable.descriptionSource);
+        m.addColumn(trackTable, trackTable.coverUriRemote);
+        m.addColumn(trackTable, trackTable.coverSource);
+        m.addColumn(trackTable, trackTable.spotifyId);
+        m.addColumn(trackTable, trackTable.source);
+        m.addColumn(trackTable, trackTable.metadataSource);
+        m.addColumn(albumTable, albumTable.coverUriRemote);
+        m.addColumn(albumTable, albumTable.coverSource);
+        m.addColumn(albumTable, albumTable.description);
+        m.addColumn(albumTable, albumTable.descriptionSource);
+        m.addColumn(artistTable, artistTable.coverUriRemote);
+        m.addColumn(artistTable, artistTable.coverSource);
+        m.addColumn(artistTable, artistTable.description);
+        m.addColumn(artistTable, artistTable.descriptionSource);
+      }
+      if (to == 5) {
+        m.addColumn(albumTable, albumTable.metadataSource);
+        m.addColumn(artistTable, artistTable.metadataSource);
+      }
+      if (to == 8) {
+        m.addColumn(albumTable, albumTable.spotifyId);
       }
     },
   );

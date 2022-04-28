@@ -26,16 +26,28 @@ class _$AlbumMetadataTearOff {
       {required String artistName,
       required String name,
       Uri? coverUri,
+      Uri? coverUriRemote,
+      String? coverSource,
+      String? description,
+      String? descriptionSource,
       int? trackCount,
       int? year,
-      DateTime? releaseDate}) {
+      DateTime? releaseDate,
+      String? spotifyId,
+      String? metadataSource}) {
     return _AlbumMetadata(
       artistName: artistName,
       name: name,
       coverUri: coverUri,
+      coverUriRemote: coverUriRemote,
+      coverSource: coverSource,
+      description: description,
+      descriptionSource: descriptionSource,
       trackCount: trackCount,
       year: year,
       releaseDate: releaseDate,
+      spotifyId: spotifyId,
+      metadataSource: metadataSource,
     );
   }
 
@@ -57,6 +69,14 @@ mixin _$AlbumMetadata {
 
   /// The URI to the album cover.
   Uri? get coverUri => throw _privateConstructorUsedError;
+  Uri? get coverUriRemote => throw _privateConstructorUsedError;
+  String? get coverSource => throw _privateConstructorUsedError;
+
+  /// Extra details about the album.
+  String? get description => throw _privateConstructorUsedError;
+
+  /// Where the [description] came from.
+  String? get descriptionSource => throw _privateConstructorUsedError;
 
   /// The total number of tracks on this album (or tracks present in the library).
   int? get trackCount => throw _privateConstructorUsedError;
@@ -66,6 +86,8 @@ mixin _$AlbumMetadata {
 
   /// The release date of this album.
   DateTime? get releaseDate => throw _privateConstructorUsedError;
+  String? get spotifyId => throw _privateConstructorUsedError;
+  String? get metadataSource => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -82,9 +104,15 @@ abstract class $AlbumMetadataCopyWith<$Res> {
       {String artistName,
       String name,
       Uri? coverUri,
+      Uri? coverUriRemote,
+      String? coverSource,
+      String? description,
+      String? descriptionSource,
       int? trackCount,
       int? year,
-      DateTime? releaseDate});
+      DateTime? releaseDate,
+      String? spotifyId,
+      String? metadataSource});
 }
 
 /// @nodoc
@@ -101,9 +129,15 @@ class _$AlbumMetadataCopyWithImpl<$Res>
     Object? artistName = freezed,
     Object? name = freezed,
     Object? coverUri = freezed,
+    Object? coverUriRemote = freezed,
+    Object? coverSource = freezed,
+    Object? description = freezed,
+    Object? descriptionSource = freezed,
     Object? trackCount = freezed,
     Object? year = freezed,
     Object? releaseDate = freezed,
+    Object? spotifyId = freezed,
+    Object? metadataSource = freezed,
   }) {
     return _then(_value.copyWith(
       artistName: artistName == freezed
@@ -118,6 +152,22 @@ class _$AlbumMetadataCopyWithImpl<$Res>
           ? _value.coverUri
           : coverUri // ignore: cast_nullable_to_non_nullable
               as Uri?,
+      coverUriRemote: coverUriRemote == freezed
+          ? _value.coverUriRemote
+          : coverUriRemote // ignore: cast_nullable_to_non_nullable
+              as Uri?,
+      coverSource: coverSource == freezed
+          ? _value.coverSource
+          : coverSource // ignore: cast_nullable_to_non_nullable
+              as String?,
+      description: description == freezed
+          ? _value.description
+          : description // ignore: cast_nullable_to_non_nullable
+              as String?,
+      descriptionSource: descriptionSource == freezed
+          ? _value.descriptionSource
+          : descriptionSource // ignore: cast_nullable_to_non_nullable
+              as String?,
       trackCount: trackCount == freezed
           ? _value.trackCount
           : trackCount // ignore: cast_nullable_to_non_nullable
@@ -130,6 +180,14 @@ class _$AlbumMetadataCopyWithImpl<$Res>
           ? _value.releaseDate
           : releaseDate // ignore: cast_nullable_to_non_nullable
               as DateTime?,
+      spotifyId: spotifyId == freezed
+          ? _value.spotifyId
+          : spotifyId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      metadataSource: metadataSource == freezed
+          ? _value.metadataSource
+          : metadataSource // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
@@ -145,9 +203,15 @@ abstract class _$AlbumMetadataCopyWith<$Res>
       {String artistName,
       String name,
       Uri? coverUri,
+      Uri? coverUriRemote,
+      String? coverSource,
+      String? description,
+      String? descriptionSource,
       int? trackCount,
       int? year,
-      DateTime? releaseDate});
+      DateTime? releaseDate,
+      String? spotifyId,
+      String? metadataSource});
 }
 
 /// @nodoc
@@ -166,9 +230,15 @@ class __$AlbumMetadataCopyWithImpl<$Res>
     Object? artistName = freezed,
     Object? name = freezed,
     Object? coverUri = freezed,
+    Object? coverUriRemote = freezed,
+    Object? coverSource = freezed,
+    Object? description = freezed,
+    Object? descriptionSource = freezed,
     Object? trackCount = freezed,
     Object? year = freezed,
     Object? releaseDate = freezed,
+    Object? spotifyId = freezed,
+    Object? metadataSource = freezed,
   }) {
     return _then(_AlbumMetadata(
       artistName: artistName == freezed
@@ -183,6 +253,22 @@ class __$AlbumMetadataCopyWithImpl<$Res>
           ? _value.coverUri
           : coverUri // ignore: cast_nullable_to_non_nullable
               as Uri?,
+      coverUriRemote: coverUriRemote == freezed
+          ? _value.coverUriRemote
+          : coverUriRemote // ignore: cast_nullable_to_non_nullable
+              as Uri?,
+      coverSource: coverSource == freezed
+          ? _value.coverSource
+          : coverSource // ignore: cast_nullable_to_non_nullable
+              as String?,
+      description: description == freezed
+          ? _value.description
+          : description // ignore: cast_nullable_to_non_nullable
+              as String?,
+      descriptionSource: descriptionSource == freezed
+          ? _value.descriptionSource
+          : descriptionSource // ignore: cast_nullable_to_non_nullable
+              as String?,
       trackCount: trackCount == freezed
           ? _value.trackCount
           : trackCount // ignore: cast_nullable_to_non_nullable
@@ -195,6 +281,14 @@ class __$AlbumMetadataCopyWithImpl<$Res>
           ? _value.releaseDate
           : releaseDate // ignore: cast_nullable_to_non_nullable
               as DateTime?,
+      spotifyId: spotifyId == freezed
+          ? _value.spotifyId
+          : spotifyId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      metadataSource: metadataSource == freezed
+          ? _value.metadataSource
+          : metadataSource // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
@@ -206,9 +300,15 @@ class _$_AlbumMetadata extends _AlbumMetadata with DiagnosticableTreeMixin {
       {required this.artistName,
       required this.name,
       this.coverUri,
+      this.coverUriRemote,
+      this.coverSource,
+      this.description,
+      this.descriptionSource,
       this.trackCount,
       this.year,
-      this.releaseDate})
+      this.releaseDate,
+      this.spotifyId,
+      this.metadataSource})
       : super._();
 
   factory _$_AlbumMetadata.fromJson(Map<String, dynamic> json) =>
@@ -227,6 +327,18 @@ class _$_AlbumMetadata extends _AlbumMetadata with DiagnosticableTreeMixin {
   /// The URI to the album cover.
   final Uri? coverUri;
   @override
+  final Uri? coverUriRemote;
+  @override
+  final String? coverSource;
+  @override
+
+  /// Extra details about the album.
+  final String? description;
+  @override
+
+  /// Where the [description] came from.
+  final String? descriptionSource;
+  @override
 
   /// The total number of tracks on this album (or tracks present in the library).
   final int? trackCount;
@@ -238,10 +350,14 @@ class _$_AlbumMetadata extends _AlbumMetadata with DiagnosticableTreeMixin {
 
   /// The release date of this album.
   final DateTime? releaseDate;
+  @override
+  final String? spotifyId;
+  @override
+  final String? metadataSource;
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'AlbumMetadata(artistName: $artistName, name: $name, coverUri: $coverUri, trackCount: $trackCount, year: $year, releaseDate: $releaseDate)';
+    return 'AlbumMetadata(artistName: $artistName, name: $name, coverUri: $coverUri, coverUriRemote: $coverUriRemote, coverSource: $coverSource, description: $description, descriptionSource: $descriptionSource, trackCount: $trackCount, year: $year, releaseDate: $releaseDate, spotifyId: $spotifyId, metadataSource: $metadataSource)';
   }
 
   @override
@@ -252,9 +368,15 @@ class _$_AlbumMetadata extends _AlbumMetadata with DiagnosticableTreeMixin {
       ..add(DiagnosticsProperty('artistName', artistName))
       ..add(DiagnosticsProperty('name', name))
       ..add(DiagnosticsProperty('coverUri', coverUri))
+      ..add(DiagnosticsProperty('coverUriRemote', coverUriRemote))
+      ..add(DiagnosticsProperty('coverSource', coverSource))
+      ..add(DiagnosticsProperty('description', description))
+      ..add(DiagnosticsProperty('descriptionSource', descriptionSource))
       ..add(DiagnosticsProperty('trackCount', trackCount))
       ..add(DiagnosticsProperty('year', year))
-      ..add(DiagnosticsProperty('releaseDate', releaseDate));
+      ..add(DiagnosticsProperty('releaseDate', releaseDate))
+      ..add(DiagnosticsProperty('spotifyId', spotifyId))
+      ..add(DiagnosticsProperty('metadataSource', metadataSource));
   }
 
   @override
@@ -267,10 +389,21 @@ class _$_AlbumMetadata extends _AlbumMetadata with DiagnosticableTreeMixin {
             const DeepCollectionEquality().equals(other.name, name) &&
             const DeepCollectionEquality().equals(other.coverUri, coverUri) &&
             const DeepCollectionEquality()
+                .equals(other.coverUriRemote, coverUriRemote) &&
+            const DeepCollectionEquality()
+                .equals(other.coverSource, coverSource) &&
+            const DeepCollectionEquality()
+                .equals(other.description, description) &&
+            const DeepCollectionEquality()
+                .equals(other.descriptionSource, descriptionSource) &&
+            const DeepCollectionEquality()
                 .equals(other.trackCount, trackCount) &&
             const DeepCollectionEquality().equals(other.year, year) &&
             const DeepCollectionEquality()
-                .equals(other.releaseDate, releaseDate));
+                .equals(other.releaseDate, releaseDate) &&
+            const DeepCollectionEquality().equals(other.spotifyId, spotifyId) &&
+            const DeepCollectionEquality()
+                .equals(other.metadataSource, metadataSource));
   }
 
   @override
@@ -279,9 +412,15 @@ class _$_AlbumMetadata extends _AlbumMetadata with DiagnosticableTreeMixin {
       const DeepCollectionEquality().hash(artistName),
       const DeepCollectionEquality().hash(name),
       const DeepCollectionEquality().hash(coverUri),
+      const DeepCollectionEquality().hash(coverUriRemote),
+      const DeepCollectionEquality().hash(coverSource),
+      const DeepCollectionEquality().hash(description),
+      const DeepCollectionEquality().hash(descriptionSource),
       const DeepCollectionEquality().hash(trackCount),
       const DeepCollectionEquality().hash(year),
-      const DeepCollectionEquality().hash(releaseDate));
+      const DeepCollectionEquality().hash(releaseDate),
+      const DeepCollectionEquality().hash(spotifyId),
+      const DeepCollectionEquality().hash(metadataSource));
 
   @JsonKey(ignore: true)
   @override
@@ -299,9 +438,15 @@ abstract class _AlbumMetadata extends AlbumMetadata {
       {required String artistName,
       required String name,
       Uri? coverUri,
+      Uri? coverUriRemote,
+      String? coverSource,
+      String? description,
+      String? descriptionSource,
       int? trackCount,
       int? year,
-      DateTime? releaseDate}) = _$_AlbumMetadata;
+      DateTime? releaseDate,
+      String? spotifyId,
+      String? metadataSource}) = _$_AlbumMetadata;
   const _AlbumMetadata._() : super._();
 
   factory _AlbumMetadata.fromJson(Map<String, dynamic> json) =
@@ -320,6 +465,18 @@ abstract class _AlbumMetadata extends AlbumMetadata {
   /// The URI to the album cover.
   Uri? get coverUri;
   @override
+  Uri? get coverUriRemote;
+  @override
+  String? get coverSource;
+  @override
+
+  /// Extra details about the album.
+  String? get description;
+  @override
+
+  /// Where the [description] came from.
+  String? get descriptionSource;
+  @override
 
   /// The total number of tracks on this album (or tracks present in the library).
   int? get trackCount;
@@ -331,6 +488,10 @@ abstract class _AlbumMetadata extends AlbumMetadata {
 
   /// The release date of this album.
   DateTime? get releaseDate;
+  @override
+  String? get spotifyId;
+  @override
+  String? get metadataSource;
   @override
   @JsonKey(ignore: true)
   _$AlbumMetadataCopyWith<_AlbumMetadata> get copyWith =>

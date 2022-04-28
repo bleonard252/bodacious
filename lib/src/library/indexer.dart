@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 import 'dart:isolate';
 import 'dart:typed_data';
@@ -9,14 +11,17 @@ import 'package:bodacious/models/album_data.dart';
 import 'package:bodacious/src/config.dart';
 import 'package:bodacious/src/library/cache_dir.dart';
 import 'package:bodacious/src/metadata/id3.dart';
+import 'package:dio/dio.dart';
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart' show WidgetsFlutterBinding;
+import 'package:fuzzywuzzy/fuzzywuzzy.dart';
 import 'package:integer/integer.dart';
 import 'package:mime/mime.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:rxdart/rxdart.dart';
+import 'package:spotify/spotify.dart';
 
 import '../../drift/database.dart';
 import '../../models/artist_data.dart';
@@ -59,14 +64,16 @@ abstract class TheIndexer {
           dbPath: message["dbDir"],
           cacheDir: message["cacheDir"],
           config: message["config"],
-          force: message["force"]
+          force: message["force"],
+          apiKeys: message["api_keys"]
         )(message["sendPort"]);
       }, {
         "sendPort": progressReceiver.sendPort,
         "dbDir": _dbPath,
         "cacheDir": _cacheDir,
         "config": ROConfig(config),
-        "force": force
+        "force": force,
+        "api_keys": apiKeys
       });
       if (progress.valueOrNull?.state != IndexerState.FINISHED) {
         _sendPortKinda.add(IndexerProgressReport(
@@ -109,6 +116,7 @@ class _IndexerIsolate {
     this.preclean = false,
     this.fetch = false,
     this.scanOnlyPath,
+    required this.apiKeys,
     required this.config,
     required this.dbPath,
     required this.cacheDir
@@ -116,6 +124,7 @@ class _IndexerIsolate {
 
   late final BoDatabase db;
   final ROConfig config;
+  final APIKeys apiKeys;
 
   final List<String> newArtists = [];
   final List<String> newAlbums = [];
@@ -350,6 +359,94 @@ class _IndexerIsolate {
         value: 0
       ));
     });
+    
+    await db.transaction<void>(() async {
+      if (apiKeys.spotifyClientId != null && apiKeys.spotifySecret != null) {
+        final spcred = SpotifyApiCredentials(apiKeys.spotifyClientId, apiKeys.spotifySecret);
+        final spotify = SpotifyApi(spcred);
+
+        final _artists = await (db.artistTable.selectOnly()
+          ..addColumns([db.artistTable.name, db.artistTable.coverUri])
+          ..where(db.artistTable.coverUri.isNull())
+        ).get();
+        for (final __artist in _artists) {
+          final artist = __artist.read(db.artistTable.name)!;
+          final cover_ = __artist.read(db.artistTable.coverUri);
+          sendProgressReport.send(IndexerProgressReport(
+            state: IndexerState.FETCHING,
+            currentFilename: "Artist: "+artist,
+            max: _artists.length,
+            value: _artists.indexOf(__artist)
+          ));
+          final _result = await spotify.search.get(artist, types: [SearchType.artist]).first();
+          final Artist? _artist = _result.first.items?.firstWhere((element) => ratio(element.name.toLowerCase(), artist.toLowerCase()) >= 85, orElse: () => null);
+          if (_artist == null) continue;
+          final _cover = _artist.images?.first.url;
+          final _spid = _artist.id;
+          
+          // Write the album cover to disk
+          final _dir = cacheDir+"/album_covers";
+          await Directory(_dir).create();
+          late final File coverFile;
+          if (_cover != null) {
+            coverFile = File(_dir+"/"+base64Encode(artist.codeUnits)+"_spotify.jpg");
+            await Dio().download(_cover, coverFile.absolute.uri.toFilePath());
+          }
+          await (db.artistTable.update()
+            ..where((tbl) => tbl.name.equals(artist))
+          ).write((_cover != null) ? ArtistTableCompanion(
+            coverUri: cover_ == null ? Value(coverFile.absolute.uri) : const Value.absent(),
+            coverUriRemote: Value(Uri.parse(_cover)),
+            coverSource: const Value("spotify"),
+            spotifyId: Value(_spid)
+          ) : ArtistTableCompanion(spotifyId: Value(_spid)));
+        }
+
+        final _albums = await (db.albumTable.selectOnly()
+          ..addColumns([db.albumTable.name, db.albumTable.artistName, db.albumTable.coverUri, db.albumTable.coverUriRemote])
+          ..where(db.albumTable.coverUri.isNull() | db.albumTable.coverUriRemote.isNull())
+        ).get();
+        for (final __album in _albums) {
+          final album = __album.read(db.albumTable.name)!;
+          final artist = __album.read(db.albumTable.artistName)!;
+          final cover_ = __album.read(db.albumTable.coverUri);
+          sendProgressReport.send(IndexerProgressReport(
+            state: IndexerState.FETCHING,
+            currentFilename: "Album: "+album,
+            max: _albums.length,
+            value: _albums.indexOf(__album)
+          ));
+          final _result = await spotify.search.get(album+" artist:"+artist, types: [SearchType.album]).first();
+          final AlbumSimple? _album = _result.first.items?.firstWhere((element) => ratio(element.name.toLowerCase(), album.toLowerCase()) >= 85, orElse: () => null);
+          if (_album == null) continue;
+          final _cover = _album.images?.first.url;
+          final _spid = _album.id;
+          
+          // Write the album cover to disk
+          final _dir = cacheDir+"/album_covers";
+          await Directory(_dir).create();
+          late final File coverFile;
+          var output = AlbumTableCompanion(spotifyId: Value(_spid));
+          if (_cover != null && cover_ == null) {
+            coverFile = File(_dir+"/"+base64Encode(utf8.encode(artist))+"."+base64Encode(utf8.encode(album))+"_spotify.jpg");
+            await Dio().download(_cover, coverFile.absolute.uri.toFilePath());
+            output = output.copyWith(
+              coverUri: Value(coverFile.absolute.uri),
+              coverSource: const Value("spotify"),
+            );
+          }
+          if (_cover != null && __album.read(db.albumTable.coverUriRemote) == null) {
+            output = output.copyWith(
+              coverUriRemote: Value(Uri.parse(_cover)),
+            );
+          }
+          await (db.albumTable.update()
+            ..where((tbl) => tbl.name.equals(album) & tbl.artistName.equals(artist))
+          ).write(output);
+        }
+      }
+    });
+    
     sendProgressReport.send(const IndexerProgressReport(
       state: IndexerState.FINISHED,
       max: 1,
@@ -361,7 +458,7 @@ class _IndexerIsolate {
     assert(track.artistName != null && track.albumName != null);
     if (track.artistName == null || track.albumName == null) return;
     final record = await db.tryGetAlbum(track.albumName!, by: track.albumName!);
-    if (newArtists.contains(track.artistName!+" - "+track.albumName!) || (record != null && !force)) return;
+    if (newAlbums.contains(track.artistName!+" - "+track.albumName!) || (record != null && !force)) return;
     newAlbums.add(track.artistName!+" - "+track.albumName!);
     var _record = AlbumMetadata(
       artistName: track.artistName!,
@@ -375,9 +472,9 @@ class _IndexerIsolate {
     assert(track.artistName != null);
     if (track.artistName == null) return;
     //final record = artistStore.record(track.artistName!);
-    final record = await db.tryGetArtist(track.albumName!);
-    if (newArtists.contains(track.albumName!) || (record != null && !force)) return;
-    newArtists.add(track.albumName!);
+    final record = await db.tryGetArtist(track.artistName!);
+    if (newArtists.contains(track.artistName!) || (record != null && !force)) return;
+    newArtists.add(track.artistName!);
     var _record = ArtistMetadata(
       name: track.artistName!
     );
