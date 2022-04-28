@@ -362,7 +362,13 @@ class _IndexerIsolate {
       ));
     });
     
-    if (config.spotifyIntegration || config.lastFmIntegration) {
+    late final Response ct;
+    try {
+      ct = await Dio().get("http://detectportal.firefox.com/success.txt", options: Options(validateStatus: (status) => true));
+    } on DioError {
+      ct = Response(requestOptions: RequestOptions(path: ""), statusCode: 0);
+    }
+    if ((config.spotifyIntegration || config.lastFmIntegration) && ct.statusCode == 200) {
       const smlx = {"small": 1, "medium": 2, "large": 3, "extralarge": 4, "mega": 5, "": 6};
       await db.transaction<void>(() async {
         if (apiKeys.lastfmApiKey != null && config.lastFmIntegration) {
@@ -383,13 +389,11 @@ class _IndexerIsolate {
               value: int.parse(_albums.indexOf(__album).toString())
             ));
             late final XmlDocument _album;
-            print("0"+album);
             try {
               _album = await lastfm.read("album.getInfo", {
                 "artist": artist, "album": album
               });
             } on LastFMError {continue;}
-            print("1"+album);
             final _images = _album.rootElement.firstElementChild?.children.where((p0) => p0 is XmlElement && p0.qualifiedName.toLowerCase() == "image").toList() ?? [];
             if (_images.isEmpty) continue;
             _images.sort((a, b) => smlx[a.getAttribute("size")]?.compareTo(smlx[b.getAttribute("size")] ?? 0) ?? 0);

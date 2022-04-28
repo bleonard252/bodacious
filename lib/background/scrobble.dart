@@ -1,5 +1,6 @@
 import 'package:bodacious/main.dart';
 import 'package:bodacious/src/online/lastfm.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:lastfm/lastfm.dart';
 
@@ -11,18 +12,20 @@ Future<void> startScrobbling() async {
       if (player.mediaItem.valueOrNull?.artist == null) return;
       if (player.mediaItem.value?.id == last) return;
       if (player.mediaItem.value?.duration == null) return;
-      if (kDebugMode) {
-        print("Scrobbling..."+(player.mediaItem.value?.id ?? ""));
-      }
-      await (lastfm as LastFMAuthorized).scrobble(
-        track: player.mediaItem.value!.title,
-        artist: player.mediaItem.value!.artist!, 
-        album: player.mediaItem.value!.album!,
-        startTime: DateTime.now().toUtc().subtract(position)
-      );
-      if (kDebugMode) {
-        print("Scrobbling successful");
-      }
+      // if (kDebugMode) {
+      //   print("Scrobbling..."+(player.mediaItem.value?.id ?? ""));
+      // }
+      try {
+        await (lastfm as LastFMAuthorized).scrobble(
+          track: player.mediaItem.value!.title,
+          artist: player.mediaItem.value!.artist!, 
+          album: player.mediaItem.value!.album!,
+          startTime: DateTime.now().toUtc().subtract(position)
+        );
+      } on DioError {return await Future.delayed(const Duration(milliseconds: 60000));}
+      // if (kDebugMode) {
+      //   print("Scrobbling successful");
+      // }
       last = player.mediaItem.value?.id;
     }
   }
@@ -47,13 +50,15 @@ Future<void> startLastFmNowPlaying() async {
     if (lastfm is LastFMAuthorized && config.lastFmToken != null) {
       if (player.mediaItem.value?.id == last) return;
       if (player.mediaItem.valueOrNull?.artist == null) return;
-      if (kDebugMode) {
-        print("Telling last.fm about our new song..."+(player.mediaItem.value?.id ?? ""));
-      }
-      await (lastfm as LastFMAuthorized).updateNowPlaying(track: player.mediaItem.value!.title, artist: player.mediaItem.value!.artist!, album: player.mediaItem.value!.album!);
-      if (kDebugMode) {
-        print("NP update done");
-      }
+      // if (kDebugMode) {
+      //   print("Telling last.fm about our new song..."+(player.mediaItem.value?.id ?? ""));
+      // }
+      try {
+        await (lastfm as LastFMAuthorized).updateNowPlaying(track: player.mediaItem.value!.title, artist: player.mediaItem.value!.artist!, album: player.mediaItem.value!.album!);
+      } on DioError {return await Future.delayed(const Duration(milliseconds: 60000));}
+      // if (kDebugMode) {
+      //   print("NP update done");
+      // }
       last = player.mediaItem.value?.id;
     }
   }
