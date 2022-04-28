@@ -17,6 +17,7 @@ class SongWidget extends ConsumerWidget {
   /// Good for artist pages.
   final bool useAlbumName;
   final bool showVariations;
+  final int? queueIndex;
   const SongWidget(this.track, {
     Key? key,
     this.onTap,
@@ -24,7 +25,8 @@ class SongWidget extends ConsumerWidget {
     this.selected = false,
     this.inQueue = false,
     this.useAlbumName = false,
-    this.showVariations = false
+    this.showVariations = false,
+    this.queueIndex
   }) : super(key: key);
 
   @override
@@ -105,6 +107,10 @@ class SongWidget extends ConsumerWidget {
                         child: Text("Add to Queue"),
                         value: "queue",
                       ),
+                      if (inQueue && queueIndex != null) const PopupMenuItem(
+                        child: Text("Remove from Queue"),
+                        value: "removequeue",
+                      )
                     ]).then((value) {
                       switch (value) {
                         case "playnext":
@@ -114,6 +120,11 @@ class SongWidget extends ConsumerWidget {
                           break;
                         case "queue":
                           player.addQueueItem(track.asMediaItem());
+                          //ref.invalidate(queueProvider);
+                          break;
+                        case "removequeue":
+                          if (queueIndex == null) break;
+                          player.removeQueueItemAt(queueIndex!);
                           //ref.invalidate(queueProvider);
                           break;
                         default:

@@ -46,6 +46,7 @@ class _QueueViewState extends ConsumerState<QueueView> {
                 queue!.entries[index],
                 selected: index == queue.position,
                 inQueue: true,
+                queueIndex: index,
                 onTap: () {
                   player.skipToQueueItem(index);
                   player.play();
