@@ -5,6 +5,7 @@ import '../main.dart';
 
 Future<void> startDiscordRpc() async {
   await player.mediaItem.listen((value) async {
+    if (!config.discordRpc) return;
     if (value == null) {
       discord.clearPresence();
     } else {

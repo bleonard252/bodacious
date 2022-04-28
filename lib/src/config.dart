@@ -22,14 +22,16 @@ class Config {
   bool get wideCompactNowPlaying => _prefs.getBool("wide-compact-now-playing") ?? false;
   set wideCompactNowPlaying(bool to) => _prefs.setBool("wide-compact-now-playing", to);
 
-  /// Whether or not to use the Android system library instead of
-  /// the Bodacious library.
+  /// Whether or not to tell Discord about currently playing tracks.
+  bool get discordRpc => _prefs.getBool("discord:activity") ?? false;
+  set discordRpc(bool to) => _prefs.setBool("discord:activity", to);
+  /// Whether or not to tell Last.fm about currently playing tracks.
   bool get lastFmScrobbling => _prefs.getBool("lastfm:scrobble") ?? false;
   set lastFmScrobbling(bool to) => _prefs.setBool("lastfm:scrobble", to);
   /// Whether to use Last.fm to fetch metadata for the library.
   bool get lastFmIntegration => _prefs.getBool("lastfm:integrate") ?? false;
   set lastFmIntegration(bool to) => _prefs.setBool("lastfm:integrate", to);
-  /// Whether to use Last.fm to fetch metadata for the library.
+  /// Whether to use Spotify to fetch metadata for the library.
   bool get spotifyIntegration => _prefs.getBool("spotify:integrate") ?? false;
   set spotifyIntegration(bool to) => _prefs.setBool("spotify:integrate", to);
 
@@ -53,6 +55,8 @@ class ROConfig implements Config {
   @override
   final String? lastFmUsername;
   @override
+  final bool discordRpc;
+  @override
   final bool lastFmIntegration;
   @override
   final bool lastFmScrobbling;
@@ -66,6 +70,7 @@ class ROConfig implements Config {
     libraries = config.libraries,
     useSystemLibrary = config.useSystemLibrary,
     wideCompactNowPlaying = config.wideCompactNowPlaying,
+    discordRpc = config.discordRpc,
     lastFmScrobbling = config.lastFmScrobbling,
     lastFmIntegration = config.lastFmIntegration,
     spotifyIntegration = config.spotifyIntegration,
