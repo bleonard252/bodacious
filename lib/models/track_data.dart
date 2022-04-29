@@ -3,6 +3,7 @@ import 'package:audio_service/audio_service.dart';
 import 'package:bodacious/drift/database.dart';
 import 'package:dart_vlc/dart_vlc.dart';
 import 'package:drift/drift.dart' hide JsonKey;
+import 'package:flinq/flinq.dart';
 import 'package:flutter/foundation.dart';
 
 import 'dart:ui' show ImageDescriptor;

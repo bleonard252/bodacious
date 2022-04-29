@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:audio_service/audio_service.dart';
 import 'package:bodacious/main.dart';
 import 'package:dart_vlc/dart_vlc.dart' as vlc;
-import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:flinq/flinq.dart';
 import 'package:just_audio/just_audio.dart' as just;
 
 import '../../models/track_data.dart';

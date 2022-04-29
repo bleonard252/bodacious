@@ -12,68 +12,11 @@ part of 'track_data.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more informations: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
 
 TrackMetadata _$TrackMetadataFromJson(Map<String, dynamic> json) {
   return _TrackMetadata.fromJson(json);
 }
-
-/// @nodoc
-class _$TrackMetadataTearOff {
-  const _$TrackMetadataTearOff();
-
-  _TrackMetadata call(
-      {String? title,
-      String? artistName,
-      String? albumName,
-      int? trackNo,
-      int discNo = 0,
-      String? description,
-      String? descriptionSource,
-      @JsonKey(ignore: true) ImageDescriptor? coverData,
-      required Uri uri,
-      @JsonKey(ignore: true) List<int>? coverBytes,
-      Uri? coverUri,
-      Uri? coverUriRemote,
-      String? coverSource = "album",
-      Duration? duration,
-      int? year,
-      DateTime? releaseDate,
-      bool available = true,
-      String? spotifyId,
-      String? source = "local",
-      String? metadataSource}) {
-    return _TrackMetadata(
-      title: title,
-      artistName: artistName,
-      albumName: albumName,
-      trackNo: trackNo,
-      discNo: discNo,
-      description: description,
-      descriptionSource: descriptionSource,
-      coverData: coverData,
-      uri: uri,
-      coverBytes: coverBytes,
-      coverUri: coverUri,
-      coverUriRemote: coverUriRemote,
-      coverSource: coverSource,
-      duration: duration,
-      year: year,
-      releaseDate: releaseDate,
-      available: available,
-      spotifyId: spotifyId,
-      source: source,
-      metadataSource: metadataSource,
-    );
-  }
-
-  TrackMetadata fromJson(Map<String, Object?> json) {
-    return TrackMetadata.fromJson(json);
-  }
-}
-
-/// @nodoc
-const $TrackMetadata = _$TrackMetadataTearOff();
 
 /// @nodoc
 mixin _$TrackMetadata {
@@ -453,7 +396,7 @@ class _$_TrackMetadata extends _TrackMetadata with DiagnosticableTreeMixin {
       this.descriptionSource,
       @JsonKey(ignore: true) this.coverData,
       required this.uri,
-      @JsonKey(ignore: true) this.coverBytes,
+      @JsonKey(ignore: true) final List<int>? coverBytes,
       this.coverUri,
       this.coverUriRemote,
       this.coverSource = "album",
@@ -464,95 +407,104 @@ class _$_TrackMetadata extends _TrackMetadata with DiagnosticableTreeMixin {
       this.spotifyId,
       this.source = "local",
       this.metadataSource})
-      : super._();
+      : _coverBytes = coverBytes,
+        super._();
 
   factory _$_TrackMetadata.fromJson(Map<String, dynamic> json) =>
       _$$_TrackMetadataFromJson(json);
 
-  @override
-
   /// The song's title.
-  final String? title;
   @override
+  final String? title;
 
   /// The artist's name. Also used to look up the artist in the database.
-  final String? artistName;
   @override
+  final String? artistName;
 
   /// The album's name. Also used with [artistName] to look up the album in the database.
-  final String? albumName;
   @override
+  final String? albumName;
 
   /// The position of the track on the named album.
+  @override
   final int? trackNo;
+  @override
   @JsonKey()
-  @override
   final int discNo;
-  @override
 
   /// Extra details about a given track, such as its origins and meaning.
-  final String? description;
   @override
+  final String? description;
 
   /// Where the [description] came from.
-  final String? descriptionSource;
   @override
+  final String? descriptionSource;
 
   /// Holds the data for a cover image. **DO NOT** STORE THIS IN THE DATABASE!
 //@Deprecated("Don't use this, just use coverBytes or coverFile instead!")
+  @override
   @JsonKey(ignore: true)
   final ImageDescriptor? coverData;
-  @override
 
   /// The URI to the track. Used by the library (database) to find the file
   /// when it's time to play it, and for fallback details.
-  final Uri uri;
   @override
+  final Uri uri;
 
   /// The raw bytes of the cover image. **DO NOT** STORE THIS IN THE DATABASE!
   @JsonKey(ignore: true)
-  final List<int>? coverBytes;
+  final List<int>? _coverBytes;
+
+  /// The raw bytes of the cover image. **DO NOT** STORE THIS IN THE DATABASE!
   @override
+  @JsonKey(ignore: true)
+  List<int>? get coverBytes {
+    final value = _coverBytes;
+    if (value == null) return null;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(value);
+  }
 
   /// The URI to the cover.
-  final Uri? coverUri;
   @override
+  final Uri? coverUri;
 
   /// A remote URI to the cover, such as from Spotify.
   /// Generally the URL used to download the cover from [coverSource].
   /// This is used with Discord RPC.
-  final Uri? coverUriRemote;
-  @JsonKey()
   @override
+  final Uri? coverUriRemote;
 
   /// Can be "album" in addition to album cover sources.
   /// "album" here indicates the cover is the same as the album's.
-  final String? coverSource;
   @override
+  @JsonKey()
+  final String? coverSource;
 
   /// The track's duration.
-  final Duration? duration;
   @override
+  final Duration? duration;
 
   /// The year the track was released. Prefer to show [releaseDate] wherever given.
-  final int? year;
   @override
+  final int? year;
 
   /// The release date of this track.
-  final DateTime? releaseDate;
-  @JsonKey()
   @override
+  final DateTime? releaseDate;
+  @override
+  @JsonKey()
   final bool available;
   @override
   final String? spotifyId;
-  @JsonKey()
-  @override
 
   /// The source of the audio for this track.
   /// This indicates where the user got a particular file, i.e. if it is
   /// ripped or bought from Bandcamp or Amazon.
   /// This can also be "spotify" or "youtube" to indicate the audio should be
   /// sourced from those services respectively (but it doesn't work yet).
+  @override
+  @JsonKey()
   final String? source;
   @override
   final String? metadataSource;
@@ -624,6 +576,7 @@ class _$_TrackMetadata extends _TrackMetadata with DiagnosticableTreeMixin {
                 .equals(other.metadataSource, metadataSource));
   }
 
+  @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hashAll([
         runtimeType,
@@ -662,26 +615,26 @@ class _$_TrackMetadata extends _TrackMetadata with DiagnosticableTreeMixin {
 
 abstract class _TrackMetadata extends TrackMetadata {
   const factory _TrackMetadata(
-      {String? title,
-      String? artistName,
-      String? albumName,
-      int? trackNo,
-      int discNo,
-      String? description,
-      String? descriptionSource,
-      @JsonKey(ignore: true) ImageDescriptor? coverData,
-      required Uri uri,
-      @JsonKey(ignore: true) List<int>? coverBytes,
-      Uri? coverUri,
-      Uri? coverUriRemote,
-      String? coverSource,
-      Duration? duration,
-      int? year,
-      DateTime? releaseDate,
-      bool available,
-      String? spotifyId,
-      String? source,
-      String? metadataSource}) = _$_TrackMetadata;
+      {final String? title,
+      final String? artistName,
+      final String? albumName,
+      final int? trackNo,
+      final int discNo,
+      final String? description,
+      final String? descriptionSource,
+      @JsonKey(ignore: true) final ImageDescriptor? coverData,
+      required final Uri uri,
+      @JsonKey(ignore: true) final List<int>? coverBytes,
+      final Uri? coverUri,
+      final Uri? coverUriRemote,
+      final String? coverSource,
+      final Duration? duration,
+      final int? year,
+      final DateTime? releaseDate,
+      final bool available,
+      final String? spotifyId,
+      final String? source,
+      final String? metadataSource}) = _$_TrackMetadata;
   const _TrackMetadata._() : super._();
 
   factory _TrackMetadata.fromJson(Map<String, dynamic> json) =
@@ -690,76 +643,76 @@ abstract class _TrackMetadata extends TrackMetadata {
   @override
 
   /// The song's title.
-  String? get title;
+  String? get title => throw _privateConstructorUsedError;
   @override
 
   /// The artist's name. Also used to look up the artist in the database.
-  String? get artistName;
+  String? get artistName => throw _privateConstructorUsedError;
   @override
 
   /// The album's name. Also used with [artistName] to look up the album in the database.
-  String? get albumName;
+  String? get albumName => throw _privateConstructorUsedError;
   @override
 
   /// The position of the track on the named album.
-  int? get trackNo;
+  int? get trackNo => throw _privateConstructorUsedError;
   @override
-  int get discNo;
+  int get discNo => throw _privateConstructorUsedError;
   @override
 
   /// Extra details about a given track, such as its origins and meaning.
-  String? get description;
+  String? get description => throw _privateConstructorUsedError;
   @override
 
   /// Where the [description] came from.
-  String? get descriptionSource;
+  String? get descriptionSource => throw _privateConstructorUsedError;
   @override
 
   /// Holds the data for a cover image. **DO NOT** STORE THIS IN THE DATABASE!
 //@Deprecated("Don't use this, just use coverBytes or coverFile instead!")
   @JsonKey(ignore: true)
-  ImageDescriptor? get coverData;
+  ImageDescriptor? get coverData => throw _privateConstructorUsedError;
   @override
 
   /// The URI to the track. Used by the library (database) to find the file
   /// when it's time to play it, and for fallback details.
-  Uri get uri;
+  Uri get uri => throw _privateConstructorUsedError;
   @override
 
   /// The raw bytes of the cover image. **DO NOT** STORE THIS IN THE DATABASE!
   @JsonKey(ignore: true)
-  List<int>? get coverBytes;
+  List<int>? get coverBytes => throw _privateConstructorUsedError;
   @override
 
   /// The URI to the cover.
-  Uri? get coverUri;
+  Uri? get coverUri => throw _privateConstructorUsedError;
   @override
 
   /// A remote URI to the cover, such as from Spotify.
   /// Generally the URL used to download the cover from [coverSource].
   /// This is used with Discord RPC.
-  Uri? get coverUriRemote;
+  Uri? get coverUriRemote => throw _privateConstructorUsedError;
   @override
 
   /// Can be "album" in addition to album cover sources.
   /// "album" here indicates the cover is the same as the album's.
-  String? get coverSource;
+  String? get coverSource => throw _privateConstructorUsedError;
   @override
 
   /// The track's duration.
-  Duration? get duration;
+  Duration? get duration => throw _privateConstructorUsedError;
   @override
 
   /// The year the track was released. Prefer to show [releaseDate] wherever given.
-  int? get year;
+  int? get year => throw _privateConstructorUsedError;
   @override
 
   /// The release date of this track.
-  DateTime? get releaseDate;
+  DateTime? get releaseDate => throw _privateConstructorUsedError;
   @override
-  bool get available;
+  bool get available => throw _privateConstructorUsedError;
   @override
-  String? get spotifyId;
+  String? get spotifyId => throw _privateConstructorUsedError;
   @override
 
   /// The source of the audio for this track.
@@ -767,9 +720,9 @@ abstract class _TrackMetadata extends TrackMetadata {
   /// ripped or bought from Bandcamp or Amazon.
   /// This can also be "spotify" or "youtube" to indicate the audio should be
   /// sourced from those services respectively (but it doesn't work yet).
-  String? get source;
+  String? get source => throw _privateConstructorUsedError;
   @override
-  String? get metadataSource;
+  String? get metadataSource => throw _privateConstructorUsedError;
   @override
   @JsonKey(ignore: true)
   _$TrackMetadataCopyWith<_TrackMetadata> get copyWith =>

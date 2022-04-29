@@ -36,6 +36,7 @@ dependencies:
   path_provider: ^2.0.9
   rxdart: ^0.27.3
   url_launcher: ^6.1.0
+  flinq: ^2.0.2
 
   # Service Deps
   dart_discord_rpc:

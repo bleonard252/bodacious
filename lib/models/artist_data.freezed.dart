@@ -12,48 +12,11 @@ part of 'artist_data.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more informations: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
 
 ArtistMetadata _$ArtistMetadataFromJson(Map<String, dynamic> json) {
   return _ArtistMetadata.fromJson(json);
 }
-
-/// @nodoc
-class _$ArtistMetadataTearOff {
-  const _$ArtistMetadataTearOff();
-
-  _ArtistMetadata call(
-      {required String name,
-      Uri? coverUri,
-      Uri? coverUriRemote,
-      String? coverSource,
-      String? description,
-      String? descriptionSource,
-      int? albumCount,
-      int? trackCount,
-      String? spotifyId,
-      String? metadataSource}) {
-    return _ArtistMetadata(
-      name: name,
-      coverUri: coverUri,
-      coverUriRemote: coverUriRemote,
-      coverSource: coverSource,
-      description: description,
-      descriptionSource: descriptionSource,
-      albumCount: albumCount,
-      trackCount: trackCount,
-      spotifyId: spotifyId,
-      metadataSource: metadataSource,
-    );
-  }
-
-  ArtistMetadata fromJson(Map<String, Object?> json) {
-    return ArtistMetadata.fromJson(json);
-  }
-}
-
-/// @nodoc
-const $ArtistMetadata = _$ArtistMetadataTearOff();
 
 /// @nodoc
 mixin _$ArtistMetadata {
@@ -284,39 +247,38 @@ class _$_ArtistMetadata extends _ArtistMetadata with DiagnosticableTreeMixin {
   factory _$_ArtistMetadata.fromJson(Map<String, dynamic> json) =>
       _$$_ArtistMetadataFromJson(json);
 
-  @override
-
   /// The artist's name.
-  final String name;
   @override
+  final String name;
 
   /// The URI to the artist icon.
-  final Uri? coverUri;
   @override
+  final Uri? coverUri;
 
   /// A remote URI to the cover, such as from Spotify.
   /// Generally the URL used to download the cover from [coverSource].
   /// This is used with Discord RPC.
-  final Uri? coverUriRemote;
   @override
+  final Uri? coverUriRemote;
 
   /// Can be "spotify", "metadata", "neighbor", "mse", "lastfm", "genius", or other sources.
-  final String? coverSource;
   @override
+  final String? coverSource;
 
   /// A biography for the artist.
-  final String? description;
   @override
+  final String? description;
 
   /// Where the biography came from.
-  final String? descriptionSource;
   @override
+  final String? descriptionSource;
 
   /// The total number of albums by this artist (or albums present in the library).
-  final int? albumCount;
   @override
+  final int? albumCount;
 
   /// The total number of tracks by this artist (or tracks present in the library).
+  @override
   final int? trackCount;
   @override
   final String? spotifyId;
@@ -369,6 +331,7 @@ class _$_ArtistMetadata extends _ArtistMetadata with DiagnosticableTreeMixin {
                 .equals(other.metadataSource, metadataSource));
   }
 
+  @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(
       runtimeType,
@@ -396,16 +359,16 @@ class _$_ArtistMetadata extends _ArtistMetadata with DiagnosticableTreeMixin {
 
 abstract class _ArtistMetadata extends ArtistMetadata {
   const factory _ArtistMetadata(
-      {required String name,
-      Uri? coverUri,
-      Uri? coverUriRemote,
-      String? coverSource,
-      String? description,
-      String? descriptionSource,
-      int? albumCount,
-      int? trackCount,
-      String? spotifyId,
-      String? metadataSource}) = _$_ArtistMetadata;
+      {required final String name,
+      final Uri? coverUri,
+      final Uri? coverUriRemote,
+      final String? coverSource,
+      final String? description,
+      final String? descriptionSource,
+      final int? albumCount,
+      final int? trackCount,
+      final String? spotifyId,
+      final String? metadataSource}) = _$_ArtistMetadata;
   const _ArtistMetadata._() : super._();
 
   factory _ArtistMetadata.fromJson(Map<String, dynamic> json) =
@@ -414,41 +377,41 @@ abstract class _ArtistMetadata extends ArtistMetadata {
   @override
 
   /// The artist's name.
-  String get name;
+  String get name => throw _privateConstructorUsedError;
   @override
 
   /// The URI to the artist icon.
-  Uri? get coverUri;
+  Uri? get coverUri => throw _privateConstructorUsedError;
   @override
 
   /// A remote URI to the cover, such as from Spotify.
   /// Generally the URL used to download the cover from [coverSource].
   /// This is used with Discord RPC.
-  Uri? get coverUriRemote;
+  Uri? get coverUriRemote => throw _privateConstructorUsedError;
   @override
 
   /// Can be "spotify", "metadata", "neighbor", "mse", "lastfm", "genius", or other sources.
-  String? get coverSource;
+  String? get coverSource => throw _privateConstructorUsedError;
   @override
 
   /// A biography for the artist.
-  String? get description;
+  String? get description => throw _privateConstructorUsedError;
   @override
 
   /// Where the biography came from.
-  String? get descriptionSource;
+  String? get descriptionSource => throw _privateConstructorUsedError;
   @override
 
   /// The total number of albums by this artist (or albums present in the library).
-  int? get albumCount;
+  int? get albumCount => throw _privateConstructorUsedError;
   @override
 
   /// The total number of tracks by this artist (or tracks present in the library).
-  int? get trackCount;
+  int? get trackCount => throw _privateConstructorUsedError;
   @override
-  String? get spotifyId;
+  String? get spotifyId => throw _privateConstructorUsedError;
   @override
-  String? get metadataSource;
+  String? get metadataSource => throw _privateConstructorUsedError;
   @override
   @JsonKey(ignore: true)
   _$ArtistMetadataCopyWith<_ArtistMetadata> get copyWith =>

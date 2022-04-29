@@ -12,52 +12,11 @@ part of 'album_data.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more informations: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
 
 AlbumMetadata _$AlbumMetadataFromJson(Map<String, dynamic> json) {
   return _AlbumMetadata.fromJson(json);
 }
-
-/// @nodoc
-class _$AlbumMetadataTearOff {
-  const _$AlbumMetadataTearOff();
-
-  _AlbumMetadata call(
-      {required String artistName,
-      required String name,
-      Uri? coverUri,
-      Uri? coverUriRemote,
-      String? coverSource,
-      String? description,
-      String? descriptionSource,
-      int? trackCount,
-      int? year,
-      DateTime? releaseDate,
-      String? spotifyId,
-      String? metadataSource}) {
-    return _AlbumMetadata(
-      artistName: artistName,
-      name: name,
-      coverUri: coverUri,
-      coverUriRemote: coverUriRemote,
-      coverSource: coverSource,
-      description: description,
-      descriptionSource: descriptionSource,
-      trackCount: trackCount,
-      year: year,
-      releaseDate: releaseDate,
-      spotifyId: spotifyId,
-      metadataSource: metadataSource,
-    );
-  }
-
-  AlbumMetadata fromJson(Map<String, Object?> json) {
-    return AlbumMetadata.fromJson(json);
-  }
-}
-
-/// @nodoc
-const $AlbumMetadata = _$AlbumMetadataTearOff();
 
 /// @nodoc
 mixin _$AlbumMetadata {
@@ -314,41 +273,40 @@ class _$_AlbumMetadata extends _AlbumMetadata with DiagnosticableTreeMixin {
   factory _$_AlbumMetadata.fromJson(Map<String, dynamic> json) =>
       _$$_AlbumMetadataFromJson(json);
 
-  @override
-
   /// The artist's name, used to group this album and make it unique.
-  final String artistName;
   @override
+  final String artistName;
 
   /// The album's name.
-  final String name;
   @override
+  final String name;
 
   /// The URI to the album cover.
+  @override
   final Uri? coverUri;
   @override
   final Uri? coverUriRemote;
   @override
   final String? coverSource;
-  @override
 
   /// Extra details about the album.
-  final String? description;
   @override
+  final String? description;
 
   /// Where the [description] came from.
-  final String? descriptionSource;
   @override
+  final String? descriptionSource;
 
   /// The total number of tracks on this album (or tracks present in the library).
-  final int? trackCount;
   @override
+  final int? trackCount;
 
   /// The year the album was released. Prefer to show [releaseDate] wherever given.
-  final int? year;
   @override
+  final int? year;
 
   /// The release date of this album.
+  @override
   final DateTime? releaseDate;
   @override
   final String? spotifyId;
@@ -406,6 +364,7 @@ class _$_AlbumMetadata extends _AlbumMetadata with DiagnosticableTreeMixin {
                 .equals(other.metadataSource, metadataSource));
   }
 
+  @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(
       runtimeType,
@@ -435,18 +394,18 @@ class _$_AlbumMetadata extends _AlbumMetadata with DiagnosticableTreeMixin {
 
 abstract class _AlbumMetadata extends AlbumMetadata {
   const factory _AlbumMetadata(
-      {required String artistName,
-      required String name,
-      Uri? coverUri,
-      Uri? coverUriRemote,
-      String? coverSource,
-      String? description,
-      String? descriptionSource,
-      int? trackCount,
-      int? year,
-      DateTime? releaseDate,
-      String? spotifyId,
-      String? metadataSource}) = _$_AlbumMetadata;
+      {required final String artistName,
+      required final String name,
+      final Uri? coverUri,
+      final Uri? coverUriRemote,
+      final String? coverSource,
+      final String? description,
+      final String? descriptionSource,
+      final int? trackCount,
+      final int? year,
+      final DateTime? releaseDate,
+      final String? spotifyId,
+      final String? metadataSource}) = _$_AlbumMetadata;
   const _AlbumMetadata._() : super._();
 
   factory _AlbumMetadata.fromJson(Map<String, dynamic> json) =
@@ -455,43 +414,43 @@ abstract class _AlbumMetadata extends AlbumMetadata {
   @override
 
   /// The artist's name, used to group this album and make it unique.
-  String get artistName;
+  String get artistName => throw _privateConstructorUsedError;
   @override
 
   /// The album's name.
-  String get name;
+  String get name => throw _privateConstructorUsedError;
   @override
 
   /// The URI to the album cover.
-  Uri? get coverUri;
+  Uri? get coverUri => throw _privateConstructorUsedError;
   @override
-  Uri? get coverUriRemote;
+  Uri? get coverUriRemote => throw _privateConstructorUsedError;
   @override
-  String? get coverSource;
+  String? get coverSource => throw _privateConstructorUsedError;
   @override
 
   /// Extra details about the album.
-  String? get description;
+  String? get description => throw _privateConstructorUsedError;
   @override
 
   /// Where the [description] came from.
-  String? get descriptionSource;
+  String? get descriptionSource => throw _privateConstructorUsedError;
   @override
 
   /// The total number of tracks on this album (or tracks present in the library).
-  int? get trackCount;
+  int? get trackCount => throw _privateConstructorUsedError;
   @override
 
   /// The year the album was released. Prefer to show [releaseDate] wherever given.
-  int? get year;
+  int? get year => throw _privateConstructorUsedError;
   @override
 
   /// The release date of this album.
-  DateTime? get releaseDate;
+  DateTime? get releaseDate => throw _privateConstructorUsedError;
   @override
-  String? get spotifyId;
+  String? get spotifyId => throw _privateConstructorUsedError;
   @override
-  String? get metadataSource;
+  String? get metadataSource => throw _privateConstructorUsedError;
   @override
   @JsonKey(ignore: true)
   _$AlbumMetadataCopyWith<_AlbumMetadata> get copyWith =>

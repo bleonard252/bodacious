@@ -4,6 +4,21 @@ set positional-arguments
 # Build the app in debug mode
 build *TARGETS='appbundle': _generate
   for target in {{TARGETS}}; do flutter build $target --debug --dart-define DISCORD_APP_ID=$DISCORD_APP_ID --dart-define LASTFM_API_KEY=$LASTFM_API_KEY --dart-define LASTFM_SECRET=$LASTFM_SECRET --dart-define SPOTIFY_API_KEY=$SPOTIFY_API_KEY --dart-define SPOTIFY_SECRET=$SPOTIFY_SECRET; done
+release-appimage:
+  #!/usr/bin/env bash
+  set -eux
+  rm -rf AppDir | true
+  mkdir AppDir
+  mkdir -p AppDir/usr/share/icons/hicolor/{128x128,1024x1024,64x64}
+  cp -r build/linux/x64/release/bundle/. AppDir/
+  #cp assets/brand/ic_circle.png AppDir/usr/share/icons/hicolor/128x128/xyz.u1024256.bodacious.png
+  convert assets/brand/ic_circle.png -resize 128x128 AppDir/usr/share/icons/hicolor/128x128/xyz.u1024256.bodacious.png
+  convert assets/brand/ic_circle.png -resize 1024x1024 AppDir/usr/share/icons/hicolor/1024x1024/xyz.u1024256.bodacious.png
+  cp assets/brand/ic_foreground_small.png AppDir/usr/share/icons/hicolor/64x64/xyz.u1024256.bodacious.png
+  mkdir -p build/linux/x64/release/appimage/
+  echo If this is not found, run: sudo pip install appimage-builder
+  appimage-builder --skip-test
+  echo AppImage released to build/linux/x64/release/appimage/bodacious-x86_64.AppImage
 # Build the app in release mode
 release *TARGETS='apk': test-all prebuild
   @#TODO: set version in version.txt

@@ -306,6 +306,13 @@ packages:
       url: "https://github.com/bleonard252/flac_metadata"
     source: git
     version: "1.0.4"
+  flinq:
+    dependency: "direct main"
+    description:
+      name: flinq
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.2"
   flutter:
     dependency: "direct main"
     description: flutter
