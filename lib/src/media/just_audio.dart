@@ -39,6 +39,7 @@ class JustAudioHandler extends BodaciousAudioHandler {
         // .then((value) => value == null ? null : mediaItem.add(value.asMediaItem()));
         queue.add([mediaItem.value!]);
       } else if (player.audioSource is just.ConcatenatingAudioSource) {
+        if ((player.audioSource as just.ConcatenatingAudioSource).children.isEmpty) return queue.add([]);
         final current = (player.audioSource as just.ConcatenatingAudioSource).children.elementAt(player.currentIndex ?? 0);
         playlist(current, mediaItem, player.currentIndex);
         final List<MediaItem> _queue = [];
@@ -46,7 +47,7 @@ class JustAudioHandler extends BodaciousAudioHandler {
           playlist(mediaItem, _queue);
         }
         queue.add(_queue);
-      } else if (player.audioSource == null) {}
+      } else if (player.audioSource == null) {return mediaItem.add(null);}
       if (mediaItem.valueOrNull != null) mediaItem.add(mediaItem.value!.copyWith(duration: player.duration));
       playbackState.add(PlaybackState(
         playing: player.playing,
