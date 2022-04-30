@@ -122,19 +122,19 @@ class _NowPlayingViewState extends ConsumerState<NowPlayingView> {
                                 style: Theme.of(context).textTheme.headline6?.copyWith(
                                   color: vtheme.onPrimary
                                 ),
-                                maxLines: 2, overflow: TextOverflow.ellipsis
+                                maxLines: 2, overflow: TextOverflow.ellipsis, textAlign: TextAlign.center
                               ),
                               Text(meta.artistName ?? "",
                                 style: Theme.of(context).textTheme.subtitle1?.copyWith(
                                   color: vtheme.onPrimary//color: vibrant?.bodyTextColor
                                 ),
-                                maxLines: 1, overflow: TextOverflow.ellipsis
+                                maxLines: 1, overflow: TextOverflow.ellipsis, textAlign: TextAlign.center
                               ),
                               Text(meta.albumName ?? "",
                                 style: Theme.of(context).textTheme.subtitle1?.copyWith(
                                   color: vtheme.onPrimary//color: vibrant?.bodyTextColor
                                 ),
-                                maxLines: 1, overflow: TextOverflow.ellipsis
+                                maxLines: 1, overflow: TextOverflow.ellipsis, textAlign: TextAlign.center
                               ),
                               Padding(
                                 padding: const EdgeInsets.symmetric(horizontal: 36.0),

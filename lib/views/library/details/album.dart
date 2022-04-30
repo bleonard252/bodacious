@@ -5,6 +5,7 @@ import 'package:bodacious/models/album_data.dart';
 import 'package:bodacious/models/artist_data.dart';
 import 'package:bodacious/models/track_data.dart';
 import 'package:bodacious/widgets/cover_placeholder.dart';
+import 'package:bodacious/widgets/frame_size.dart';
 import 'package:bodacious/widgets/item/artist.dart';
 import 'package:bodacious/widgets/item/song.dart';
 import 'package:drift/drift.dart' hide Column, Table;
@@ -27,9 +28,9 @@ class AlbumDetailsViewState extends State<AlbumDetailsView> {
     double _lastOffset = 0.0;
     controller.addListener(() {
       if (controller.positions.isEmpty) return;
-      if (_lastOffset < 48 && controller.offset >= 48) {
+      if (_lastOffset < 256 && controller.offset >= 256) {
         setState(() {});
-      } else if (_lastOffset > 48 && controller.offset <= 48) {
+      } else if (_lastOffset > 256 && controller.offset <= 256) {
         setState(() {});
       } else if (controller.position.atEdge) {
         setState(() {});
@@ -47,60 +48,118 @@ class AlbumDetailsViewState extends State<AlbumDetailsView> {
       builder: (context, snapshot) {
         final AlbumMetadata album = snapshot.data ?? widget.album;
         return Scaffold(
+          appBar: AppBar(
+            elevation: 0,
+            scrolledUnderElevation: 0,
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor.withOpacity(0.5),
+            title: (controller.positions.isNotEmpty && controller.offset >= 256) ? Text(widget.album.name) : null,
+          ),
+          extendBody: true,
+          extendBodyBehindAppBar: true,
           body: CustomScrollView(
             controller: controller,
             slivers: [
-              SliverAppBar(
-                expandedHeight: 128.0,
-                pinned: true,
-                flexibleSpace: FlexibleSpaceBar(
-                  title: PreferredSize(
-                    preferredSize: const Size.fromHeight(76),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.max,
-                      children: [
-                        if (controller.positions.isEmpty || controller.offset <= 48) ...[
-                          if (album.coverUri?.scheme == "file") Image(
-                            image: (album.coverUri?.scheme == "file" ? FileImage(File.fromUri(album.coverUri!))
-                              : NetworkImage(album.coverUri.toString())) as ImageProvider,
-                            width: 72,
-                            fit: BoxFit.fitHeight,
-                            errorBuilder: (context, e, s) => const CoverPlaceholder(size: 72),
-                          )
-                          else const CoverPlaceholder(size: 72)
-                        ],
-                        Expanded(
-                          child: Padding(
-                            padding: (controller.positions.isEmpty || controller.offset <= 48) ? const EdgeInsets.all(8.0) : EdgeInsets.zero,
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  album.name, 
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                if (controller.positions.isEmpty || controller.offset <= 48) Text(album.artistName, 
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: Theme.of(context).textTheme.caption
-                                )
-                              ],
-                            ),
-                          ),
-                        )
-                      ]
+              // SliverAppBar(
+              //   expandedHeight: 128.0,
+              //   pinned: true,
+              //   flexibleSpace: FlexibleSpaceBar(
+              //     title: PreferredSize(
+              //       preferredSize: const Size.fromHeight(76),
+              //       child:
+              //     ),
+              //   ),
+              //   //title: Text(album.name),
+              // ),
+              const SliverToBoxAdapter(child: SizedBox(height: 56)),
+              SliverToBoxAdapter(child: (FrameSize.of(context)) ? Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    if (album.coverUri?.scheme == "file") Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Image(
+                        image: (album.coverUri?.scheme == "file" ? FileImage(File.fromUri(album.coverUri!))
+                          : NetworkImage(album.coverUri.toString())) as ImageProvider,
+                        width: 196, height: 196,
+                        fit: BoxFit.fitHeight,
+                        errorBuilder: (context, e, s) => const CoverPlaceholder(size: 196),
+                      ),
+                    )
+                    else const Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: CoverPlaceholder(size: 196),
                     ),
-                  ),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0).add(const EdgeInsets.symmetric(vertical: 12)),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              album.name, 
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: Theme.of(context).textTheme.headline4,
+                            ),
+                            Text(album.artistName, 
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: Theme.of(context).textTheme.headline6
+                            )
+                          ],
+                        ),
+                      ),
+                    )
+                  ]
                 ),
-                //title: Text(album.name),
-              ),
+              ) : Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (album.coverUri?.scheme == "file") Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Image(
+                        image: (album.coverUri?.scheme == "file" ? FileImage(File.fromUri(album.coverUri!))
+                          : NetworkImage(album.coverUri.toString())) as ImageProvider,
+                        width: 196, height: 196,
+                        fit: BoxFit.fitHeight,
+                        errorBuilder: (context, e, s) => const CoverPlaceholder(size: 196),
+                      ),
+                    )
+                    else const Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: CoverPlaceholder(size: 196),
+                    ),
+                    Text(
+                      album.name, 
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.headline5,
+                      textAlign: TextAlign.center,
+                    ),
+                    Text(album.artistName, 
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.headline6,
+                      textAlign: TextAlign.center,
+                    )
+                  ]
+                ),
+              )),
               FutureBuilder<ArtistMetadata?>(
                 future: db.tryGetArtist(album.artistName),
-                builder: (context, snapshot) => snapshot.hasData ? SliverToBoxAdapter(child: ArtistWidget(snapshot.data!, hideDetails: true)) 
+                builder: (context, snapshot) => snapshot.hasData ? SliverToBoxAdapter(child: ArtistWidget(
+                  snapshot.data!,
+                  hideDetails: true,
+                  subtitle: const TextSpan(text: "Album artist"),
+                )) 
                 : SliverToBoxAdapter(child: Container())
               ),
               if (album.year != null || album.trackCount != null) SliverToBoxAdapter(

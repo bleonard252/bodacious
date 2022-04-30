@@ -23,39 +23,37 @@ class _QueueViewState extends ConsumerState<QueueView> {
   @override
   Widget build(BuildContext context) {
     final queue = ref.watch(queueProvider).value;
-    return Column(
-      children: [
-        AppBar(
-          leading: FrameSize.of(context) ? null : Tooltip(
-            message: "Back to Now Playing",
-            child: IconButton(
-              onPressed: () => widget.setParentState?.call(() => context.go("/now_playing")),
-              icon: const Icon(MdiIcons.arrowLeft)
-            ),
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(
+        leading: FrameSize.of(context) ? null : Tooltip(
+          message: "Back to Now Playing",
+          child: IconButton(
+            onPressed: () => widget.setParentState?.call(() => context.go("/now_playing")),
+            icon: const Icon(MdiIcons.arrowLeft)
           ),
-          backgroundColor: Colors.transparent,
-          elevation: 0,
         ),
-        Expanded(
-          child: ListView.builder(
-            itemExtent: 72.0,
-            controller: controller,
-            itemCount: (queue?.entries.length ?? 0),
-            itemBuilder: (context, index) {
-              return SongWidget(
-                queue!.entries[index],
-                selected: index == queue.position,
-                inQueue: true,
-                queueIndex: index,
-                onTap: () {
-                  player.skipToQueueItem(index);
-                  player.play();
-                }
-              );
+        backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.5),
+        elevation: 0,
+      ),
+      body: ListView.builder(
+        itemExtent: 72.0,
+        controller: controller,
+        itemCount: (queue?.entries.length ?? 0),
+        itemBuilder: (context, index) {
+          return SongWidget(
+            queue!.entries[index],
+            selected: index == queue.position,
+            inQueue: true,
+            queueIndex: index,
+            onTap: () {
+              player.skipToQueueItem(index);
+              player.play();
             }
-          ),
-        ),
-      ],
+          );
+        }
+      ),
     );
   }
 }

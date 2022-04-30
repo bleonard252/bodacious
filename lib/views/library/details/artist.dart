@@ -5,6 +5,7 @@ import 'package:bodacious/models/album_data.dart';
 import 'package:bodacious/models/artist_data.dart';
 import 'package:bodacious/models/track_data.dart';
 import 'package:bodacious/widgets/cover_placeholder.dart';
+import 'package:bodacious/widgets/frame_size.dart';
 import 'package:bodacious/widgets/item/album.dart';
 import 'package:bodacious/widgets/item/song.dart';
 import 'package:drift/drift.dart' hide Column, Table;
@@ -47,71 +48,182 @@ class ArtistDetailsViewState extends State<ArtistDetailsView> {
       builder: (context, snapshot) {
         final ArtistMetadata artist = snapshot.data ?? widget.artist;
         return Scaffold(
+          appBar: AppBar(
+            elevation: 0,
+            scrolledUnderElevation: 0,
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor.withOpacity(0.5),
+            title: (controller.positions.isNotEmpty && controller.offset >= 256) ? Text(widget.artist.name) : null,
+          ),
+          extendBody: true,
+          extendBodyBehindAppBar: true,
           body: CustomScrollView(
             controller: controller,
             slivers: [
-              SliverAppBar(
-                expandedHeight: 128.0,
-                pinned: true,
-                flexibleSpace: FlexibleSpaceBar(
-                  title: PreferredSize(
-                    preferredSize: const Size.fromHeight(76),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.max,
-                      children: [
-                        if (controller.positions.isEmpty || controller.offset <= 48) ClipOval(child: artist.coverUri != null ? Image(
+              // SliverAppBar(
+              //   expandedHeight: 128.0,
+              //   pinned: true,
+              //   flexibleSpace: FlexibleSpaceBar(
+              //     title: PreferredSize(
+              //       preferredSize: const Size.fromHeight(76),
+              //       child: Row(
+              //         crossAxisAlignment: CrossAxisAlignment.end,
+              //         mainAxisAlignment: MainAxisAlignment.start,
+              //         mainAxisSize: MainAxisSize.max,
+              //         children: [
+              //           if (controller.positions.isEmpty || controller.offset <= 48) 
+              //           ClipOval(child: artist.coverUri != null ? Image(
+              //             image: (artist.coverUri?.scheme == "file" ? FileImage(File.fromUri(artist.coverUri!))
+              //               : NetworkImage(artist.coverUri.toString())) as ImageProvider,
+              //             width: 72,
+              //             height: 72,
+              //             fit: BoxFit.cover,
+              //             errorBuilder: (context, e, s) => const CoverPlaceholder(size: 48, iconSize: 24),
+              //           ) : 
+              //           Expanded(
+              //             child: Padding(
+              //               padding: (controller.positions.isEmpty || controller.offset <= 48) ? const EdgeInsets.all(8.0) : EdgeInsets.zero,
+              //               child: Text(
+              //                 artist.name, 
+              //                 maxLines: 2,
+              //                 overflow: TextOverflow.ellipsis,
+              //               ),
+              //             ),
+              //           )
+              //         ]
+              //       ),
+              //     ),
+              //   ),
+              //   //title: Text(album.name),
+              // ),
+              const SliverToBoxAdapter(child: SizedBox(height: 56)),
+              SliverToBoxAdapter(child: (FrameSize.of(context)) ? Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: (artist.coverUri?.scheme == "file") ? ClipOval(
+                        child: Image(
                           image: (artist.coverUri?.scheme == "file" ? FileImage(File.fromUri(artist.coverUri!))
                             : NetworkImage(artist.coverUri.toString())) as ImageProvider,
-                          width: 72,
-                          height: 72,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, e, s) => const CoverPlaceholder(size: 48, iconSize: 24),
-                        ) : FutureBuilder<AlbumMetadata?>(
-                          future: (
-                            db.select(db.albumTable)
-                            //..addColumns([db.albumTable.coverUri, db.albumTable.artistName, db.albumTable.releaseDate, db.albumTable.year])
-                            ..where((tbl) => tbl.artistName.equals(artist.name))
-                            ..orderBy([
-                              (tbl) => OrderingTerm.desc(tbl.releaseDate),
-                              (tbl) => OrderingTerm.desc(tbl.year),
-                            ])
-                            ..limit(1)
-                          ).getSingleOrNull(),
-                          // albumStore.findFirst(db, finder: Finder(
-                          //   filter: Filter.matches('artistName', artist.name),
-                          //   sortOrders: [SortOrder('releaseDate', false), SortOrder('year', false)]
-                          // )),
-                          builder: (context, snapshot) {
-                            //final album = AlbumMetadata.fromJson((snapshot.data as dynamic)?.value ?? {"name": "Unknown album", "artistName": "Unknown artist"});
-                            final coverUri = snapshot.data?.coverUri;
-                            return coverUri?.scheme == "file" ? Image(
-                              image: (coverUri?.scheme == "file" ? FileImage(File.fromUri(coverUri!))
-                                : NetworkImage(coverUri.toString())) as ImageProvider,
-                              width: 72,
-                              height: 72,
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, e, s) => const CoverPlaceholder(size: 72),
-                            ): const CoverPlaceholder(size: 72);
-                          })
+                          width: 196, height: 196,
+                          fit: BoxFit.fitHeight,
+                          errorBuilder: (context, e, s) => const CoverPlaceholder(size: 196),
                         ),
-                        Expanded(
-                          child: Padding(
-                            padding: (controller.positions.isEmpty || controller.offset <= 48) ? const EdgeInsets.all(8.0) : EdgeInsets.zero,
-                            child: Text(
+                      ) : FutureBuilder<AlbumMetadata?>(
+                        future: (
+                          db.select(db.albumTable)
+                          //..addColumns([db.albumTable.coverUri, db.albumTable.artistName, db.albumTable.releaseDate, db.albumTable.year])
+                          ..where((tbl) => tbl.artistName.equals(artist.name) & (tbl.releaseDate.isNotNull() | tbl.year.isNotNull()))
+                          ..orderBy([
+                            (tbl) => OrderingTerm.desc(tbl.releaseDate),
+                            (tbl) => OrderingTerm.desc(tbl.year),
+                          ])
+                          ..limit(1)
+                        ).getSingleOrNull(),
+                        // albumStore.findFirst(db, finder: Finder(
+                        //   filter: Filter.matches('artistName', artist.name),
+                        //   sortOrders: [SortOrder('releaseDate', false), SortOrder('year', false)]
+                        // )),
+                        builder: (context, snapshot) {
+                          //final album = AlbumMetadata.fromJson((snapshot.data as dynamic)?.value ?? {"name": "Unknown album", "artistName": "Unknown artist"});
+                          final coverUri = snapshot.data?.coverUri;
+                          return coverUri?.scheme == "file" ? Image(
+                            image: (coverUri?.scheme == "file" ? FileImage(File.fromUri(coverUri!))
+                              : NetworkImage(coverUri.toString())) as ImageProvider,
+                            width: 196, height: 196,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, e, s) => const CoverPlaceholder(size: 196),
+                          ): const CoverPlaceholder(size: 196);
+                        }
+                      )
+                    ),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0).add(const EdgeInsets.symmetric(vertical: 12)),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
                               artist.name, 
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
+                              style: Theme.of(context).textTheme.headline4,
                             ),
-                          ),
-                        )
-                      ]
-                    ),
-                  ),
+                            // Text(album.artistName, 
+                            //   maxLines: 1,
+                            //   overflow: TextOverflow.ellipsis,
+                            //   style: Theme.of(context).textTheme.headline6
+                            // )
+                          ],
+                        ),
+                      ),
+                    )
+                  ]
                 ),
-                //title: Text(album.name),
-              ),
+              ) : Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: ClipOval(child: (artist.coverUri?.scheme == "file") ? Image(
+                        image: (artist.coverUri?.scheme == "file" ? FileImage(File.fromUri(artist.coverUri!))
+                          : NetworkImage(artist.coverUri.toString())) as ImageProvider,
+                        width: 196, height: 196,
+                        fit: BoxFit.fitHeight,
+                        errorBuilder: (context, e, s) => const CoverPlaceholder(size: 196),
+                      ) :FutureBuilder<AlbumMetadata?>(
+                        future: (
+                          db.select(db.albumTable)
+                          //..addColumns([db.albumTable.coverUri, db.albumTable.artistName, db.albumTable.releaseDate, db.albumTable.year])
+                          ..where((tbl) => tbl.artistName.equals(artist.name) & (tbl.releaseDate.isNotNull() | tbl.year.isNotNull()))
+                          ..orderBy([
+                            (tbl) => OrderingTerm.desc(tbl.releaseDate),
+                            (tbl) => OrderingTerm.desc(tbl.year),
+                          ])
+                          ..limit(1)
+                        ).getSingleOrNull(),
+                        // albumStore.findFirst(db, finder: Finder(
+                        //   filter: Filter.matches('artistName', artist.name),
+                        //   sortOrders: [SortOrder('releaseDate', false), SortOrder('year', false)]
+                        // )),
+                        builder: (context, snapshot) {
+                          //final album = AlbumMetadata.fromJson((snapshot.data as dynamic)?.value ?? {"name": "Unknown album", "artistName": "Unknown artist"});
+                          final coverUri = snapshot.data?.coverUri;
+                          return coverUri?.scheme == "file" ? Image(
+                            image: (coverUri?.scheme == "file" ? FileImage(File.fromUri(coverUri!))
+                              : NetworkImage(coverUri.toString())) as ImageProvider,
+                            width: 196, height: 196,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, e, s) => const CoverPlaceholder(size: 196),
+                          ): const CoverPlaceholder(size: 72); // leave this one at 72
+                        }
+                      )),
+                    ),
+                    Text(
+                      artist.name, 
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.headline5,
+                      textAlign: TextAlign.center,
+                    ),
+                    // Text(album.artistName, 
+                    //   maxLines: 1,
+                    //   overflow: TextOverflow.ellipsis,
+                    //   style: Theme.of(context).textTheme.headline6,
+                    //   textAlign: TextAlign.center,
+                    // )
+                  ]
+                ),
+              )),
               if (artist.trackCount != null || artist.albumCount != null) SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),

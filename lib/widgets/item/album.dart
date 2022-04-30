@@ -12,16 +12,19 @@ class AlbumWidget extends ConsumerWidget {
   final AlbumMetadata album;
   final Function()? onTap;
   final bool hideArtist;
+  final InlineSpan? subtitle;
   const AlbumWidget(this.album, {
     Key? key,
     this.onTap,
-    this.hideArtist = false
+    this.hideArtist = false,
+    this.subtitle
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final _subtitle = buildChildren();
     return SizedBox(
-      height: hideArtist ? 64.0 : 72.0,
+      height: _subtitle.isEmpty ? 64.0 : 72.0,
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         leading: album.coverUri?.scheme == "file" ? Image(
@@ -40,16 +43,21 @@ class AlbumWidget extends ConsumerWidget {
           const WidgetSpan(child: SizedBox(width: 6)),
           TextSpan(text: album.name)
         ])),
-        subtitle: hideArtist ? null : Text.rich(TextSpan(children: [
-          // const WidgetSpan(child: Icon(MdiIcons.spotify)),
-          // const WidgetSpan(child: SizedBox(width: 6)),
-          TextSpan(text: album.artistName),
-          //if (album.year != null) TextSpan(text: album.year.toString())
-        ])),
+        subtitle: _subtitle.isEmpty ? null : Text.rich(TextSpan(children: _subtitle)),
         onTap: onTap ?? () {
           context.go("/library/albums/"+Uri.encodeComponent(album.artistName)+"/"+Uri.encodeComponent(album.name), extra: album);
         },
       ),
     );
+  }
+
+  List<InlineSpan> buildChildren() {
+    return [
+      if (subtitle != null) subtitle!,
+      // const WidgetSpan(child: Icon(MdiIcons.spotify)),
+      // const WidgetSpan(child: SizedBox(width: 6)),
+      if (!hideArtist) TextSpan(text: album.artistName),
+      //if (album.year != null) TextSpan(text: album.year.toString())
+    ];
   }
 }
