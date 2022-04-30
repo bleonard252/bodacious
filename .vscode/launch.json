@@ -14,7 +14,7 @@
       "request": "launch",
       "type": "dart",
       //"preLaunchTask": "Pre-build app",
-      "tool": ""
+      "envFile": ".env"
     },
     {
       "name": "bodacious (profile mode)",

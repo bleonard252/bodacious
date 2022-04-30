@@ -34,6 +34,37 @@ class _QueueViewState extends ConsumerState<QueueView> {
             icon: const Icon(MdiIcons.arrowLeft)
           ),
         ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextButton(
+              child: const Padding(
+                padding: EdgeInsets.all(8.0),
+                child: Text("CLEAR"),
+              ),
+              style: ButtonStyle(
+                foregroundColor: MaterialStateColor.resolveWith((_) => Theme.of(context).colorScheme.onPrimary),
+                overlayColor: MaterialStateColor.resolveWith((_) => Theme.of(context).colorScheme.primaryContainer.withOpacity(0.2))
+              ),
+              onPressed: () async {
+                final r = await showDialog<bool>(context: context, builder: (context) => AlertDialog(
+                  title: const Text("Are you sure?"),
+                  content: const Text("This will clear the queue and stop your music."),
+                  actions: [
+                    TextButton(onPressed: () => Navigator.pop(context, false), child: const Text("No")),
+                    TextButton(onPressed: () => Navigator.pop(context, true), child: const Text("Yes")),
+                  ],
+                )) ?? false;
+                if (!r) return;
+                await player.stop();
+                await player.updateQueue([]);
+                player.queue.add([]);
+                player.mediaItem.add(null);
+                ref.refresh(nowPlayingProvider);
+              },
+            ),
+          )
+        ],
         backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.5),
         elevation: 0,
       ),
