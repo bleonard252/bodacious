@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
+import '../../main.dart';
 import '../cover_placeholder.dart';
 
 class AlbumWidget extends ConsumerWidget {
@@ -47,6 +48,53 @@ class AlbumWidget extends ConsumerWidget {
         onTap: onTap ?? () {
           context.go("/library/albums/"+Uri.encodeComponent(album.artistName)+"/"+Uri.encodeComponent(album.name), extra: album);
         },
+        trailing: Builder(
+          builder: (context) {
+            return IconButton(
+              icon: const Icon(MdiIcons.dotsVertical),
+              onPressed: () {
+                // the following block was ripped straight from PopupMenuButtonState().showButtonMenu
+                final button = context.findRenderObject()! as RenderBox;
+                final overlay = Navigator.of(context, rootNavigator: true).overlay!.context.findRenderObject()! as RenderBox;
+                final position = RelativeRect.fromRect(
+                  Rect.fromPoints(
+                    button.localToGlobal(Offset.zero, ancestor: overlay),
+                    button.localToGlobal(button.size.bottomRight(Offset.zero), ancestor: overlay),
+                  ),
+                  Offset.zero & overlay.size,
+                );
+                showMenu(context: context, position: position, items: [
+                  const PopupMenuItem(
+                    child: Text("Play all next"),
+                    value: "playnext",
+                  ),
+                  const PopupMenuItem(
+                    child: Text("Add all to Queue"),
+                    value: "queue",
+                  ),
+                ]).then((value) async {
+                  switch (value) {
+                    case "playnext":
+                      final q = ref.read(queueProvider).value;
+                      final tracks = await db.tryGetAlbumTracks(album.name, by: album.artistName);
+                      final x = (q?.position ?? 0);
+                      for (int i = 0; i < tracks.length; i++) {
+                        player.insertQueueItem(x+i, tracks[i].asMediaItem());
+                      }
+                      break;
+                    case "queue":
+                      final tracks = await db.tryGetAlbumTracks(album.name, by: album.artistName);
+                      for (int i = 0; i < tracks.length; i++) {
+                        player.addQueueItem(tracks[i].asMediaItem());
+                      }
+                      break;
+                    default:
+                  }
+                });
+              }
+            );
+          }
+        ),
       ),
     );
   }

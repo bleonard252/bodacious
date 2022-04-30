@@ -108,7 +108,7 @@ class VlcAudioHandler extends BodaciousAudioHandler {
   @override
   addQueueItem(MediaItem mediaItem) async {
     if (player.current.isPlaylist) {
-      player.add(vlc.Media.file(File(mediaItem.id)));
+      player.add(mediaItemToVlcMedia(mediaItem));
       // a more complex solution may be needed
       // when network resources come into play
     } else {
@@ -119,7 +119,7 @@ class VlcAudioHandler extends BodaciousAudioHandler {
   @override
   insertQueueItem(int index, MediaItem mediaItem) async {
     if (player.current.isPlaylist) {
-      player.insert(index, vlc.Media.file(File(Uri.parse(mediaItem.id).toFilePath())));
+      player.insert(index, mediaItemToVlcMedia(mediaItem));
       // a more complex solution may be needed
       // when network resources come into play
     } else {
@@ -130,7 +130,7 @@ class VlcAudioHandler extends BodaciousAudioHandler {
   @override
   updateQueue(List<MediaItem> queue, [int? index]) async {
     player.open(vlc.Playlist(
-      medias: queue.map((e) => vlc.Media.file(File.fromUri(Uri.parse(e.id)))).toList()
+      medias: queue.map((e) => mediaItemToVlcMedia(e)).toList()
     ), autoStart: true);
     if (index != null) player.jump(index);
     return super.updateQueue(queue, index);
@@ -159,5 +159,9 @@ class VlcAudioHandler extends BodaciousAudioHandler {
       repeatMode: _repeating,
     ));
     return player.setPlaylistMode(repeatModes[repeatMode]!);
+  }
+
+  vlc.Media mediaItemToVlcMedia(MediaItem mediaItem) {
+    return vlc.Media.file(File.fromUri(mediaItem is BodaciousMediaItem ? mediaItem.parent.uri : Uri.parse(mediaItem.id)));
   }
 }

@@ -44,6 +44,16 @@ class BoDatabase extends _$BoDatabase {
       ..where((tbl) => tbl.name.equals(albumName) & tbl.artistName.equals(by))
     ).getSingleOrNull();
   }
+  Future<List<TrackMetadata>> tryGetAlbumTracks(String albumName, {required String by}) {
+    return (
+      select(trackTable)
+      ..where((tbl) => tbl.albumName.equals(albumName) & tbl.artistName.equals(by))
+      ..orderBy([
+        (tbl) => OrderingTerm.asc(tbl.discNo),
+        (tbl) => OrderingTerm.asc(tbl.trackNo),
+      ])
+    ).get();
+  }
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
