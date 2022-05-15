@@ -235,11 +235,11 @@ class _$TrackMetadataCopyWithImpl<$Res>
 }
 
 /// @nodoc
-abstract class _$TrackMetadataCopyWith<$Res>
+abstract class _$$_TrackMetadataCopyWith<$Res>
     implements $TrackMetadataCopyWith<$Res> {
-  factory _$TrackMetadataCopyWith(
-          _TrackMetadata value, $Res Function(_TrackMetadata) then) =
-      __$TrackMetadataCopyWithImpl<$Res>;
+  factory _$$_TrackMetadataCopyWith(
+          _$_TrackMetadata value, $Res Function(_$_TrackMetadata) then) =
+      __$$_TrackMetadataCopyWithImpl<$Res>;
   @override
   $Res call(
       {String? title,
@@ -265,15 +265,15 @@ abstract class _$TrackMetadataCopyWith<$Res>
 }
 
 /// @nodoc
-class __$TrackMetadataCopyWithImpl<$Res>
+class __$$_TrackMetadataCopyWithImpl<$Res>
     extends _$TrackMetadataCopyWithImpl<$Res>
-    implements _$TrackMetadataCopyWith<$Res> {
-  __$TrackMetadataCopyWithImpl(
-      _TrackMetadata _value, $Res Function(_TrackMetadata) _then)
-      : super(_value, (v) => _then(v as _TrackMetadata));
+    implements _$$_TrackMetadataCopyWith<$Res> {
+  __$$_TrackMetadataCopyWithImpl(
+      _$_TrackMetadata _value, $Res Function(_$_TrackMetadata) _then)
+      : super(_value, (v) => _then(v as _$_TrackMetadata));
 
   @override
-  _TrackMetadata get _value => super._value as _TrackMetadata;
+  _$_TrackMetadata get _value => super._value as _$_TrackMetadata;
 
   @override
   $Res call({
@@ -298,7 +298,7 @@ class __$TrackMetadataCopyWithImpl<$Res>
     Object? source = freezed,
     Object? metadataSource = freezed,
   }) {
-    return _then(_TrackMetadata(
+    return _then(_$_TrackMetadata(
       title: title == freezed
           ? _value.title
           : title // ignore: cast_nullable_to_non_nullable
@@ -336,7 +336,7 @@ class __$TrackMetadataCopyWithImpl<$Res>
           : uri // ignore: cast_nullable_to_non_nullable
               as Uri,
       coverBytes: coverBytes == freezed
-          ? _value.coverBytes
+          ? _value._coverBytes
           : coverBytes // ignore: cast_nullable_to_non_nullable
               as List<int>?,
       coverUri: coverUri == freezed
@@ -452,7 +452,6 @@ class _$_TrackMetadata extends _TrackMetadata with DiagnosticableTreeMixin {
   final Uri uri;
 
   /// The raw bytes of the cover image. **DO NOT** STORE THIS IN THE DATABASE!
-  @JsonKey(ignore: true)
   final List<int>? _coverBytes;
 
   /// The raw bytes of the cover image. **DO NOT** STORE THIS IN THE DATABASE!
@@ -545,7 +544,7 @@ class _$_TrackMetadata extends _TrackMetadata with DiagnosticableTreeMixin {
   bool operator ==(dynamic other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _TrackMetadata &&
+            other is _$_TrackMetadata &&
             const DeepCollectionEquality().equals(other.title, title) &&
             const DeepCollectionEquality()
                 .equals(other.artistName, artistName) &&
@@ -559,7 +558,7 @@ class _$_TrackMetadata extends _TrackMetadata with DiagnosticableTreeMixin {
             const DeepCollectionEquality().equals(other.coverData, coverData) &&
             const DeepCollectionEquality().equals(other.uri, uri) &&
             const DeepCollectionEquality()
-                .equals(other.coverBytes, coverBytes) &&
+                .equals(other._coverBytes, _coverBytes) &&
             const DeepCollectionEquality().equals(other.coverUri, coverUri) &&
             const DeepCollectionEquality()
                 .equals(other.coverUriRemote, coverUriRemote) &&
@@ -589,7 +588,7 @@ class _$_TrackMetadata extends _TrackMetadata with DiagnosticableTreeMixin {
         const DeepCollectionEquality().hash(descriptionSource),
         const DeepCollectionEquality().hash(coverData),
         const DeepCollectionEquality().hash(uri),
-        const DeepCollectionEquality().hash(coverBytes),
+        const DeepCollectionEquality().hash(_coverBytes),
         const DeepCollectionEquality().hash(coverUri),
         const DeepCollectionEquality().hash(coverUriRemote),
         const DeepCollectionEquality().hash(coverSource),
@@ -604,8 +603,8 @@ class _$_TrackMetadata extends _TrackMetadata with DiagnosticableTreeMixin {
 
   @JsonKey(ignore: true)
   @override
-  _$TrackMetadataCopyWith<_TrackMetadata> get copyWith =>
-      __$TrackMetadataCopyWithImpl<_TrackMetadata>(this, _$identity);
+  _$$_TrackMetadataCopyWith<_$_TrackMetadata> get copyWith =>
+      __$$_TrackMetadataCopyWithImpl<_$_TrackMetadata>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
@@ -725,6 +724,6 @@ abstract class _TrackMetadata extends TrackMetadata {
   String? get metadataSource => throw _privateConstructorUsedError;
   @override
   @JsonKey(ignore: true)
-  _$TrackMetadataCopyWith<_TrackMetadata> get copyWith =>
+  _$$_TrackMetadataCopyWith<_$_TrackMetadata> get copyWith =>
       throw _privateConstructorUsedError;
 }

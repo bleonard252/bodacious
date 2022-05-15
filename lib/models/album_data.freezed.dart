@@ -152,11 +152,11 @@ class _$AlbumMetadataCopyWithImpl<$Res>
 }
 
 /// @nodoc
-abstract class _$AlbumMetadataCopyWith<$Res>
+abstract class _$$_AlbumMetadataCopyWith<$Res>
     implements $AlbumMetadataCopyWith<$Res> {
-  factory _$AlbumMetadataCopyWith(
-          _AlbumMetadata value, $Res Function(_AlbumMetadata) then) =
-      __$AlbumMetadataCopyWithImpl<$Res>;
+  factory _$$_AlbumMetadataCopyWith(
+          _$_AlbumMetadata value, $Res Function(_$_AlbumMetadata) then) =
+      __$$_AlbumMetadataCopyWithImpl<$Res>;
   @override
   $Res call(
       {String artistName,
@@ -174,15 +174,15 @@ abstract class _$AlbumMetadataCopyWith<$Res>
 }
 
 /// @nodoc
-class __$AlbumMetadataCopyWithImpl<$Res>
+class __$$_AlbumMetadataCopyWithImpl<$Res>
     extends _$AlbumMetadataCopyWithImpl<$Res>
-    implements _$AlbumMetadataCopyWith<$Res> {
-  __$AlbumMetadataCopyWithImpl(
-      _AlbumMetadata _value, $Res Function(_AlbumMetadata) _then)
-      : super(_value, (v) => _then(v as _AlbumMetadata));
+    implements _$$_AlbumMetadataCopyWith<$Res> {
+  __$$_AlbumMetadataCopyWithImpl(
+      _$_AlbumMetadata _value, $Res Function(_$_AlbumMetadata) _then)
+      : super(_value, (v) => _then(v as _$_AlbumMetadata));
 
   @override
-  _AlbumMetadata get _value => super._value as _AlbumMetadata;
+  _$_AlbumMetadata get _value => super._value as _$_AlbumMetadata;
 
   @override
   $Res call({
@@ -199,7 +199,7 @@ class __$AlbumMetadataCopyWithImpl<$Res>
     Object? spotifyId = freezed,
     Object? metadataSource = freezed,
   }) {
-    return _then(_AlbumMetadata(
+    return _then(_$_AlbumMetadata(
       artistName: artistName == freezed
           ? _value.artistName
           : artistName // ignore: cast_nullable_to_non_nullable
@@ -341,7 +341,7 @@ class _$_AlbumMetadata extends _AlbumMetadata with DiagnosticableTreeMixin {
   bool operator ==(dynamic other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _AlbumMetadata &&
+            other is _$_AlbumMetadata &&
             const DeepCollectionEquality()
                 .equals(other.artistName, artistName) &&
             const DeepCollectionEquality().equals(other.name, name) &&
@@ -383,8 +383,8 @@ class _$_AlbumMetadata extends _AlbumMetadata with DiagnosticableTreeMixin {
 
   @JsonKey(ignore: true)
   @override
-  _$AlbumMetadataCopyWith<_AlbumMetadata> get copyWith =>
-      __$AlbumMetadataCopyWithImpl<_AlbumMetadata>(this, _$identity);
+  _$$_AlbumMetadataCopyWith<_$_AlbumMetadata> get copyWith =>
+      __$$_AlbumMetadataCopyWithImpl<_$_AlbumMetadata>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
@@ -453,6 +453,6 @@ abstract class _AlbumMetadata extends AlbumMetadata {
   String? get metadataSource => throw _privateConstructorUsedError;
   @override
   @JsonKey(ignore: true)
-  _$AlbumMetadataCopyWith<_AlbumMetadata> get copyWith =>
+  _$$_AlbumMetadataCopyWith<_$_AlbumMetadata> get copyWith =>
       throw _privateConstructorUsedError;
 }

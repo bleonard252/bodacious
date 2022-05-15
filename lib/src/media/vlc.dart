@@ -99,9 +99,9 @@ class VlcAudioHandler extends BodaciousAudioHandler {
   seek(Duration position) => Future.sync(() => player.seek(position))
   .then((value) => playbackState.add(playbackState.value.copyWith(updatePosition: position)));
   @override
-  skipToNext() => Future.sync(() => player.current.index == null ? player.next() : player.jump(player.current.index!+1));
+  skipToNext() => Future.sync(() => player.current.index == null ? player.next() : player.jumpToIndex(player.current.index!+1));
   @override
-  skipToPrevious() => Future.sync(() => player.current.index == null ? player.back() : player.jump(player.current.index!-1));
+  skipToPrevious() => Future.sync(() => player.current.index == null ? player.previous() : player.jumpToIndex(player.current.index!-1));
   @override
   stop() => Future.sync(() => player.stop()).then((_) => super.stop());
 
@@ -132,12 +132,12 @@ class VlcAudioHandler extends BodaciousAudioHandler {
     player.open(vlc.Playlist(
       medias: queue.map((e) => mediaItemToVlcMedia(e)).toList()
     ), autoStart: true);
-    if (index != null) player.jump(index);
+    if (index != null) player.jumpToIndex(index);
     return super.updateQueue(queue, index);
   }
   @override
   skipToQueueItem(int index) {
-    player.jump(index);
+    player.jumpToIndex(index);
     return super.skipToQueueItem(index);
   }
   @override

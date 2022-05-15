@@ -38,7 +38,7 @@ abstract class TheIndexer {
   /// Don't try to touch the isolate before this aight
   static Future<void> spawn({bool force = false}) async {
     final _dbPath = await () async {
-      late final String dbPath;
+      late String dbPath;
       try {
         dbPath = (await getLibraryDirectory()).absolute.path+"/_boLibrary.sqlite";
       } catch(_) {

@@ -165,9 +165,9 @@ void main() async {
     child: MyApp(),
   ));
 
-  TheIndexer.spawn().catchError((error) => errors.add(error));
+  TheIndexer.spawn().catchError((error) => errors.add(error.toString()));
 
-  if (config.lastFmToken != null) {
+  if (config.lastFmToken != null && apiKeys.lastfmApiKey != null) {
     lastfm = LastFMAuthorized(
       apiKeys.lastfmApiKey!,
       secret: apiKeys.lastfmSecret!,

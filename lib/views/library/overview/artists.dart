@@ -13,14 +13,14 @@ class ArtistLibraryList extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return StreamBuilder<void>(
-      stream: db.select(db.artistTable).watch(),
+      stream: db.selectOnly(db.artistTable).watch(),
       builder: (context, _) {
-        return FutureBuilder<int>(
-          future: (db.selectOnly(db.artistTable)..addColumns([db.artistTable.name])).get().then((value) => value.length),
+        return FutureBuilder<List<TypedResult>>(
+          future: (db.selectOnly(db.artistTable)..addColumns([db.artistTable.name])).get(),
           builder: (context, snapshot) {
             return CustomScrollView(
               slivers: [
-                if (snapshot.connectionState != ConnectionState.done) SliverToBoxAdapter(child: Container())
+                if (snapshot.connectionState != ConnectionState.done) const SliverFillRemaining(child: Center(child: CircularProgressIndicator(value: null)))
                 else SliverList(
                   //itemExtent: 72.0,
                   delegate: SliverChildBuilderDelegate(
@@ -37,7 +37,7 @@ class ArtistLibraryList extends ConsumerWidget {
                         return ArtistWidget(artist);
                       },
                     ),
-                    childCount: snapshot.data ?? 0
+                    childCount: snapshot.data?.length ?? 0
                   )
                 ),
               ],
