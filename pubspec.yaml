@@ -15,8 +15,7 @@ environment:
 dependencies:
   # Audio Player Deps
   just_audio: ^0.9.20
-  just_audio_mpv:
-    path: ../just_audio_mpv
+  just_audio_mpv: ^0.0.1-pre.1
   #just_audio_libwinmedia: ^0.0.4
   #just_audio_background: ^0.0.1-beta.5
   audio_service: ^0.18.4
