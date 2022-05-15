@@ -15,10 +15,11 @@ environment:
 dependencies:
   # Audio Player Deps
   just_audio: ^0.9.20
+  just_audio_mpv:
+    path: ../just_audio_mpv
   #just_audio_libwinmedia: ^0.0.4
   #just_audio_background: ^0.0.1-beta.5
   audio_service: ^0.18.4
-  dart_vlc: ^0.2.0
   
   # Widget & Flutter Deps
   go_router: ^3.0.5
@@ -75,7 +76,7 @@ dev_dependencies:
   flutter_launcher_icons: ^0.9.2
   flutter_app_name: ^0.1.1
   drift_dev: ^1.6.0
-  
+
   # For testing
   mocktail: ^0.3.0
 

@@ -1,7 +1,6 @@
 
 import 'package:audio_service/audio_service.dart';
 import 'package:bodacious/drift/database.dart';
-import 'package:dart_vlc/dart_vlc.dart';
 import 'package:drift/drift.dart' hide JsonKey;
 import 'package:flinq/flinq.dart';
 import 'package:flutter/foundation.dart';
@@ -69,7 +68,6 @@ class TrackMetadata with _$TrackMetadata implements Insertable<TrackMetadata> {
 
   BodaciousMediaItem asMediaItem() => BodaciousMediaItem(this);
   BodaciousAudioSource asAudioSource() => BodaciousAudioSource(this);
-  BodaciousVlcMedia asVlcMedia() => BodaciousVlcMedia(this);
   
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -97,25 +95,6 @@ class TrackMetadata with _$TrackMetadata implements Insertable<TrackMetadata> {
 class BodaciousAudioSource extends UriAudioSource {
   final TrackMetadata parent;
   BodaciousAudioSource(this.parent) : super(parent.uri, duration: parent.duration);
-}
-class BodaciousVlcMedia implements Media {
-  final TrackMetadata parent;
-  BodaciousVlcMedia(this.parent);
-  
-  @override
-  MediaSourceType get mediaSourceType => MediaSourceType.media;
-  @override
-  final MediaType mediaType = MediaType.file; // rework so maybe later it can read from network
-  @override
-  Map<String, String> get metas => {};
-  @override
-  void parse(Duration timeout) {}
-  @override
-  String get resource => parent.uri.toFilePath();
-  @override
-  Duration get startTime => const Duration();
-  @override
-  Duration get stopTime => const Duration();
 }
 
 class BodaciousMediaItem extends MediaItem {

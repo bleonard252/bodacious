@@ -30,8 +30,8 @@ import 'package:bodacious/widgets/now_playing.dart';
 import 'package:bodacious/widgets/frame_size.dart';
 import 'package:bodacious/widgets/now_playing_sidebar.dart';
 import 'package:dart_discord_rpc/dart_discord_rpc.dart';
-import 'package:dart_vlc/dart_vlc.dart' show DartVLC;
 import 'package:drift/drift.dart' hide Column;
+import 'package:flinq/flinq.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -54,7 +54,7 @@ late final ReplaySubject<String> errors = ReplaySubject();
 
 void main() async {
   runApp(const SplashScreen());
-  try {DartVLC.initialize();} finally {}
+  //try {DartVLC.initialize();} finally {}
   if (Platform.isWindows || Platform.isLinux) {
     DiscordRPC.initialize();
     discord = DiscordRPC(applicationId: const String.fromEnvironment("DISCORD_APP_ID"));
@@ -66,17 +66,17 @@ void main() async {
   try {
     player = await AudioService.init<BodaciousAudioHandler>(
       builder: () {
-        if (Platform.isAndroid || Platform.isIOS || kIsWeb) {
+        if (Platform.isAndroid || Platform.isIOS || Platform.isLinux || kIsWeb) {
           return JustAudioHandler();
         } else {
-          return VlcAudioHandler();
+          throw UnsupportedError("Platform not supported");
         }
       },
       config: const AudioServiceConfig(
         androidNotificationChannelId: 'xyz.u1024256.bodacious.player',
         androidNotificationChannelName: 'Audio player',
         androidNotificationChannelDescription: "Bodacious puts your music in the notifications with this, which also lets it play in the background.",
-        androidNotificationOngoing: true,
+        //androidNotificationOngoing: true,
         androidNotificationIcon: "drawable/notification",
         androidStopForegroundOnPause: true,
         notificationColor: Colors.amber,
@@ -101,7 +101,7 @@ void main() async {
         if (kDebugMode) {
           print(update.id+" is not a supported URI.");
         }
-        continue;
+        yield nothingPlaying.copyWith(title: Uri.tryParse(update.id)?.pathSegments.lastOrNull);
       }
       if (!ref.state.hasValue) yield nothingPlaying.copyWith(uri: Uri.file(update.id));
       // final _dbEntry = await songStore.findFirst(db, finder: Finder(filter: Filter.equals('uri', Uri.file(update.id).toString())));

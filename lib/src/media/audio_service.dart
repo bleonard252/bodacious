@@ -3,14 +3,12 @@ import 'dart:io';
 
 import 'package:audio_service/audio_service.dart';
 import 'package:bodacious/main.dart';
-import 'package:dart_vlc/dart_vlc.dart' as vlc;
 import 'package:flinq/flinq.dart';
 import 'package:just_audio/just_audio.dart' as just;
 
 import '../../models/track_data.dart';
 
 part 'just_audio.dart';
-part 'vlc.dart';
 
 /// The audio handler for all of Bodacious.
 abstract class BodaciousAudioHandler extends BaseAudioHandler with SeekHandler {

@@ -264,9 +264,9 @@ class _NowPlayingViewState extends ConsumerState<NowPlayingView> {
                                       stream: player.playbackState,
                                       initialData: player.playbackState.valueOrNull,
                                       builder: (context, snapshot) => Tooltip(
-                                        message: player is VlcAudioHandler ? "Shuffling is not supported on this device" : snapshot.data?.shuffleMode != AudioServiceShuffleMode.none ? "Shuffling" : "Not shuffling",
+                                        message: snapshot.data?.shuffleMode != AudioServiceShuffleMode.none ? "Shuffling" : "Not shuffling",
                                         child: IconButton(
-                                          onPressed: player is VlcAudioHandler ? null : () => player.setShuffleMode(
+                                          onPressed: () => player.setShuffleMode(
                                             (snapshot.data?.shuffleMode == AudioServiceShuffleMode.none)
                                             ? AudioServiceShuffleMode.all
                                             : AudioServiceShuffleMode.none
