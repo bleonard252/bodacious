@@ -65,6 +65,8 @@ dependencies:
 
 dependency_overrides:
   xml: ^5.1.2
+  just_audio_mpv:
+    path: ../just_audio_mpv
 
 dev_dependencies:
   flutter_test:

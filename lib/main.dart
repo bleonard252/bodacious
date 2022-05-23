@@ -63,10 +63,12 @@ void main() async {
   db = BoDatabase();
   config = Config(await SharedPreferences.getInstance());
 
+  
+
   try {
     player = await AudioService.init<BodaciousAudioHandler>(
       builder: () {
-        if (Platform.isAndroid || Platform.isIOS || Platform.isLinux || kIsWeb) {
+        if (Platform.isAndroid || Platform.isIOS || Platform.isLinux || Platform.isWindows || kIsWeb) {
           return JustAudioHandler();
         } else {
           throw UnsupportedError("Platform not supported");

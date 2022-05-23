@@ -34,9 +34,11 @@ class SongLibraryList extends ConsumerWidget {
                     return SongWidget(
                       track,
                       selected: ref.watch(nowPlayingProvider).value?.uri == track.uri,
-                      onTap: () {
-                        player.prepareFromTrackMetadata(track);
-                        player.play();
+                      onTap: () async {
+                        //player.prepareFromTrackMetadata(track);
+                        player.stop();
+                        await player.updateQueue([snapshot.data!.asMediaItem()], 0);
+                        await player.play();
                       },
                     );
                     // return SizedBox(

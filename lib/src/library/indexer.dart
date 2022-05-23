@@ -505,7 +505,7 @@ class _IndexerIsolate {
   }
 
   Future<void> registerAlbumMetadata(TrackMetadata track) async {
-    assert(track.artistName != null && track.albumName != null);
+    //assert(track.artistName != null && track.albumName != null);
     if (track.artistName == null || track.albumName == null) return;
     final record = await db.tryGetAlbum(track.albumName!, by: track.albumName!);
     if (newAlbums.contains(track.artistName!+" - "+track.albumName!) || (record != null && !force)) return;
@@ -519,7 +519,7 @@ class _IndexerIsolate {
   }
 
   Future<void> registerArtistMetadata(TrackMetadata track) async {
-    assert(track.artistName != null);
+    //assert(track.artistName != null);
     if (track.artistName == null) return;
     //final record = artistStore.record(track.artistName!);
     final record = await db.tryGetArtist(track.artistName!);

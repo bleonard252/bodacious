@@ -492,9 +492,9 @@ packages:
   just_audio_mpv:
     dependency: "direct main"
     description:
-      name: just_audio_mpv
-      url: "https://pub.dartlang.org"
-    source: hosted
+      path: "../just_audio_mpv"
+      relative: true
+    source: path
     version: "0.0.1-pre.1"
   just_audio_platform_interface:
     dependency: transitive
@@ -948,7 +948,7 @@ packages:
       name: string_scanner
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.1.0"
+    version: "1.1.1"
   synchronized:
     dependency: transitive
     description:
