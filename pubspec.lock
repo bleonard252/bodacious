@@ -495,7 +495,7 @@ packages:
       path: "../just_audio_mpv"
       relative: true
     source: path
-    version: "0.0.1-pre.1"
+    version: "0.1.0"
   just_audio_platform_interface:
     dependency: transitive
     description:
@@ -1103,6 +1103,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.5.2"
+  window_manager:
+    dependency: "direct main"
+    description:
+      name: window_manager
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.2.3"
   xdg_directories:
     dependency: transitive
     description:

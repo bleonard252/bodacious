@@ -41,6 +41,7 @@ import 'package:lastfm/lastfm.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:window_manager/window_manager.dart';
 //import 'package:bitsdojo_window/bitsdojo_window.dart';
 
 late final BoDatabase db;
@@ -193,12 +194,29 @@ void main() async {
 late final StreamProvider<TrackMetadata> nowPlayingProvider;
 late final StreamProvider<Queue<TrackMetadata>> queueProvider;
 
-class MyApp extends ConsumerWidget {
-  const MyApp({Key? key}) : super(key: key);
+class MyApp extends ConsumerStatefulWidget {
+  const MyApp({super.key});
+
+  @override
+  ConsumerState<ConsumerStatefulWidget> createState() => _MyAppState();
+}
+
+class _MyAppState extends ConsumerState<MyApp> with WindowListener {
+  @override
+  void initState() {
+    windowManager.addListener(this);
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    windowManager.removeListener(this);
+    super.dispose();
+  }
 
   // This widget is the root of your application.
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Bodacious',
       theme: ThemeData.light().copyWith(
@@ -230,6 +248,12 @@ class MyApp extends ConsumerWidget {
         }
       )
     );
+  }
+
+  @override
+  void onWindowClose() async {
+    await player.stop();
+    super.onWindowClose();
   }
 }
 
