@@ -99,10 +99,11 @@ class BoDatabase extends _$BoDatabase {
 
 LazyDatabase _openConnection() {
   return LazyDatabase(() async {
-    late final String dbPath;
+    late String dbPath;
     try {
       dbPath = (await getLibraryDirectory()).absolute.path;
     } catch(_) {
+      print(_);
       try {
         dbPath = (await getApplicationSupportDirectory()).absolute.path;
       } catch(_) {

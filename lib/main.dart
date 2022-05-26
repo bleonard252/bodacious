@@ -62,8 +62,7 @@ void main() async {
   }
   db = BoDatabase();
   config = Config(await SharedPreferences.getInstance());
-
-  
+  await db.executor.ensureOpen(db);
 
   try {
     player = await AudioService.init<BodaciousAudioHandler>(
