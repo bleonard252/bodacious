@@ -45,8 +45,8 @@ class AlbumWidget extends ConsumerWidget {
           TextSpan(text: album.name)
         ])),
         subtitle: _subtitle.isEmpty ? null : Text.rich(TextSpan(children: _subtitle)),
-        onTap: onTap ?? () {
-          context.go("/library/albums/"+Uri.encodeComponent(album.artistName)+"/"+Uri.encodeComponent(album.name), extra: album);
+        onTap: onTap ?? () async {
+          context.go("/library/${album.artistId}/${album.id}", extra: album);
         },
         trailing: Builder(
           builder: (context) {

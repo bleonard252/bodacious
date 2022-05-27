@@ -20,14 +20,32 @@ TrackMetadata _$TrackMetadataFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$TrackMetadata {
+  /// The database ID of the track.
+  /// It is 7-20 characters long but is generally 13 characters long.
+  /// These IDs are unique but not ordered.
+  String get id => throw _privateConstructorUsedError;
+
   /// The song's title.
   String? get title => throw _privateConstructorUsedError;
 
-  /// The artist's name. Also used to look up the artist in the database.
+  /// The track artist's name.
   String? get artistName => throw _privateConstructorUsedError;
+
+  /// The name of the artist of the album.
+  String? get albumArtistName => throw _privateConstructorUsedError;
+
+  /// The database ID of the album artist.
+  String get albumArtistId => throw _privateConstructorUsedError;
+
+  /// The database ID of the track artist.
+  /// This is usually the same as [albumArtistId].
+  String get trackArtistId => throw _privateConstructorUsedError;
 
   /// The album's name. Also used with [artistName] to look up the album in the database.
   String? get albumName => throw _privateConstructorUsedError;
+
+  /// The album's database ID.
+  String get albumId => throw _privateConstructorUsedError;
 
   /// The position of the track on the named album.
   int? get trackNo => throw _privateConstructorUsedError;
@@ -95,9 +113,14 @@ abstract class $TrackMetadataCopyWith<$Res> {
           TrackMetadata value, $Res Function(TrackMetadata) then) =
       _$TrackMetadataCopyWithImpl<$Res>;
   $Res call(
-      {String? title,
+      {String id,
+      String? title,
       String? artistName,
+      String? albumArtistName,
+      String albumArtistId,
+      String trackArtistId,
       String? albumName,
+      String albumId,
       int? trackNo,
       int discNo,
       String? description,
@@ -128,9 +151,14 @@ class _$TrackMetadataCopyWithImpl<$Res>
 
   @override
   $Res call({
+    Object? id = freezed,
     Object? title = freezed,
     Object? artistName = freezed,
+    Object? albumArtistName = freezed,
+    Object? albumArtistId = freezed,
+    Object? trackArtistId = freezed,
     Object? albumName = freezed,
+    Object? albumId = freezed,
     Object? trackNo = freezed,
     Object? discNo = freezed,
     Object? description = freezed,
@@ -150,6 +178,10 @@ class _$TrackMetadataCopyWithImpl<$Res>
     Object? metadataSource = freezed,
   }) {
     return _then(_value.copyWith(
+      id: id == freezed
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
       title: title == freezed
           ? _value.title
           : title // ignore: cast_nullable_to_non_nullable
@@ -158,10 +190,26 @@ class _$TrackMetadataCopyWithImpl<$Res>
           ? _value.artistName
           : artistName // ignore: cast_nullable_to_non_nullable
               as String?,
+      albumArtistName: albumArtistName == freezed
+          ? _value.albumArtistName
+          : albumArtistName // ignore: cast_nullable_to_non_nullable
+              as String?,
+      albumArtistId: albumArtistId == freezed
+          ? _value.albumArtistId
+          : albumArtistId // ignore: cast_nullable_to_non_nullable
+              as String,
+      trackArtistId: trackArtistId == freezed
+          ? _value.trackArtistId
+          : trackArtistId // ignore: cast_nullable_to_non_nullable
+              as String,
       albumName: albumName == freezed
           ? _value.albumName
           : albumName // ignore: cast_nullable_to_non_nullable
               as String?,
+      albumId: albumId == freezed
+          ? _value.albumId
+          : albumId // ignore: cast_nullable_to_non_nullable
+              as String,
       trackNo: trackNo == freezed
           ? _value.trackNo
           : trackNo // ignore: cast_nullable_to_non_nullable
@@ -242,9 +290,14 @@ abstract class _$$_TrackMetadataCopyWith<$Res>
       __$$_TrackMetadataCopyWithImpl<$Res>;
   @override
   $Res call(
-      {String? title,
+      {String id,
+      String? title,
       String? artistName,
+      String? albumArtistName,
+      String albumArtistId,
+      String trackArtistId,
       String? albumName,
+      String albumId,
       int? trackNo,
       int discNo,
       String? description,
@@ -277,9 +330,14 @@ class __$$_TrackMetadataCopyWithImpl<$Res>
 
   @override
   $Res call({
+    Object? id = freezed,
     Object? title = freezed,
     Object? artistName = freezed,
+    Object? albumArtistName = freezed,
+    Object? albumArtistId = freezed,
+    Object? trackArtistId = freezed,
     Object? albumName = freezed,
+    Object? albumId = freezed,
     Object? trackNo = freezed,
     Object? discNo = freezed,
     Object? description = freezed,
@@ -299,6 +357,10 @@ class __$$_TrackMetadataCopyWithImpl<$Res>
     Object? metadataSource = freezed,
   }) {
     return _then(_$_TrackMetadata(
+      id: id == freezed
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
       title: title == freezed
           ? _value.title
           : title // ignore: cast_nullable_to_non_nullable
@@ -307,10 +369,26 @@ class __$$_TrackMetadataCopyWithImpl<$Res>
           ? _value.artistName
           : artistName // ignore: cast_nullable_to_non_nullable
               as String?,
+      albumArtistName: albumArtistName == freezed
+          ? _value.albumArtistName
+          : albumArtistName // ignore: cast_nullable_to_non_nullable
+              as String?,
+      albumArtistId: albumArtistId == freezed
+          ? _value.albumArtistId
+          : albumArtistId // ignore: cast_nullable_to_non_nullable
+              as String,
+      trackArtistId: trackArtistId == freezed
+          ? _value.trackArtistId
+          : trackArtistId // ignore: cast_nullable_to_non_nullable
+              as String,
       albumName: albumName == freezed
           ? _value.albumName
           : albumName // ignore: cast_nullable_to_non_nullable
               as String?,
+      albumId: albumId == freezed
+          ? _value.albumId
+          : albumId // ignore: cast_nullable_to_non_nullable
+              as String,
       trackNo: trackNo == freezed
           ? _value.trackNo
           : trackNo // ignore: cast_nullable_to_non_nullable
@@ -387,9 +465,14 @@ class __$$_TrackMetadataCopyWithImpl<$Res>
 @JsonSerializable()
 class _$_TrackMetadata extends _TrackMetadata with DiagnosticableTreeMixin {
   const _$_TrackMetadata(
-      {this.title,
+      {this.id = "",
+      this.title,
       this.artistName,
+      this.albumArtistName,
+      this.albumArtistId = "",
+      this.trackArtistId = "",
       this.albumName,
+      this.albumId = "",
       this.trackNo,
       this.discNo = 0,
       this.description,
@@ -413,17 +496,44 @@ class _$_TrackMetadata extends _TrackMetadata with DiagnosticableTreeMixin {
   factory _$_TrackMetadata.fromJson(Map<String, dynamic> json) =>
       _$$_TrackMetadataFromJson(json);
 
+  /// The database ID of the track.
+  /// It is 7-20 characters long but is generally 13 characters long.
+  /// These IDs are unique but not ordered.
+  @override
+  @JsonKey()
+  final String id;
+
   /// The song's title.
   @override
   final String? title;
 
-  /// The artist's name. Also used to look up the artist in the database.
+  /// The track artist's name.
   @override
   final String? artistName;
+
+  /// The name of the artist of the album.
+  @override
+  final String? albumArtistName;
+
+  /// The database ID of the album artist.
+  @override
+  @JsonKey()
+  final String albumArtistId;
+
+  /// The database ID of the track artist.
+  /// This is usually the same as [albumArtistId].
+  @override
+  @JsonKey()
+  final String trackArtistId;
 
   /// The album's name. Also used with [artistName] to look up the album in the database.
   @override
   final String? albumName;
+
+  /// The album's database ID.
+  @override
+  @JsonKey()
+  final String albumId;
 
   /// The position of the track on the named album.
   @override
@@ -510,7 +620,7 @@ class _$_TrackMetadata extends _TrackMetadata with DiagnosticableTreeMixin {
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'TrackMetadata(title: $title, artistName: $artistName, albumName: $albumName, trackNo: $trackNo, discNo: $discNo, description: $description, descriptionSource: $descriptionSource, coverData: $coverData, uri: $uri, coverBytes: $coverBytes, coverUri: $coverUri, coverUriRemote: $coverUriRemote, coverSource: $coverSource, duration: $duration, year: $year, releaseDate: $releaseDate, available: $available, spotifyId: $spotifyId, source: $source, metadataSource: $metadataSource)';
+    return 'TrackMetadata(id: $id, title: $title, artistName: $artistName, albumArtistName: $albumArtistName, albumArtistId: $albumArtistId, trackArtistId: $trackArtistId, albumName: $albumName, albumId: $albumId, trackNo: $trackNo, discNo: $discNo, description: $description, descriptionSource: $descriptionSource, coverData: $coverData, uri: $uri, coverBytes: $coverBytes, coverUri: $coverUri, coverUriRemote: $coverUriRemote, coverSource: $coverSource, duration: $duration, year: $year, releaseDate: $releaseDate, available: $available, spotifyId: $spotifyId, source: $source, metadataSource: $metadataSource)';
   }
 
   @override
@@ -518,9 +628,14 @@ class _$_TrackMetadata extends _TrackMetadata with DiagnosticableTreeMixin {
     super.debugFillProperties(properties);
     properties
       ..add(DiagnosticsProperty('type', 'TrackMetadata'))
+      ..add(DiagnosticsProperty('id', id))
       ..add(DiagnosticsProperty('title', title))
       ..add(DiagnosticsProperty('artistName', artistName))
+      ..add(DiagnosticsProperty('albumArtistName', albumArtistName))
+      ..add(DiagnosticsProperty('albumArtistId', albumArtistId))
+      ..add(DiagnosticsProperty('trackArtistId', trackArtistId))
       ..add(DiagnosticsProperty('albumName', albumName))
+      ..add(DiagnosticsProperty('albumId', albumId))
       ..add(DiagnosticsProperty('trackNo', trackNo))
       ..add(DiagnosticsProperty('discNo', discNo))
       ..add(DiagnosticsProperty('description', description))
@@ -545,10 +660,18 @@ class _$_TrackMetadata extends _TrackMetadata with DiagnosticableTreeMixin {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$_TrackMetadata &&
+            const DeepCollectionEquality().equals(other.id, id) &&
             const DeepCollectionEquality().equals(other.title, title) &&
             const DeepCollectionEquality()
                 .equals(other.artistName, artistName) &&
+            const DeepCollectionEquality()
+                .equals(other.albumArtistName, albumArtistName) &&
+            const DeepCollectionEquality()
+                .equals(other.albumArtistId, albumArtistId) &&
+            const DeepCollectionEquality()
+                .equals(other.trackArtistId, trackArtistId) &&
             const DeepCollectionEquality().equals(other.albumName, albumName) &&
+            const DeepCollectionEquality().equals(other.albumId, albumId) &&
             const DeepCollectionEquality().equals(other.trackNo, trackNo) &&
             const DeepCollectionEquality().equals(other.discNo, discNo) &&
             const DeepCollectionEquality()
@@ -579,9 +702,14 @@ class _$_TrackMetadata extends _TrackMetadata with DiagnosticableTreeMixin {
   @override
   int get hashCode => Object.hashAll([
         runtimeType,
+        const DeepCollectionEquality().hash(id),
         const DeepCollectionEquality().hash(title),
         const DeepCollectionEquality().hash(artistName),
+        const DeepCollectionEquality().hash(albumArtistName),
+        const DeepCollectionEquality().hash(albumArtistId),
+        const DeepCollectionEquality().hash(trackArtistId),
         const DeepCollectionEquality().hash(albumName),
+        const DeepCollectionEquality().hash(albumId),
         const DeepCollectionEquality().hash(trackNo),
         const DeepCollectionEquality().hash(discNo),
         const DeepCollectionEquality().hash(description),
@@ -614,9 +742,14 @@ class _$_TrackMetadata extends _TrackMetadata with DiagnosticableTreeMixin {
 
 abstract class _TrackMetadata extends TrackMetadata {
   const factory _TrackMetadata(
-      {final String? title,
+      {final String id,
+      final String? title,
       final String? artistName,
+      final String? albumArtistName,
+      final String albumArtistId,
+      final String trackArtistId,
       final String? albumName,
+      final String albumId,
       final int? trackNo,
       final int discNo,
       final String? description,
@@ -641,16 +774,39 @@ abstract class _TrackMetadata extends TrackMetadata {
 
   @override
 
+  /// The database ID of the track.
+  /// It is 7-20 characters long but is generally 13 characters long.
+  /// These IDs are unique but not ordered.
+  String get id => throw _privateConstructorUsedError;
+  @override
+
   /// The song's title.
   String? get title => throw _privateConstructorUsedError;
   @override
 
-  /// The artist's name. Also used to look up the artist in the database.
+  /// The track artist's name.
   String? get artistName => throw _privateConstructorUsedError;
+  @override
+
+  /// The name of the artist of the album.
+  String? get albumArtistName => throw _privateConstructorUsedError;
+  @override
+
+  /// The database ID of the album artist.
+  String get albumArtistId => throw _privateConstructorUsedError;
+  @override
+
+  /// The database ID of the track artist.
+  /// This is usually the same as [albumArtistId].
+  String get trackArtistId => throw _privateConstructorUsedError;
   @override
 
   /// The album's name. Also used with [artistName] to look up the album in the database.
   String? get albumName => throw _privateConstructorUsedError;
+  @override
+
+  /// The album's database ID.
+  String get albumId => throw _privateConstructorUsedError;
   @override
 
   /// The position of the track on the named album.

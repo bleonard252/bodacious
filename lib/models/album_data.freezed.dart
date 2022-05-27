@@ -20,8 +20,14 @@ AlbumMetadata _$AlbumMetadataFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$AlbumMetadata {
+  /// The database ID of the album.
+  /// It is 7-20 characters long but is generally 12 characters long.
+  /// These IDs are unique but not ordered.
+  String get id => throw _privateConstructorUsedError;
+
   /// The artist's name, used to group this album and make it unique.
   String get artistName => throw _privateConstructorUsedError;
+  String get artistId => throw _privateConstructorUsedError;
 
   /// The album's name.
   String get name => throw _privateConstructorUsedError;
@@ -60,7 +66,9 @@ abstract class $AlbumMetadataCopyWith<$Res> {
           AlbumMetadata value, $Res Function(AlbumMetadata) then) =
       _$AlbumMetadataCopyWithImpl<$Res>;
   $Res call(
-      {String artistName,
+      {String id,
+      String artistName,
+      String artistId,
       String name,
       Uri? coverUri,
       Uri? coverUriRemote,
@@ -85,7 +93,9 @@ class _$AlbumMetadataCopyWithImpl<$Res>
 
   @override
   $Res call({
+    Object? id = freezed,
     Object? artistName = freezed,
+    Object? artistId = freezed,
     Object? name = freezed,
     Object? coverUri = freezed,
     Object? coverUriRemote = freezed,
@@ -99,9 +109,17 @@ class _$AlbumMetadataCopyWithImpl<$Res>
     Object? metadataSource = freezed,
   }) {
     return _then(_value.copyWith(
+      id: id == freezed
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
       artistName: artistName == freezed
           ? _value.artistName
           : artistName // ignore: cast_nullable_to_non_nullable
+              as String,
+      artistId: artistId == freezed
+          ? _value.artistId
+          : artistId // ignore: cast_nullable_to_non_nullable
               as String,
       name: name == freezed
           ? _value.name
@@ -159,7 +177,9 @@ abstract class _$$_AlbumMetadataCopyWith<$Res>
       __$$_AlbumMetadataCopyWithImpl<$Res>;
   @override
   $Res call(
-      {String artistName,
+      {String id,
+      String artistName,
+      String artistId,
       String name,
       Uri? coverUri,
       Uri? coverUriRemote,
@@ -186,7 +206,9 @@ class __$$_AlbumMetadataCopyWithImpl<$Res>
 
   @override
   $Res call({
+    Object? id = freezed,
     Object? artistName = freezed,
+    Object? artistId = freezed,
     Object? name = freezed,
     Object? coverUri = freezed,
     Object? coverUriRemote = freezed,
@@ -200,9 +222,17 @@ class __$$_AlbumMetadataCopyWithImpl<$Res>
     Object? metadataSource = freezed,
   }) {
     return _then(_$_AlbumMetadata(
+      id: id == freezed
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
       artistName: artistName == freezed
           ? _value.artistName
           : artistName // ignore: cast_nullable_to_non_nullable
+              as String,
+      artistId: artistId == freezed
+          ? _value.artistId
+          : artistId // ignore: cast_nullable_to_non_nullable
               as String,
       name: name == freezed
           ? _value.name
@@ -256,7 +286,9 @@ class __$$_AlbumMetadataCopyWithImpl<$Res>
 @JsonSerializable()
 class _$_AlbumMetadata extends _AlbumMetadata with DiagnosticableTreeMixin {
   const _$_AlbumMetadata(
-      {required this.artistName,
+      {this.id = "",
+      required this.artistName,
+      this.artistId = "",
       required this.name,
       this.coverUri,
       this.coverUriRemote,
@@ -273,9 +305,19 @@ class _$_AlbumMetadata extends _AlbumMetadata with DiagnosticableTreeMixin {
   factory _$_AlbumMetadata.fromJson(Map<String, dynamic> json) =>
       _$$_AlbumMetadataFromJson(json);
 
+  /// The database ID of the album.
+  /// It is 7-20 characters long but is generally 12 characters long.
+  /// These IDs are unique but not ordered.
+  @override
+  @JsonKey()
+  final String id;
+
   /// The artist's name, used to group this album and make it unique.
   @override
   final String artistName;
+  @override
+  @JsonKey()
+  final String artistId;
 
   /// The album's name.
   @override
@@ -315,7 +357,7 @@ class _$_AlbumMetadata extends _AlbumMetadata with DiagnosticableTreeMixin {
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'AlbumMetadata(artistName: $artistName, name: $name, coverUri: $coverUri, coverUriRemote: $coverUriRemote, coverSource: $coverSource, description: $description, descriptionSource: $descriptionSource, trackCount: $trackCount, year: $year, releaseDate: $releaseDate, spotifyId: $spotifyId, metadataSource: $metadataSource)';
+    return 'AlbumMetadata(id: $id, artistName: $artistName, artistId: $artistId, name: $name, coverUri: $coverUri, coverUriRemote: $coverUriRemote, coverSource: $coverSource, description: $description, descriptionSource: $descriptionSource, trackCount: $trackCount, year: $year, releaseDate: $releaseDate, spotifyId: $spotifyId, metadataSource: $metadataSource)';
   }
 
   @override
@@ -323,7 +365,9 @@ class _$_AlbumMetadata extends _AlbumMetadata with DiagnosticableTreeMixin {
     super.debugFillProperties(properties);
     properties
       ..add(DiagnosticsProperty('type', 'AlbumMetadata'))
+      ..add(DiagnosticsProperty('id', id))
       ..add(DiagnosticsProperty('artistName', artistName))
+      ..add(DiagnosticsProperty('artistId', artistId))
       ..add(DiagnosticsProperty('name', name))
       ..add(DiagnosticsProperty('coverUri', coverUri))
       ..add(DiagnosticsProperty('coverUriRemote', coverUriRemote))
@@ -342,8 +386,10 @@ class _$_AlbumMetadata extends _AlbumMetadata with DiagnosticableTreeMixin {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$_AlbumMetadata &&
+            const DeepCollectionEquality().equals(other.id, id) &&
             const DeepCollectionEquality()
                 .equals(other.artistName, artistName) &&
+            const DeepCollectionEquality().equals(other.artistId, artistId) &&
             const DeepCollectionEquality().equals(other.name, name) &&
             const DeepCollectionEquality().equals(other.coverUri, coverUri) &&
             const DeepCollectionEquality()
@@ -368,7 +414,9 @@ class _$_AlbumMetadata extends _AlbumMetadata with DiagnosticableTreeMixin {
   @override
   int get hashCode => Object.hash(
       runtimeType,
+      const DeepCollectionEquality().hash(id),
       const DeepCollectionEquality().hash(artistName),
+      const DeepCollectionEquality().hash(artistId),
       const DeepCollectionEquality().hash(name),
       const DeepCollectionEquality().hash(coverUri),
       const DeepCollectionEquality().hash(coverUriRemote),
@@ -394,7 +442,9 @@ class _$_AlbumMetadata extends _AlbumMetadata with DiagnosticableTreeMixin {
 
 abstract class _AlbumMetadata extends AlbumMetadata {
   const factory _AlbumMetadata(
-      {required final String artistName,
+      {final String id,
+      required final String artistName,
+      final String artistId,
       required final String name,
       final Uri? coverUri,
       final Uri? coverUriRemote,
@@ -413,8 +463,16 @@ abstract class _AlbumMetadata extends AlbumMetadata {
 
   @override
 
+  /// The database ID of the album.
+  /// It is 7-20 characters long but is generally 12 characters long.
+  /// These IDs are unique but not ordered.
+  String get id => throw _privateConstructorUsedError;
+  @override
+
   /// The artist's name, used to group this album and make it unique.
   String get artistName => throw _privateConstructorUsedError;
+  @override
+  String get artistId => throw _privateConstructorUsedError;
   @override
 
   /// The album's name.

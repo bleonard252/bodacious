@@ -53,6 +53,7 @@ Future<TrackMetadata> loadID3FromBytes(List<int> bytes, File file, {String? cach
         for (var element in (block as VorbisComment).comments) {
           if (element.startsWith("TITLE=")) flacdata.putIfAbsent("title", () => element.replaceFirst("TITLE=", ""));
           if (element.startsWith("ARTIST=")) flacdata.putIfAbsent("artist", () => element.replaceFirst("ARTIST=", ""));
+          if (element.startsWith("ALBUMARTIST=")) flacdata.putIfAbsent("albumartist", () => element.replaceFirst("ALBUMARTIST=", ""));
           if (element.startsWith("ALBUM=")) flacdata.putIfAbsent("album", () => element.replaceFirst("ALBUM=", ""));
           if (element.startsWith("TRACKNUMBER=")) flacdata.putIfAbsent("track", () => element.replaceFirst("TRACKNUMBER=", ""));
           if (element.startsWith("DISCNUMBER=")) flacdata.putIfAbsent("disc", () => element.replaceFirst("DISCNUMBER=", ""));
@@ -100,6 +101,7 @@ Future<TrackMetadata> loadID3FromBytes(List<int> bytes, File file, {String? cach
     title: flacdata["title"] ?? rawTags["Title"],
     artistName: flacdata["artist"] ?? rawTags["Artist"],
     albumName: flacdata["album"] ?? rawTags["Album"],
+    albumArtistName: flacdata["albumartist"] ?? rawTags["TPE2"],
     year: int.tryParse(flacdata["year"] ?? rawTags["Year"] ?? ""),
     //coverData: descriptor,
     trackNo: int.tryParse((flacdata["track"] ?? rawTags["Track"] ?? "").replaceFirst(RegExp(r"\/[0-9]*"), "")),

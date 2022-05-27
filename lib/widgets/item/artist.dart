@@ -74,7 +74,7 @@ class ArtistWidget extends ConsumerWidget {
         ])),
         subtitle: _subtitle.isEmpty ? null : Text.rich(TextSpan(children: _subtitle)),
         onTap: onTap ?? () {
-          context.go("/library/artists/"+Uri.encodeComponent(artist.name), extra: artist);
+          context.go("/library/${artist.id}", extra: artist);
         },
       ),
     );

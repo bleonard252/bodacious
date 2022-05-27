@@ -1,13 +1,21 @@
+import 'package:bodacious/drift/album_data.dart';
 import 'package:bodacious/models/track_data.dart';
 import 'package:drift/drift.dart';
+import 'package:nanoid/non_secure.dart';
+
+import 'artist_data.dart';
 
 @UseRowClass(TrackMetadata)
 class TrackTable extends Table {
   @override
-  get primaryKey => {uri};
+  get primaryKey => {id};
+  TextColumn get id => text().withLength(max: 20, min: 7).clientDefault(() => nanoid(13))();
   TextColumn get title => text().nullable()();
   TextColumn get artistName => text().nullable()();
+  TextColumn get albumArtistId => text().references(ArtistTable, #id)();
+  TextColumn get trackArtistId => text().references(ArtistTable, #id)();
   TextColumn get albumName => text().nullable()();
+  TextColumn get albumId => text().references(AlbumTable, #id)();
   IntColumn get trackNo => integer().withDefault(const Constant(0))();
   IntColumn get discNo => integer().withDefault(const Constant(0))();
   TextColumn get description => text().nullable()();

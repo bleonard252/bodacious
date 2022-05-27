@@ -8,7 +8,9 @@ part of 'album_data.dart';
 
 _$_AlbumMetadata _$$_AlbumMetadataFromJson(Map<String, dynamic> json) =>
     _$_AlbumMetadata(
+      id: json['id'] as String? ?? "",
       artistName: json['artistName'] as String,
+      artistId: json['artistId'] as String? ?? "",
       name: json['name'] as String,
       coverUri: json['coverUri'] == null
           ? null
@@ -30,7 +32,9 @@ _$_AlbumMetadata _$$_AlbumMetadataFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$$_AlbumMetadataToJson(_$_AlbumMetadata instance) =>
     <String, dynamic>{
+      'id': instance.id,
       'artistName': instance.artistName,
+      'artistId': instance.artistId,
       'name': instance.name,
       'coverUri': instance.coverUri?.toString(),
       'coverUriRemote': instance.coverUriRemote?.toString(),

@@ -8,6 +8,7 @@ part of 'artist_data.dart';
 
 _$_ArtistMetadata _$$_ArtistMetadataFromJson(Map<String, dynamic> json) =>
     _$_ArtistMetadata(
+      id: json['id'] as String? ?? "",
       name: json['name'] as String,
       coverUri: json['coverUri'] == null
           ? null
@@ -26,6 +27,7 @@ _$_ArtistMetadata _$$_ArtistMetadataFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$$_ArtistMetadataToJson(_$_ArtistMetadata instance) =>
     <String, dynamic>{
+      'id': instance.id,
       'name': instance.name,
       'coverUri': instance.coverUri?.toString(),
       'coverUriRemote': instance.coverUriRemote?.toString(),

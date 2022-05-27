@@ -8,9 +8,14 @@ part of 'track_data.dart';
 
 _$_TrackMetadata _$$_TrackMetadataFromJson(Map<String, dynamic> json) =>
     _$_TrackMetadata(
+      id: json['id'] as String? ?? "",
       title: json['title'] as String?,
       artistName: json['artistName'] as String?,
+      albumArtistName: json['albumArtistName'] as String?,
+      albumArtistId: json['albumArtistId'] as String? ?? "",
+      trackArtistId: json['trackArtistId'] as String? ?? "",
       albumName: json['albumName'] as String?,
+      albumId: json['albumId'] as String? ?? "",
       trackNo: json['trackNo'] as int?,
       discNo: json['discNo'] as int? ?? 0,
       description: json['description'] as String?,
@@ -38,9 +43,14 @@ _$_TrackMetadata _$$_TrackMetadataFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$$_TrackMetadataToJson(_$_TrackMetadata instance) =>
     <String, dynamic>{
+      'id': instance.id,
       'title': instance.title,
       'artistName': instance.artistName,
+      'albumArtistName': instance.albumArtistName,
+      'albumArtistId': instance.albumArtistId,
+      'trackArtistId': instance.trackArtistId,
       'albumName': instance.albumName,
+      'albumId': instance.albumId,
       'trackNo': instance.trackNo,
       'discNo': instance.discNo,
       'description': instance.description,

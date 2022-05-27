@@ -495,7 +495,7 @@ packages:
       path: "../just_audio_mpv"
       relative: true
     source: path
-    version: "0.1.0"
+    version: "0.1.1"
   just_audio_platform_interface:
     dependency: transitive
     description:
@@ -580,6 +580,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.0.1"
+  nanoid:
+    dependency: "direct main"
+    description:
+      name: nanoid
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.0"
   node_preamble:
     dependency: transitive
     description:

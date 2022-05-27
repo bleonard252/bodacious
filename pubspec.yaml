@@ -63,6 +63,7 @@ dependencies:
   path: ^1.8.1
   shared_preferences: ^2.0.13
   window_manager: ^0.2.3
+  nanoid: ^1.0.0
 
 dependency_overrides:
   xml: ^5.1.2

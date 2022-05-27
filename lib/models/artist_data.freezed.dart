@@ -20,6 +20,11 @@ ArtistMetadata _$ArtistMetadataFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$ArtistMetadata {
+  /// The database ID of the artist.
+  /// It is 7-20 characters long but is generally 10 characters long.
+  /// These IDs are unique but not ordered.
+  String get id => throw _privateConstructorUsedError;
+
   /// The artist's name.
   String get name => throw _privateConstructorUsedError;
 
@@ -60,7 +65,8 @@ abstract class $ArtistMetadataCopyWith<$Res> {
           ArtistMetadata value, $Res Function(ArtistMetadata) then) =
       _$ArtistMetadataCopyWithImpl<$Res>;
   $Res call(
-      {String name,
+      {String id,
+      String name,
       Uri? coverUri,
       Uri? coverUriRemote,
       String? coverSource,
@@ -83,6 +89,7 @@ class _$ArtistMetadataCopyWithImpl<$Res>
 
   @override
   $Res call({
+    Object? id = freezed,
     Object? name = freezed,
     Object? coverUri = freezed,
     Object? coverUriRemote = freezed,
@@ -95,6 +102,10 @@ class _$ArtistMetadataCopyWithImpl<$Res>
     Object? metadataSource = freezed,
   }) {
     return _then(_value.copyWith(
+      id: id == freezed
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
       name: name == freezed
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
@@ -147,7 +158,8 @@ abstract class _$$_ArtistMetadataCopyWith<$Res>
       __$$_ArtistMetadataCopyWithImpl<$Res>;
   @override
   $Res call(
-      {String name,
+      {String id,
+      String name,
       Uri? coverUri,
       Uri? coverUriRemote,
       String? coverSource,
@@ -172,6 +184,7 @@ class __$$_ArtistMetadataCopyWithImpl<$Res>
 
   @override
   $Res call({
+    Object? id = freezed,
     Object? name = freezed,
     Object? coverUri = freezed,
     Object? coverUriRemote = freezed,
@@ -184,6 +197,10 @@ class __$$_ArtistMetadataCopyWithImpl<$Res>
     Object? metadataSource = freezed,
   }) {
     return _then(_$_ArtistMetadata(
+      id: id == freezed
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
       name: name == freezed
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
@@ -232,7 +249,8 @@ class __$$_ArtistMetadataCopyWithImpl<$Res>
 @JsonSerializable()
 class _$_ArtistMetadata extends _ArtistMetadata with DiagnosticableTreeMixin {
   const _$_ArtistMetadata(
-      {required this.name,
+      {this.id = "",
+      required this.name,
       this.coverUri,
       this.coverUriRemote,
       this.coverSource,
@@ -246,6 +264,13 @@ class _$_ArtistMetadata extends _ArtistMetadata with DiagnosticableTreeMixin {
 
   factory _$_ArtistMetadata.fromJson(Map<String, dynamic> json) =>
       _$$_ArtistMetadataFromJson(json);
+
+  /// The database ID of the artist.
+  /// It is 7-20 characters long but is generally 10 characters long.
+  /// These IDs are unique but not ordered.
+  @override
+  @JsonKey()
+  final String id;
 
   /// The artist's name.
   @override
@@ -287,7 +312,7 @@ class _$_ArtistMetadata extends _ArtistMetadata with DiagnosticableTreeMixin {
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'ArtistMetadata(name: $name, coverUri: $coverUri, coverUriRemote: $coverUriRemote, coverSource: $coverSource, description: $description, descriptionSource: $descriptionSource, albumCount: $albumCount, trackCount: $trackCount, spotifyId: $spotifyId, metadataSource: $metadataSource)';
+    return 'ArtistMetadata(id: $id, name: $name, coverUri: $coverUri, coverUriRemote: $coverUriRemote, coverSource: $coverSource, description: $description, descriptionSource: $descriptionSource, albumCount: $albumCount, trackCount: $trackCount, spotifyId: $spotifyId, metadataSource: $metadataSource)';
   }
 
   @override
@@ -295,6 +320,7 @@ class _$_ArtistMetadata extends _ArtistMetadata with DiagnosticableTreeMixin {
     super.debugFillProperties(properties);
     properties
       ..add(DiagnosticsProperty('type', 'ArtistMetadata'))
+      ..add(DiagnosticsProperty('id', id))
       ..add(DiagnosticsProperty('name', name))
       ..add(DiagnosticsProperty('coverUri', coverUri))
       ..add(DiagnosticsProperty('coverUriRemote', coverUriRemote))
@@ -312,6 +338,7 @@ class _$_ArtistMetadata extends _ArtistMetadata with DiagnosticableTreeMixin {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$_ArtistMetadata &&
+            const DeepCollectionEquality().equals(other.id, id) &&
             const DeepCollectionEquality().equals(other.name, name) &&
             const DeepCollectionEquality().equals(other.coverUri, coverUri) &&
             const DeepCollectionEquality()
@@ -335,6 +362,7 @@ class _$_ArtistMetadata extends _ArtistMetadata with DiagnosticableTreeMixin {
   @override
   int get hashCode => Object.hash(
       runtimeType,
+      const DeepCollectionEquality().hash(id),
       const DeepCollectionEquality().hash(name),
       const DeepCollectionEquality().hash(coverUri),
       const DeepCollectionEquality().hash(coverUriRemote),
@@ -359,7 +387,8 @@ class _$_ArtistMetadata extends _ArtistMetadata with DiagnosticableTreeMixin {
 
 abstract class _ArtistMetadata extends ArtistMetadata {
   const factory _ArtistMetadata(
-      {required final String name,
+      {final String id,
+      required final String name,
       final Uri? coverUri,
       final Uri? coverUriRemote,
       final String? coverSource,
@@ -374,6 +403,12 @@ abstract class _ArtistMetadata extends ArtistMetadata {
   factory _ArtistMetadata.fromJson(Map<String, dynamic> json) =
       _$_ArtistMetadata.fromJson;
 
+  @override
+
+  /// The database ID of the artist.
+  /// It is 7-20 characters long but is generally 10 characters long.
+  /// These IDs are unique but not ordered.
+  String get id => throw _privateConstructorUsedError;
   @override
 
   /// The artist's name.

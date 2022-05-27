@@ -7,9 +7,354 @@ part of 'database.dart';
 // **************************************************************************
 
 // ignore_for_file: type=lint
+class ArtistTableCompanion extends UpdateCompanion<ArtistMetadata> {
+  final Value<String> id;
+  final Value<String> name;
+  final Value<Uri?> coverUri;
+  final Value<Uri?> coverUriRemote;
+  final Value<String?> coverSource;
+  final Value<String?> description;
+  final Value<String?> descriptionSource;
+  final Value<int?> trackCount;
+  final Value<int?> albumCount;
+  final Value<String?> spotifyId;
+  final Value<String?> metadataSource;
+  const ArtistTableCompanion({
+    this.id = const Value.absent(),
+    this.name = const Value.absent(),
+    this.coverUri = const Value.absent(),
+    this.coverUriRemote = const Value.absent(),
+    this.coverSource = const Value.absent(),
+    this.description = const Value.absent(),
+    this.descriptionSource = const Value.absent(),
+    this.trackCount = const Value.absent(),
+    this.albumCount = const Value.absent(),
+    this.spotifyId = const Value.absent(),
+    this.metadataSource = const Value.absent(),
+  });
+  ArtistTableCompanion.insert({
+    this.id = const Value.absent(),
+    required String name,
+    this.coverUri = const Value.absent(),
+    this.coverUriRemote = const Value.absent(),
+    this.coverSource = const Value.absent(),
+    this.description = const Value.absent(),
+    this.descriptionSource = const Value.absent(),
+    this.trackCount = const Value.absent(),
+    this.albumCount = const Value.absent(),
+    this.spotifyId = const Value.absent(),
+    this.metadataSource = const Value.absent(),
+  }) : name = Value(name);
+  static Insertable<ArtistMetadata> custom({
+    Expression<String>? id,
+    Expression<String>? name,
+    Expression<Uri?>? coverUri,
+    Expression<Uri?>? coverUriRemote,
+    Expression<String?>? coverSource,
+    Expression<String?>? description,
+    Expression<String?>? descriptionSource,
+    Expression<int?>? trackCount,
+    Expression<int?>? albumCount,
+    Expression<String?>? spotifyId,
+    Expression<String?>? metadataSource,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (name != null) 'name': name,
+      if (coverUri != null) 'cover_uri': coverUri,
+      if (coverUriRemote != null) 'cover_uri_remote': coverUriRemote,
+      if (coverSource != null) 'cover_source': coverSource,
+      if (description != null) 'description': description,
+      if (descriptionSource != null) 'description_source': descriptionSource,
+      if (trackCount != null) 'track_count': trackCount,
+      if (albumCount != null) 'album_count': albumCount,
+      if (spotifyId != null) 'spotify_id': spotifyId,
+      if (metadataSource != null) 'metadata_source': metadataSource,
+    });
+  }
+
+  ArtistTableCompanion copyWith(
+      {Value<String>? id,
+      Value<String>? name,
+      Value<Uri?>? coverUri,
+      Value<Uri?>? coverUriRemote,
+      Value<String?>? coverSource,
+      Value<String?>? description,
+      Value<String?>? descriptionSource,
+      Value<int?>? trackCount,
+      Value<int?>? albumCount,
+      Value<String?>? spotifyId,
+      Value<String?>? metadataSource}) {
+    return ArtistTableCompanion(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      coverUri: coverUri ?? this.coverUri,
+      coverUriRemote: coverUriRemote ?? this.coverUriRemote,
+      coverSource: coverSource ?? this.coverSource,
+      description: description ?? this.description,
+      descriptionSource: descriptionSource ?? this.descriptionSource,
+      trackCount: trackCount ?? this.trackCount,
+      albumCount: albumCount ?? this.albumCount,
+      spotifyId: spotifyId ?? this.spotifyId,
+      metadataSource: metadataSource ?? this.metadataSource,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (coverUri.present) {
+      final converter = $ArtistTableTable.$converter0;
+      map['cover_uri'] = Variable<String?>(converter.mapToSql(coverUri.value));
+    }
+    if (coverUriRemote.present) {
+      final converter = $ArtistTableTable.$converter1;
+      map['cover_uri_remote'] =
+          Variable<String?>(converter.mapToSql(coverUriRemote.value));
+    }
+    if (coverSource.present) {
+      map['cover_source'] = Variable<String?>(coverSource.value);
+    }
+    if (description.present) {
+      map['description'] = Variable<String?>(description.value);
+    }
+    if (descriptionSource.present) {
+      map['description_source'] = Variable<String?>(descriptionSource.value);
+    }
+    if (trackCount.present) {
+      map['track_count'] = Variable<int?>(trackCount.value);
+    }
+    if (albumCount.present) {
+      map['album_count'] = Variable<int?>(albumCount.value);
+    }
+    if (spotifyId.present) {
+      map['spotify_id'] = Variable<String?>(spotifyId.value);
+    }
+    if (metadataSource.present) {
+      map['metadata_source'] = Variable<String?>(metadataSource.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ArtistTableCompanion(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('coverUri: $coverUri, ')
+          ..write('coverUriRemote: $coverUriRemote, ')
+          ..write('coverSource: $coverSource, ')
+          ..write('description: $description, ')
+          ..write('descriptionSource: $descriptionSource, ')
+          ..write('trackCount: $trackCount, ')
+          ..write('albumCount: $albumCount, ')
+          ..write('spotifyId: $spotifyId, ')
+          ..write('metadataSource: $metadataSource')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $ArtistTableTable extends ArtistTable
+    with TableInfo<$ArtistTableTable, ArtistMetadata> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ArtistTableTable(this.attachedDatabase, [this._alias]);
+  final VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String?> id = GeneratedColumn<String?>(
+      'id', aliasedName, false,
+      additionalChecks:
+          GeneratedColumn.checkTextLength(minTextLength: 7, maxTextLength: 20),
+      type: const StringType(),
+      requiredDuringInsert: false,
+      clientDefault: () => nanoid(10));
+  final VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String?> name = GeneratedColumn<String?>(
+      'name', aliasedName, false,
+      type: const StringType(), requiredDuringInsert: true);
+  final VerificationMeta _coverUriMeta = const VerificationMeta('coverUri');
+  @override
+  late final GeneratedColumnWithTypeConverter<Uri, String?> coverUri =
+      GeneratedColumn<String?>('cover_uri', aliasedName, true,
+              type: const StringType(), requiredDuringInsert: false)
+          .withConverter<Uri>($ArtistTableTable.$converter0);
+  final VerificationMeta _coverUriRemoteMeta =
+      const VerificationMeta('coverUriRemote');
+  @override
+  late final GeneratedColumnWithTypeConverter<Uri, String?> coverUriRemote =
+      GeneratedColumn<String?>('cover_uri_remote', aliasedName, true,
+              type: const StringType(), requiredDuringInsert: false)
+          .withConverter<Uri>($ArtistTableTable.$converter1);
+  final VerificationMeta _coverSourceMeta =
+      const VerificationMeta('coverSource');
+  @override
+  late final GeneratedColumn<String?> coverSource = GeneratedColumn<String?>(
+      'cover_source', aliasedName, true,
+      type: const StringType(), requiredDuringInsert: false);
+  final VerificationMeta _descriptionMeta =
+      const VerificationMeta('description');
+  @override
+  late final GeneratedColumn<String?> description = GeneratedColumn<String?>(
+      'description', aliasedName, true,
+      type: const StringType(), requiredDuringInsert: false);
+  final VerificationMeta _descriptionSourceMeta =
+      const VerificationMeta('descriptionSource');
+  @override
+  late final GeneratedColumn<String?> descriptionSource =
+      GeneratedColumn<String?>('description_source', aliasedName, true,
+          type: const StringType(), requiredDuringInsert: false);
+  final VerificationMeta _trackCountMeta = const VerificationMeta('trackCount');
+  @override
+  late final GeneratedColumn<int?> trackCount = GeneratedColumn<int?>(
+      'track_count', aliasedName, true,
+      type: const IntType(), requiredDuringInsert: false);
+  final VerificationMeta _albumCountMeta = const VerificationMeta('albumCount');
+  @override
+  late final GeneratedColumn<int?> albumCount = GeneratedColumn<int?>(
+      'album_count', aliasedName, true,
+      type: const IntType(), requiredDuringInsert: false);
+  final VerificationMeta _spotifyIdMeta = const VerificationMeta('spotifyId');
+  @override
+  late final GeneratedColumn<String?> spotifyId = GeneratedColumn<String?>(
+      'spotify_id', aliasedName, true,
+      type: const StringType(), requiredDuringInsert: false);
+  final VerificationMeta _metadataSourceMeta =
+      const VerificationMeta('metadataSource');
+  @override
+  late final GeneratedColumn<String?> metadataSource = GeneratedColumn<String?>(
+      'metadata_source', aliasedName, true,
+      type: const StringType(), requiredDuringInsert: false);
+  @override
+  List<GeneratedColumn> get $columns => [
+        id,
+        name,
+        coverUri,
+        coverUriRemote,
+        coverSource,
+        description,
+        descriptionSource,
+        trackCount,
+        albumCount,
+        spotifyId,
+        metadataSource
+      ];
+  @override
+  String get aliasedName => _alias ?? 'artist_table';
+  @override
+  String get actualTableName => 'artist_table';
+  @override
+  VerificationContext validateIntegrity(Insertable<ArtistMetadata> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+          _nameMeta, name.isAcceptableOrUnknown(data['name']!, _nameMeta));
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    context.handle(_coverUriMeta, const VerificationResult.success());
+    context.handle(_coverUriRemoteMeta, const VerificationResult.success());
+    if (data.containsKey('cover_source')) {
+      context.handle(
+          _coverSourceMeta,
+          coverSource.isAcceptableOrUnknown(
+              data['cover_source']!, _coverSourceMeta));
+    }
+    if (data.containsKey('description')) {
+      context.handle(
+          _descriptionMeta,
+          description.isAcceptableOrUnknown(
+              data['description']!, _descriptionMeta));
+    }
+    if (data.containsKey('description_source')) {
+      context.handle(
+          _descriptionSourceMeta,
+          descriptionSource.isAcceptableOrUnknown(
+              data['description_source']!, _descriptionSourceMeta));
+    }
+    if (data.containsKey('track_count')) {
+      context.handle(
+          _trackCountMeta,
+          trackCount.isAcceptableOrUnknown(
+              data['track_count']!, _trackCountMeta));
+    }
+    if (data.containsKey('album_count')) {
+      context.handle(
+          _albumCountMeta,
+          albumCount.isAcceptableOrUnknown(
+              data['album_count']!, _albumCountMeta));
+    }
+    if (data.containsKey('spotify_id')) {
+      context.handle(_spotifyIdMeta,
+          spotifyId.isAcceptableOrUnknown(data['spotify_id']!, _spotifyIdMeta));
+    }
+    if (data.containsKey('metadata_source')) {
+      context.handle(
+          _metadataSourceMeta,
+          metadataSource.isAcceptableOrUnknown(
+              data['metadata_source']!, _metadataSourceMeta));
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  ArtistMetadata map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ArtistMetadata(
+      id: const StringType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}id'])!,
+      name: const StringType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}name'])!,
+      coverUri: $ArtistTableTable.$converter0.mapToDart(const StringType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}cover_uri'])),
+      coverUriRemote: $ArtistTableTable.$converter1.mapToDart(const StringType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}cover_uri_remote'])),
+      coverSource: const StringType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}cover_source']),
+      description: const StringType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}description']),
+      descriptionSource: const StringType().mapFromDatabaseResponse(
+          data['${effectivePrefix}description_source']),
+      albumCount: const IntType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}album_count']),
+      trackCount: const IntType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}track_count']),
+      spotifyId: const StringType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}spotify_id']),
+      metadataSource: const StringType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}metadata_source']),
+    );
+  }
+
+  @override
+  $ArtistTableTable createAlias(String alias) {
+    return $ArtistTableTable(attachedDatabase, alias);
+  }
+
+  static TypeConverter<Uri, String> $converter0 = UriConverter();
+  static TypeConverter<Uri, String> $converter1 = UriConverter();
+}
+
 class AlbumTableCompanion extends UpdateCompanion<AlbumMetadata> {
+  final Value<String> id;
   final Value<String> name;
   final Value<String> artistName;
+  final Value<String> artistId;
   final Value<Uri?> coverUri;
   final Value<Uri?> coverUriRemote;
   final Value<String?> coverSource;
@@ -21,8 +366,10 @@ class AlbumTableCompanion extends UpdateCompanion<AlbumMetadata> {
   final Value<String?> spotifyId;
   final Value<String?> metadataSource;
   const AlbumTableCompanion({
+    this.id = const Value.absent(),
     this.name = const Value.absent(),
     this.artistName = const Value.absent(),
+    this.artistId = const Value.absent(),
     this.coverUri = const Value.absent(),
     this.coverUriRemote = const Value.absent(),
     this.coverSource = const Value.absent(),
@@ -35,8 +382,10 @@ class AlbumTableCompanion extends UpdateCompanion<AlbumMetadata> {
     this.metadataSource = const Value.absent(),
   });
   AlbumTableCompanion.insert({
+    this.id = const Value.absent(),
     required String name,
     required String artistName,
+    required String artistId,
     this.coverUri = const Value.absent(),
     this.coverUriRemote = const Value.absent(),
     this.coverSource = const Value.absent(),
@@ -48,10 +397,13 @@ class AlbumTableCompanion extends UpdateCompanion<AlbumMetadata> {
     this.spotifyId = const Value.absent(),
     this.metadataSource = const Value.absent(),
   })  : name = Value(name),
-        artistName = Value(artistName);
+        artistName = Value(artistName),
+        artistId = Value(artistId);
   static Insertable<AlbumMetadata> custom({
+    Expression<String>? id,
     Expression<String>? name,
     Expression<String>? artistName,
+    Expression<String>? artistId,
     Expression<Uri?>? coverUri,
     Expression<Uri?>? coverUriRemote,
     Expression<String?>? coverSource,
@@ -64,8 +416,10 @@ class AlbumTableCompanion extends UpdateCompanion<AlbumMetadata> {
     Expression<String?>? metadataSource,
   }) {
     return RawValuesInsertable({
+      if (id != null) 'id': id,
       if (name != null) 'name': name,
       if (artistName != null) 'artist_name': artistName,
+      if (artistId != null) 'artist_id': artistId,
       if (coverUri != null) 'cover_uri': coverUri,
       if (coverUriRemote != null) 'cover_uri_remote': coverUriRemote,
       if (coverSource != null) 'cover_source': coverSource,
@@ -80,8 +434,10 @@ class AlbumTableCompanion extends UpdateCompanion<AlbumMetadata> {
   }
 
   AlbumTableCompanion copyWith(
-      {Value<String>? name,
+      {Value<String>? id,
+      Value<String>? name,
       Value<String>? artistName,
+      Value<String>? artistId,
       Value<Uri?>? coverUri,
       Value<Uri?>? coverUriRemote,
       Value<String?>? coverSource,
@@ -93,8 +449,10 @@ class AlbumTableCompanion extends UpdateCompanion<AlbumMetadata> {
       Value<String?>? spotifyId,
       Value<String?>? metadataSource}) {
     return AlbumTableCompanion(
+      id: id ?? this.id,
       name: name ?? this.name,
       artistName: artistName ?? this.artistName,
+      artistId: artistId ?? this.artistId,
       coverUri: coverUri ?? this.coverUri,
       coverUriRemote: coverUriRemote ?? this.coverUriRemote,
       coverSource: coverSource ?? this.coverSource,
@@ -111,11 +469,17 @@ class AlbumTableCompanion extends UpdateCompanion<AlbumMetadata> {
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
     if (name.present) {
       map['name'] = Variable<String>(name.value);
     }
     if (artistName.present) {
       map['artist_name'] = Variable<String>(artistName.value);
+    }
+    if (artistId.present) {
+      map['artist_id'] = Variable<String>(artistId.value);
     }
     if (coverUri.present) {
       final converter = $AlbumTableTable.$converter0;
@@ -156,8 +520,10 @@ class AlbumTableCompanion extends UpdateCompanion<AlbumMetadata> {
   @override
   String toString() {
     return (StringBuffer('AlbumTableCompanion(')
+          ..write('id: $id, ')
           ..write('name: $name, ')
           ..write('artistName: $artistName, ')
+          ..write('artistId: $artistId, ')
           ..write('coverUri: $coverUri, ')
           ..write('coverUriRemote: $coverUriRemote, ')
           ..write('coverSource: $coverSource, ')
@@ -179,6 +545,15 @@ class $AlbumTableTable extends AlbumTable
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
   $AlbumTableTable(this.attachedDatabase, [this._alias]);
+  final VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String?> id = GeneratedColumn<String?>(
+      'id', aliasedName, false,
+      additionalChecks:
+          GeneratedColumn.checkTextLength(minTextLength: 7, maxTextLength: 20),
+      type: const StringType(),
+      requiredDuringInsert: false,
+      clientDefault: () => nanoid(12));
   final VerificationMeta _nameMeta = const VerificationMeta('name');
   @override
   late final GeneratedColumn<String?> name = GeneratedColumn<String?>(
@@ -189,6 +564,13 @@ class $AlbumTableTable extends AlbumTable
   late final GeneratedColumn<String?> artistName = GeneratedColumn<String?>(
       'artist_name', aliasedName, false,
       type: const StringType(), requiredDuringInsert: true);
+  final VerificationMeta _artistIdMeta = const VerificationMeta('artistId');
+  @override
+  late final GeneratedColumn<String?> artistId = GeneratedColumn<String?>(
+      'artist_id', aliasedName, false,
+      type: const StringType(),
+      requiredDuringInsert: true,
+      defaultConstraints: 'REFERENCES artist_table (id)');
   final VerificationMeta _coverUriMeta = const VerificationMeta('coverUri');
   @override
   late final GeneratedColumnWithTypeConverter<Uri, String?> coverUri =
@@ -249,8 +631,10 @@ class $AlbumTableTable extends AlbumTable
       type: const StringType(), requiredDuringInsert: false);
   @override
   List<GeneratedColumn> get $columns => [
+        id,
         name,
         artistName,
+        artistId,
         coverUri,
         coverUriRemote,
         coverSource,
@@ -271,6 +655,9 @@ class $AlbumTableTable extends AlbumTable
       {bool isInserting = false}) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
     if (data.containsKey('name')) {
       context.handle(
           _nameMeta, name.isAcceptableOrUnknown(data['name']!, _nameMeta));
@@ -284,6 +671,12 @@ class $AlbumTableTable extends AlbumTable
               data['artist_name']!, _artistNameMeta));
     } else if (isInserting) {
       context.missing(_artistNameMeta);
+    }
+    if (data.containsKey('artist_id')) {
+      context.handle(_artistIdMeta,
+          artistId.isAcceptableOrUnknown(data['artist_id']!, _artistIdMeta));
+    } else if (isInserting) {
+      context.missing(_artistIdMeta);
     }
     context.handle(_coverUriMeta, const VerificationResult.success());
     context.handle(_coverUriRemoteMeta, const VerificationResult.success());
@@ -335,13 +728,17 @@ class $AlbumTableTable extends AlbumTable
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => {artistName, name};
+  Set<GeneratedColumn> get $primaryKey => {id};
   @override
   AlbumMetadata map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return AlbumMetadata(
+      id: const StringType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}id'])!,
       artistName: const StringType()
           .mapFromDatabaseResponse(data['${effectivePrefix}artist_name'])!,
+      artistId: const StringType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}artist_id'])!,
       name: const StringType()
           .mapFromDatabaseResponse(data['${effectivePrefix}name'])!,
       coverUri: $AlbumTableTable.$converter0.mapToDart(const StringType()
@@ -376,327 +773,14 @@ class $AlbumTableTable extends AlbumTable
   static TypeConverter<Uri, String> $converter1 = UriConverter();
 }
 
-class ArtistTableCompanion extends UpdateCompanion<ArtistMetadata> {
-  final Value<String> name;
-  final Value<Uri?> coverUri;
-  final Value<Uri?> coverUriRemote;
-  final Value<String?> coverSource;
-  final Value<String?> description;
-  final Value<String?> descriptionSource;
-  final Value<int?> trackCount;
-  final Value<int?> albumCount;
-  final Value<String?> spotifyId;
-  final Value<String?> metadataSource;
-  const ArtistTableCompanion({
-    this.name = const Value.absent(),
-    this.coverUri = const Value.absent(),
-    this.coverUriRemote = const Value.absent(),
-    this.coverSource = const Value.absent(),
-    this.description = const Value.absent(),
-    this.descriptionSource = const Value.absent(),
-    this.trackCount = const Value.absent(),
-    this.albumCount = const Value.absent(),
-    this.spotifyId = const Value.absent(),
-    this.metadataSource = const Value.absent(),
-  });
-  ArtistTableCompanion.insert({
-    required String name,
-    this.coverUri = const Value.absent(),
-    this.coverUriRemote = const Value.absent(),
-    this.coverSource = const Value.absent(),
-    this.description = const Value.absent(),
-    this.descriptionSource = const Value.absent(),
-    this.trackCount = const Value.absent(),
-    this.albumCount = const Value.absent(),
-    this.spotifyId = const Value.absent(),
-    this.metadataSource = const Value.absent(),
-  }) : name = Value(name);
-  static Insertable<ArtistMetadata> custom({
-    Expression<String>? name,
-    Expression<Uri?>? coverUri,
-    Expression<Uri?>? coverUriRemote,
-    Expression<String?>? coverSource,
-    Expression<String?>? description,
-    Expression<String?>? descriptionSource,
-    Expression<int?>? trackCount,
-    Expression<int?>? albumCount,
-    Expression<String?>? spotifyId,
-    Expression<String?>? metadataSource,
-  }) {
-    return RawValuesInsertable({
-      if (name != null) 'name': name,
-      if (coverUri != null) 'cover_uri': coverUri,
-      if (coverUriRemote != null) 'cover_uri_remote': coverUriRemote,
-      if (coverSource != null) 'cover_source': coverSource,
-      if (description != null) 'description': description,
-      if (descriptionSource != null) 'description_source': descriptionSource,
-      if (trackCount != null) 'track_count': trackCount,
-      if (albumCount != null) 'album_count': albumCount,
-      if (spotifyId != null) 'spotify_id': spotifyId,
-      if (metadataSource != null) 'metadata_source': metadataSource,
-    });
-  }
-
-  ArtistTableCompanion copyWith(
-      {Value<String>? name,
-      Value<Uri?>? coverUri,
-      Value<Uri?>? coverUriRemote,
-      Value<String?>? coverSource,
-      Value<String?>? description,
-      Value<String?>? descriptionSource,
-      Value<int?>? trackCount,
-      Value<int?>? albumCount,
-      Value<String?>? spotifyId,
-      Value<String?>? metadataSource}) {
-    return ArtistTableCompanion(
-      name: name ?? this.name,
-      coverUri: coverUri ?? this.coverUri,
-      coverUriRemote: coverUriRemote ?? this.coverUriRemote,
-      coverSource: coverSource ?? this.coverSource,
-      description: description ?? this.description,
-      descriptionSource: descriptionSource ?? this.descriptionSource,
-      trackCount: trackCount ?? this.trackCount,
-      albumCount: albumCount ?? this.albumCount,
-      spotifyId: spotifyId ?? this.spotifyId,
-      metadataSource: metadataSource ?? this.metadataSource,
-    );
-  }
-
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    if (name.present) {
-      map['name'] = Variable<String>(name.value);
-    }
-    if (coverUri.present) {
-      final converter = $ArtistTableTable.$converter0;
-      map['cover_uri'] = Variable<String?>(converter.mapToSql(coverUri.value));
-    }
-    if (coverUriRemote.present) {
-      final converter = $ArtistTableTable.$converter1;
-      map['cover_uri_remote'] =
-          Variable<String?>(converter.mapToSql(coverUriRemote.value));
-    }
-    if (coverSource.present) {
-      map['cover_source'] = Variable<String?>(coverSource.value);
-    }
-    if (description.present) {
-      map['description'] = Variable<String?>(description.value);
-    }
-    if (descriptionSource.present) {
-      map['description_source'] = Variable<String?>(descriptionSource.value);
-    }
-    if (trackCount.present) {
-      map['track_count'] = Variable<int?>(trackCount.value);
-    }
-    if (albumCount.present) {
-      map['album_count'] = Variable<int?>(albumCount.value);
-    }
-    if (spotifyId.present) {
-      map['spotify_id'] = Variable<String?>(spotifyId.value);
-    }
-    if (metadataSource.present) {
-      map['metadata_source'] = Variable<String?>(metadataSource.value);
-    }
-    return map;
-  }
-
-  @override
-  String toString() {
-    return (StringBuffer('ArtistTableCompanion(')
-          ..write('name: $name, ')
-          ..write('coverUri: $coverUri, ')
-          ..write('coverUriRemote: $coverUriRemote, ')
-          ..write('coverSource: $coverSource, ')
-          ..write('description: $description, ')
-          ..write('descriptionSource: $descriptionSource, ')
-          ..write('trackCount: $trackCount, ')
-          ..write('albumCount: $albumCount, ')
-          ..write('spotifyId: $spotifyId, ')
-          ..write('metadataSource: $metadataSource')
-          ..write(')'))
-        .toString();
-  }
-}
-
-class $ArtistTableTable extends ArtistTable
-    with TableInfo<$ArtistTableTable, ArtistMetadata> {
-  @override
-  final GeneratedDatabase attachedDatabase;
-  final String? _alias;
-  $ArtistTableTable(this.attachedDatabase, [this._alias]);
-  final VerificationMeta _nameMeta = const VerificationMeta('name');
-  @override
-  late final GeneratedColumn<String?> name = GeneratedColumn<String?>(
-      'name', aliasedName, false,
-      type: const StringType(), requiredDuringInsert: true);
-  final VerificationMeta _coverUriMeta = const VerificationMeta('coverUri');
-  @override
-  late final GeneratedColumnWithTypeConverter<Uri, String?> coverUri =
-      GeneratedColumn<String?>('cover_uri', aliasedName, true,
-              type: const StringType(), requiredDuringInsert: false)
-          .withConverter<Uri>($ArtistTableTable.$converter0);
-  final VerificationMeta _coverUriRemoteMeta =
-      const VerificationMeta('coverUriRemote');
-  @override
-  late final GeneratedColumnWithTypeConverter<Uri, String?> coverUriRemote =
-      GeneratedColumn<String?>('cover_uri_remote', aliasedName, true,
-              type: const StringType(), requiredDuringInsert: false)
-          .withConverter<Uri>($ArtistTableTable.$converter1);
-  final VerificationMeta _coverSourceMeta =
-      const VerificationMeta('coverSource');
-  @override
-  late final GeneratedColumn<String?> coverSource = GeneratedColumn<String?>(
-      'cover_source', aliasedName, true,
-      type: const StringType(), requiredDuringInsert: false);
-  final VerificationMeta _descriptionMeta =
-      const VerificationMeta('description');
-  @override
-  late final GeneratedColumn<String?> description = GeneratedColumn<String?>(
-      'description', aliasedName, true,
-      type: const StringType(), requiredDuringInsert: false);
-  final VerificationMeta _descriptionSourceMeta =
-      const VerificationMeta('descriptionSource');
-  @override
-  late final GeneratedColumn<String?> descriptionSource =
-      GeneratedColumn<String?>('description_source', aliasedName, true,
-          type: const StringType(), requiredDuringInsert: false);
-  final VerificationMeta _trackCountMeta = const VerificationMeta('trackCount');
-  @override
-  late final GeneratedColumn<int?> trackCount = GeneratedColumn<int?>(
-      'track_count', aliasedName, true,
-      type: const IntType(), requiredDuringInsert: false);
-  final VerificationMeta _albumCountMeta = const VerificationMeta('albumCount');
-  @override
-  late final GeneratedColumn<int?> albumCount = GeneratedColumn<int?>(
-      'album_count', aliasedName, true,
-      type: const IntType(), requiredDuringInsert: false);
-  final VerificationMeta _spotifyIdMeta = const VerificationMeta('spotifyId');
-  @override
-  late final GeneratedColumn<String?> spotifyId = GeneratedColumn<String?>(
-      'spotify_id', aliasedName, true,
-      type: const StringType(), requiredDuringInsert: false);
-  final VerificationMeta _metadataSourceMeta =
-      const VerificationMeta('metadataSource');
-  @override
-  late final GeneratedColumn<String?> metadataSource = GeneratedColumn<String?>(
-      'metadata_source', aliasedName, true,
-      type: const StringType(), requiredDuringInsert: false);
-  @override
-  List<GeneratedColumn> get $columns => [
-        name,
-        coverUri,
-        coverUriRemote,
-        coverSource,
-        description,
-        descriptionSource,
-        trackCount,
-        albumCount,
-        spotifyId,
-        metadataSource
-      ];
-  @override
-  String get aliasedName => _alias ?? 'artist_table';
-  @override
-  String get actualTableName => 'artist_table';
-  @override
-  VerificationContext validateIntegrity(Insertable<ArtistMetadata> instance,
-      {bool isInserting = false}) {
-    final context = VerificationContext();
-    final data = instance.toColumns(true);
-    if (data.containsKey('name')) {
-      context.handle(
-          _nameMeta, name.isAcceptableOrUnknown(data['name']!, _nameMeta));
-    } else if (isInserting) {
-      context.missing(_nameMeta);
-    }
-    context.handle(_coverUriMeta, const VerificationResult.success());
-    context.handle(_coverUriRemoteMeta, const VerificationResult.success());
-    if (data.containsKey('cover_source')) {
-      context.handle(
-          _coverSourceMeta,
-          coverSource.isAcceptableOrUnknown(
-              data['cover_source']!, _coverSourceMeta));
-    }
-    if (data.containsKey('description')) {
-      context.handle(
-          _descriptionMeta,
-          description.isAcceptableOrUnknown(
-              data['description']!, _descriptionMeta));
-    }
-    if (data.containsKey('description_source')) {
-      context.handle(
-          _descriptionSourceMeta,
-          descriptionSource.isAcceptableOrUnknown(
-              data['description_source']!, _descriptionSourceMeta));
-    }
-    if (data.containsKey('track_count')) {
-      context.handle(
-          _trackCountMeta,
-          trackCount.isAcceptableOrUnknown(
-              data['track_count']!, _trackCountMeta));
-    }
-    if (data.containsKey('album_count')) {
-      context.handle(
-          _albumCountMeta,
-          albumCount.isAcceptableOrUnknown(
-              data['album_count']!, _albumCountMeta));
-    }
-    if (data.containsKey('spotify_id')) {
-      context.handle(_spotifyIdMeta,
-          spotifyId.isAcceptableOrUnknown(data['spotify_id']!, _spotifyIdMeta));
-    }
-    if (data.containsKey('metadata_source')) {
-      context.handle(
-          _metadataSourceMeta,
-          metadataSource.isAcceptableOrUnknown(
-              data['metadata_source']!, _metadataSourceMeta));
-    }
-    return context;
-  }
-
-  @override
-  Set<GeneratedColumn> get $primaryKey => {name};
-  @override
-  ArtistMetadata map(Map<String, dynamic> data, {String? tablePrefix}) {
-    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return ArtistMetadata(
-      name: const StringType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}name'])!,
-      coverUri: $ArtistTableTable.$converter0.mapToDart(const StringType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}cover_uri'])),
-      coverUriRemote: $ArtistTableTable.$converter1.mapToDart(const StringType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}cover_uri_remote'])),
-      coverSource: const StringType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}cover_source']),
-      description: const StringType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}description']),
-      descriptionSource: const StringType().mapFromDatabaseResponse(
-          data['${effectivePrefix}description_source']),
-      albumCount: const IntType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}album_count']),
-      trackCount: const IntType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}track_count']),
-      spotifyId: const StringType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}spotify_id']),
-      metadataSource: const StringType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}metadata_source']),
-    );
-  }
-
-  @override
-  $ArtistTableTable createAlias(String alias) {
-    return $ArtistTableTable(attachedDatabase, alias);
-  }
-
-  static TypeConverter<Uri, String> $converter0 = UriConverter();
-  static TypeConverter<Uri, String> $converter1 = UriConverter();
-}
-
 class TrackTableCompanion extends UpdateCompanion<TrackMetadata> {
+  final Value<String> id;
   final Value<String?> title;
   final Value<String?> artistName;
+  final Value<String> albumArtistId;
+  final Value<String> trackArtistId;
   final Value<String?> albumName;
+  final Value<String> albumId;
   final Value<int> trackNo;
   final Value<int> discNo;
   final Value<String?> description;
@@ -713,9 +797,13 @@ class TrackTableCompanion extends UpdateCompanion<TrackMetadata> {
   final Value<String?> source;
   final Value<String?> metadataSource;
   const TrackTableCompanion({
+    this.id = const Value.absent(),
     this.title = const Value.absent(),
     this.artistName = const Value.absent(),
+    this.albumArtistId = const Value.absent(),
+    this.trackArtistId = const Value.absent(),
     this.albumName = const Value.absent(),
+    this.albumId = const Value.absent(),
     this.trackNo = const Value.absent(),
     this.discNo = const Value.absent(),
     this.description = const Value.absent(),
@@ -733,9 +821,13 @@ class TrackTableCompanion extends UpdateCompanion<TrackMetadata> {
     this.metadataSource = const Value.absent(),
   });
   TrackTableCompanion.insert({
+    this.id = const Value.absent(),
     this.title = const Value.absent(),
     this.artistName = const Value.absent(),
+    required String albumArtistId,
+    required String trackArtistId,
     this.albumName = const Value.absent(),
+    required String albumId,
     this.trackNo = const Value.absent(),
     this.discNo = const Value.absent(),
     this.description = const Value.absent(),
@@ -751,11 +843,18 @@ class TrackTableCompanion extends UpdateCompanion<TrackMetadata> {
     this.spotifyId = const Value.absent(),
     this.source = const Value.absent(),
     this.metadataSource = const Value.absent(),
-  }) : uri = Value(uri);
+  })  : albumArtistId = Value(albumArtistId),
+        trackArtistId = Value(trackArtistId),
+        albumId = Value(albumId),
+        uri = Value(uri);
   static Insertable<TrackMetadata> custom({
+    Expression<String>? id,
     Expression<String?>? title,
     Expression<String?>? artistName,
+    Expression<String>? albumArtistId,
+    Expression<String>? trackArtistId,
     Expression<String?>? albumName,
+    Expression<String>? albumId,
     Expression<int>? trackNo,
     Expression<int>? discNo,
     Expression<String?>? description,
@@ -773,9 +872,13 @@ class TrackTableCompanion extends UpdateCompanion<TrackMetadata> {
     Expression<String?>? metadataSource,
   }) {
     return RawValuesInsertable({
+      if (id != null) 'id': id,
       if (title != null) 'title': title,
       if (artistName != null) 'artist_name': artistName,
+      if (albumArtistId != null) 'album_artist_id': albumArtistId,
+      if (trackArtistId != null) 'track_artist_id': trackArtistId,
       if (albumName != null) 'album_name': albumName,
+      if (albumId != null) 'album_id': albumId,
       if (trackNo != null) 'track_no': trackNo,
       if (discNo != null) 'disc_no': discNo,
       if (description != null) 'description': description,
@@ -795,9 +898,13 @@ class TrackTableCompanion extends UpdateCompanion<TrackMetadata> {
   }
 
   TrackTableCompanion copyWith(
-      {Value<String?>? title,
+      {Value<String>? id,
+      Value<String?>? title,
       Value<String?>? artistName,
+      Value<String>? albumArtistId,
+      Value<String>? trackArtistId,
       Value<String?>? albumName,
+      Value<String>? albumId,
       Value<int>? trackNo,
       Value<int>? discNo,
       Value<String?>? description,
@@ -814,9 +921,13 @@ class TrackTableCompanion extends UpdateCompanion<TrackMetadata> {
       Value<String?>? source,
       Value<String?>? metadataSource}) {
     return TrackTableCompanion(
+      id: id ?? this.id,
       title: title ?? this.title,
       artistName: artistName ?? this.artistName,
+      albumArtistId: albumArtistId ?? this.albumArtistId,
+      trackArtistId: trackArtistId ?? this.trackArtistId,
       albumName: albumName ?? this.albumName,
+      albumId: albumId ?? this.albumId,
       trackNo: trackNo ?? this.trackNo,
       discNo: discNo ?? this.discNo,
       description: description ?? this.description,
@@ -838,14 +949,26 @@ class TrackTableCompanion extends UpdateCompanion<TrackMetadata> {
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
     if (title.present) {
       map['title'] = Variable<String?>(title.value);
     }
     if (artistName.present) {
       map['artist_name'] = Variable<String?>(artistName.value);
     }
+    if (albumArtistId.present) {
+      map['album_artist_id'] = Variable<String>(albumArtistId.value);
+    }
+    if (trackArtistId.present) {
+      map['track_artist_id'] = Variable<String>(trackArtistId.value);
+    }
     if (albumName.present) {
       map['album_name'] = Variable<String?>(albumName.value);
+    }
+    if (albumId.present) {
+      map['album_id'] = Variable<String>(albumId.value);
     }
     if (trackNo.present) {
       map['track_no'] = Variable<int>(trackNo.value);
@@ -903,9 +1026,13 @@ class TrackTableCompanion extends UpdateCompanion<TrackMetadata> {
   @override
   String toString() {
     return (StringBuffer('TrackTableCompanion(')
+          ..write('id: $id, ')
           ..write('title: $title, ')
           ..write('artistName: $artistName, ')
+          ..write('albumArtistId: $albumArtistId, ')
+          ..write('trackArtistId: $trackArtistId, ')
           ..write('albumName: $albumName, ')
+          ..write('albumId: $albumId, ')
           ..write('trackNo: $trackNo, ')
           ..write('discNo: $discNo, ')
           ..write('description: $description, ')
@@ -932,6 +1059,15 @@ class $TrackTableTable extends TrackTable
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
   $TrackTableTable(this.attachedDatabase, [this._alias]);
+  final VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String?> id = GeneratedColumn<String?>(
+      'id', aliasedName, false,
+      additionalChecks:
+          GeneratedColumn.checkTextLength(minTextLength: 7, maxTextLength: 20),
+      type: const StringType(),
+      requiredDuringInsert: false,
+      clientDefault: () => nanoid(13));
   final VerificationMeta _titleMeta = const VerificationMeta('title');
   @override
   late final GeneratedColumn<String?> title = GeneratedColumn<String?>(
@@ -942,11 +1078,34 @@ class $TrackTableTable extends TrackTable
   late final GeneratedColumn<String?> artistName = GeneratedColumn<String?>(
       'artist_name', aliasedName, true,
       type: const StringType(), requiredDuringInsert: false);
+  final VerificationMeta _albumArtistIdMeta =
+      const VerificationMeta('albumArtistId');
+  @override
+  late final GeneratedColumn<String?> albumArtistId = GeneratedColumn<String?>(
+      'album_artist_id', aliasedName, false,
+      type: const StringType(),
+      requiredDuringInsert: true,
+      defaultConstraints: 'REFERENCES artist_table (id)');
+  final VerificationMeta _trackArtistIdMeta =
+      const VerificationMeta('trackArtistId');
+  @override
+  late final GeneratedColumn<String?> trackArtistId = GeneratedColumn<String?>(
+      'track_artist_id', aliasedName, false,
+      type: const StringType(),
+      requiredDuringInsert: true,
+      defaultConstraints: 'REFERENCES artist_table (id)');
   final VerificationMeta _albumNameMeta = const VerificationMeta('albumName');
   @override
   late final GeneratedColumn<String?> albumName = GeneratedColumn<String?>(
       'album_name', aliasedName, true,
       type: const StringType(), requiredDuringInsert: false);
+  final VerificationMeta _albumIdMeta = const VerificationMeta('albumId');
+  @override
+  late final GeneratedColumn<String?> albumId = GeneratedColumn<String?>(
+      'album_id', aliasedName, false,
+      type: const StringType(),
+      requiredDuringInsert: true,
+      defaultConstraints: 'REFERENCES album_table (id)');
   final VerificationMeta _trackNoMeta = const VerificationMeta('trackNo');
   @override
   late final GeneratedColumn<int?> trackNo = GeneratedColumn<int?>(
@@ -1041,9 +1200,13 @@ class $TrackTableTable extends TrackTable
       type: const StringType(), requiredDuringInsert: false);
   @override
   List<GeneratedColumn> get $columns => [
+        id,
         title,
         artistName,
+        albumArtistId,
+        trackArtistId,
         albumName,
+        albumId,
         trackNo,
         discNo,
         description,
@@ -1069,6 +1232,9 @@ class $TrackTableTable extends TrackTable
       {bool isInserting = false}) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
     if (data.containsKey('title')) {
       context.handle(
           _titleMeta, title.isAcceptableOrUnknown(data['title']!, _titleMeta));
@@ -1079,9 +1245,31 @@ class $TrackTableTable extends TrackTable
           artistName.isAcceptableOrUnknown(
               data['artist_name']!, _artistNameMeta));
     }
+    if (data.containsKey('album_artist_id')) {
+      context.handle(
+          _albumArtistIdMeta,
+          albumArtistId.isAcceptableOrUnknown(
+              data['album_artist_id']!, _albumArtistIdMeta));
+    } else if (isInserting) {
+      context.missing(_albumArtistIdMeta);
+    }
+    if (data.containsKey('track_artist_id')) {
+      context.handle(
+          _trackArtistIdMeta,
+          trackArtistId.isAcceptableOrUnknown(
+              data['track_artist_id']!, _trackArtistIdMeta));
+    } else if (isInserting) {
+      context.missing(_trackArtistIdMeta);
+    }
     if (data.containsKey('album_name')) {
       context.handle(_albumNameMeta,
           albumName.isAcceptableOrUnknown(data['album_name']!, _albumNameMeta));
+    }
+    if (data.containsKey('album_id')) {
+      context.handle(_albumIdMeta,
+          albumId.isAcceptableOrUnknown(data['album_id']!, _albumIdMeta));
+    } else if (isInserting) {
+      context.missing(_albumIdMeta);
     }
     if (data.containsKey('track_no')) {
       context.handle(_trackNoMeta,
@@ -1145,17 +1333,25 @@ class $TrackTableTable extends TrackTable
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => {uri};
+  Set<GeneratedColumn> get $primaryKey => {id};
   @override
   TrackMetadata map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return TrackMetadata(
+      id: const StringType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}id'])!,
       title: const StringType()
           .mapFromDatabaseResponse(data['${effectivePrefix}title']),
       artistName: const StringType()
           .mapFromDatabaseResponse(data['${effectivePrefix}artist_name']),
+      albumArtistId: const StringType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}album_artist_id'])!,
+      trackArtistId: const StringType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}track_artist_id'])!,
       albumName: const StringType()
           .mapFromDatabaseResponse(data['${effectivePrefix}album_name']),
+      albumId: const StringType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}album_id'])!,
       trackNo: const IntType()
           .mapFromDatabaseResponse(data['${effectivePrefix}track_no'])!,
       discNo: const IntType()
@@ -1203,12 +1399,12 @@ class $TrackTableTable extends TrackTable
 abstract class _$BoDatabase extends GeneratedDatabase {
   _$BoDatabase(QueryExecutor e) : super(SqlTypeSystem.defaultInstance, e);
   _$BoDatabase.connect(DatabaseConnection c) : super.connect(c);
-  late final $AlbumTableTable albumTable = $AlbumTableTable(this);
   late final $ArtistTableTable artistTable = $ArtistTableTable(this);
+  late final $AlbumTableTable albumTable = $AlbumTableTable(this);
   late final $TrackTableTable trackTable = $TrackTableTable(this);
   @override
   Iterable<TableInfo> get allTables => allSchemaEntities.whereType<TableInfo>();
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities =>
-      [albumTable, artistTable, trackTable];
+      [artistTable, albumTable, trackTable];
 }

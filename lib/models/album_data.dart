@@ -11,8 +11,13 @@ part 'album_data.g.dart';
 class AlbumMetadata with _$AlbumMetadata implements Insertable<AlbumMetadata> {
   const AlbumMetadata._();
   const factory AlbumMetadata({
+    /// The database ID of the album.
+    /// It is 7-20 characters long but is generally 12 characters long.
+    /// These IDs are unique but not ordered.
+    @Default("") String id,
     /// The artist's name, used to group this album and make it unique.
     required String artistName,
+    @Default("") String artistId,
     /// The album's name.
     required String name,
     /// The URI to the album cover.

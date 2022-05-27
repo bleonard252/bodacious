@@ -8,6 +8,7 @@ import 'package:bodacious/models/artist_data.dart';
 import 'package:bodacious/models/track_data.dart';
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
+import 'package:nanoid/non_secure.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
 
@@ -24,7 +25,7 @@ class BoDatabase extends _$BoDatabase {
 
   // you should bump this number whenever you change or add a table definition
   @override
-  int get schemaVersion => 8;
+  int get schemaVersion => 9;
 
   Future<TrackMetadata?> tryGetTrackFromUri(Uri uri) {
     return (
@@ -55,43 +56,36 @@ class BoDatabase extends _$BoDatabase {
     ).get();
   }
 
+  Future<String?> tryGetAlbumId(String albumName, {required String by}) {
+    return (
+      selectOnly(albumTable)
+      ..addColumns([albumTable.name, albumTable.artistName, albumTable.id])
+      ..where(albumTable.name.equals(albumName) & albumTable.artistName.equals(by))
+    ).getSingleOrNull().then((v) => v?.readTableOrNull(albumTable)?.id);
+  }
+  Future<String?> tryGetArtistId(String artistName) {
+    return (
+      selectOnly(artistTable)
+      ..addColumns([artistTable.name, artistTable.id])
+      ..where(artistTable.name.equals(artistName))
+    ).getSingleOrNull().then((v) => v?.readTableOrNull(artistTable)?.id);
+  }
+
   @override
   MigrationStrategy get migration => MigrationStrategy(
+    beforeOpen: (d) async {
+      await customStatement('PRAGMA foreign_keys = ON');
+    },
     onUpgrade: (m, from, to) async {
       if (from > to) throw UnsupportedError("Downgrades are not supported");
-      if (to == 2) m.addColumn(trackTable, trackTable.available);
-      if (to == 3) {
-        /// Reset the database.
-        /// This clears customizations but forces the database to rescan.
-        /// Thankfully there are no customizations yet so there's nothing
-        /// too bad about doing this.
+      if (to == 9) {
+        // This is gonna hurt, at least for the cached stuff,
+        // just a little bit.
+        // Apparently the migrator doesn't support changing the
+        // primary keys (we're gonna use proper IDs now).
         m.drop(albumTable);
         m.drop(trackTable);
         m.drop(artistTable);
-      }
-      if (to == 4) {
-        m.addColumn(trackTable, trackTable.description);
-        m.addColumn(trackTable, trackTable.descriptionSource);
-        m.addColumn(trackTable, trackTable.coverUriRemote);
-        m.addColumn(trackTable, trackTable.coverSource);
-        m.addColumn(trackTable, trackTable.spotifyId);
-        m.addColumn(trackTable, trackTable.source);
-        m.addColumn(trackTable, trackTable.metadataSource);
-        m.addColumn(albumTable, albumTable.coverUriRemote);
-        m.addColumn(albumTable, albumTable.coverSource);
-        m.addColumn(albumTable, albumTable.description);
-        m.addColumn(albumTable, albumTable.descriptionSource);
-        m.addColumn(artistTable, artistTable.coverUriRemote);
-        m.addColumn(artistTable, artistTable.coverSource);
-        m.addColumn(artistTable, artistTable.description);
-        m.addColumn(artistTable, artistTable.descriptionSource);
-      }
-      if (to == 5) {
-        m.addColumn(albumTable, albumTable.metadataSource);
-        m.addColumn(artistTable, artistTable.metadataSource);
-      }
-      if (to == 8) {
-        m.addColumn(albumTable, albumTable.spotifyId);
       }
     },
   );
@@ -113,4 +107,19 @@ LazyDatabase _openConnection() {
     final file = File(p.join(dbPath, '_boLibrary.sqlite'));
     return NativeDatabase(file);
   });
+}
+
+extension on TrackMetadata {
+  Future<ArtistMetadata?> getArtist(BoDatabase db, [bool albumArtist = false]) {
+    return (
+      db.select(db.artistTable)
+      ..where((tbl) => tbl.id.equals(albumArtist ? albumArtistId : trackArtistId))
+    ).getSingleOrNull();
+  }
+  Future<AlbumMetadata?> getAlbum(BoDatabase db) {
+    return (
+      db.select(db.albumTable)
+      ..where((tbl) => tbl.id.equals(albumId))
+    ).getSingleOrNull();
+  }
 }

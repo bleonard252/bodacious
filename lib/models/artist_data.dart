@@ -10,6 +10,10 @@ part 'artist_data.g.dart';
 class ArtistMetadata with _$ArtistMetadata implements Insertable<ArtistMetadata> {
   const ArtistMetadata._();
   const factory ArtistMetadata({
+    /// The database ID of the artist.
+    /// It is 7-20 characters long but is generally 10 characters long.
+    /// These IDs are unique but not ordered.
+    @Default("") String id,
     /// The artist's name.
     required String name,
     /// The URI to the artist icon.
