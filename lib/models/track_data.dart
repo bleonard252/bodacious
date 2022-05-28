@@ -87,7 +87,11 @@ class TrackMetadata with _$TrackMetadata implements Insertable<TrackMetadata> {
     return TrackTableCompanion(
       title: Value(title),
       artistName: Value(artistName),
+      trackArtistId: Value(trackArtistId),
+      albumArtistName: Value(albumArtistName),
+      albumArtistId: Value(albumArtistId),
       albumName: Value(albumName),
+      albumId: Value(albumId),
       trackNo: Value.ofNullable(trackNo),
       discNo: Value.ofNullable(discNo),
       coverUri: Value(coverUri),

@@ -283,14 +283,36 @@ class _IndexerIsolate {
         TrackMetadata record = (/*_mse ??*/ _id3 ?? _ctxmeta ?? TrackMetadata.empty()).copyWith(
           uri: file.absolute.uri
         ).copyWith(id: _id);
+
+        // If one artist field is not set but the other is,
+        // make them match.
+        // This should leave it as is if they're both already set.
+        if (record.albumArtistName != null && record.artistName == null) {
+          record = record.copyWith(
+            artistName: record.albumArtistName
+          );
+        }
+        if (record.artistName != null && record.albumArtistName == null) {
+          record = record.copyWith(
+            albumArtistName: record.artistName
+          );
+        }
+
         final artist = await registerArtistMetadata(record);
-        if (artist != null) record = record.copyWith(trackArtistId: artist.id);
-        final albumArtist = await registerArtistMetadata(record, true);
-        if (albumArtist != null) record = record.copyWith(albumArtistId: albumArtist.id);
+        record = record.copyWith(trackArtistId: artist!.id);
+
+        if (record.artistName != record.albumArtistName) {
+          final albumArtist = await registerArtistMetadata(record, true);
+          record = record.copyWith(albumArtistId: albumArtist!.id);
+        } else {
+          record = record.copyWith(albumArtistId: record.trackArtistId);
+        }
+
         final album = await registerAlbumMetadata(record);
-        if (album != null) record = record.copyWith(albumId: album.id);
+        record = record.copyWith(albumId: album!.id);
+
         //await tr_rec.put(db, record.toJson());
-        db.into(db.trackTable).insertOnConflictUpdate(record);
+        await db.into(db.trackTable).insertOnConflictUpdate(record);
       }
 
       if (newArtists.isNotEmpty) {
@@ -359,7 +381,7 @@ class _IndexerIsolate {
         value: 0
       ));
     });
-    
+
     late final Response ct;
     try {
       ct = await Dio().get("http://detectportal.firefox.com/success.txt", options: Options(validateStatus: (status) => true));
@@ -508,14 +530,13 @@ class _IndexerIsolate {
   }
 
   Future<AlbumMetadata?> registerAlbumMetadata(TrackMetadata track) async {
-    //assert(track.artistName != null && track.albumName != null);
-    if (track.artistName == null || track.albumName == null) return null;
-    final record = await db.tryGetAlbum(track.albumName!, by: track.albumName!);
-    if (newAlbums.contains(track.artistName!+" - "+track.albumName!) || (record != null && !force)) return null;
-    newAlbums.add(track.artistName!+" - "+track.albumName!);
+    if (track.albumArtistName == null || track.albumName == null) return null;
+    final record = await db.tryGetAlbum(track.albumName!, by: track.albumArtistName!);
+    if (newAlbums.contains(track.albumArtistName!+" - "+track.albumName!) || (record != null && !force)) return record;
+    newAlbums.add(track.albumArtistName!+" - "+track.albumName!);
     final id = nanoid(12);
     var _record = AlbumMetadata(
-      artistName: track.albumArtistName ?? track.artistName!,
+      artistName: track.albumArtistName!,
       name: track.albumName!,
       coverUri: track.coverUri,
       artistId: track.albumArtistId,
@@ -526,23 +547,14 @@ class _IndexerIsolate {
   }
 
   Future<ArtistMetadata?> registerArtistMetadata(TrackMetadata track, [bool albumArtist = false]) async {
-    //assert(track.artistName != null);
-    if (!albumArtist && track.artistName == null && track.albumArtistName != null) {
-      track = track.copyWith(artistName: track.albumArtistName);
-    } else if (!albumArtist && track.artistName == null) {
-      return null;
-    }
-    if (albumArtist && track.albumArtistName == null && track.artistName != null) {
-      track = track.copyWith(albumArtistName: track.artistName);
-    } else if (albumArtist && track.albumArtistName == null) {
-      return null;
-    }
+    if (albumArtist && track.albumArtistName == null) return null;
+    if (!albumArtist && track.artistName == null) return null;
     //final record = artistStore.record(track.artistName!);
     final record = await db.tryGetArtist(albumArtist ? track.albumArtistName! : track.artistName!);
-    if (newArtists.contains(track.artistName!) || (record != null && !force)) return null;
+    if (newArtists.contains(track.artistName!) || (record != null && !force)) return record;
     newArtists.add(track.artistName!);
     final id = nanoid(10);
-    var _record = ArtistMetadata(
+    ArtistMetadata _record = ArtistMetadata(
       name: track.artistName!,
       id: id
     );

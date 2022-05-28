@@ -43,7 +43,9 @@ class AlbumMetadata with _$AlbumMetadata implements Insertable<AlbumMetadata> {
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     return AlbumTableCompanion(
+      id: Value(id),
       artistName: Value(artistName),
+      artistId: Value(artistId),
       name: Value(name),
       coverUri: Value(coverUri),
       coverUriRemote: Value(coverUriRemote),

@@ -399,8 +399,8 @@ class OuterFrame extends StatelessWidget {
       GoRoute(path: "/library", builder: (context, state) => const LibraryRootView(), routes: [
         // GoRoute(path: "albums/:artistName/:name", builder: (context, state) => AlbumDetailsView(album: state.extra as AlbumMetadata)),
         // GoRoute(path: "artists/:name", builder: (context, state) => ArtistDetailsView(artist: state.extra as ArtistMetadata))
-        GoRoute(path: ":artistId", builder: (context, state) => ArtistDetailsView(artist: state.extra as ArtistMetadata), routes: [
-          GoRoute(path: ":albumId", builder: (context, state) => AlbumDetailsView(album: state.extra as AlbumMetadata), routes: [
+        GoRoute(path: ":artistId", builder: (context, state) => ArtistDetailsWrapper(id: state.params["artistId"]!, data: state.extra), routes: [
+          GoRoute(path: ":albumId", builder: (context, state) => AlbumDetailsWrapper(id: state.params["albumId"]!, data: state.extra), routes: [
             //TODO: track metadata page
           ])
         ])

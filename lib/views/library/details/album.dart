@@ -11,6 +11,55 @@ import 'package:bodacious/widgets/item/song.dart';
 import 'package:drift/drift.dart' hide Column, Table;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+
+class AlbumDetailsWrapper extends StatelessWidget {
+  final String id;
+  final dynamic data;
+  const AlbumDetailsWrapper({ Key? key, this.data, required this.id }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<AlbumMetadata?>(
+      initialData: data is AlbumMetadata ? data : null,
+      future: data is AlbumMetadata ? null : (db.select(db.albumTable)
+      ..where((tbl) => tbl.id.equals(id))
+      ).getSingleOrNull(),
+      builder: (context, snapshot) =>
+      snapshot.hasError ? Material(
+        color: Colors.black,
+        child: Center(
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: const Icon(MdiIcons.alertCircle, color: Colors.red),
+              ),
+              Text(snapshot.error.toString(), textAlign: TextAlign.center, style: const TextStyle(color: Colors.red))
+            ]
+          )
+        ),
+      ) : snapshot.hasData ? AlbumDetailsView(album: snapshot.data!)
+      : snapshot.connectionState == ConnectionState.done ? Material(
+        color: Colors.black,
+        child: Center(
+          child: Column(
+            children: const [
+              Padding(
+                padding: EdgeInsets.all(8.0),
+                child: Icon(MdiIcons.ghost, color: Colors.blue),
+              ),
+              Text("No album found", textAlign: TextAlign.center, style: TextStyle(color: Colors.blue))
+            ]
+          )
+        )
+      ) : const Material(
+        color: Colors.black,
+        child: Center(child: CircularProgressIndicator(value: null))
+      )
+    );
+  }
+}
 
 class AlbumDetailsView extends StatefulWidget {
   final AlbumMetadata album;
