@@ -7,7 +7,7 @@ class JustAudioHandler extends BodaciousAudioHandler {
     void playlist(just.AudioSource current, dynamic output, [int? index]) {
       if (current is just.UriAudioSource) {
         if (index != player.currentIndex) {
-          late final String _title;
+          late String _title;
           try {_title = Uri.decodeComponent(current.uri.pathSegments.lastOrNull ?? "Unknown track");}
           catch(e) {_title = current.uri.pathSegments.lastOrNull ?? "Unknown track";}
           output.add(MediaItem(
