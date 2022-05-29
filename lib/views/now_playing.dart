@@ -16,15 +16,21 @@ import 'package:image/image.dart' show rgbToHsl;
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:palette_generator/palette_generator.dart';
 
-FutureProvider<Set<Color>> colorProvider = FutureProvider((ref) async {
+FutureProvider<Set<Color>?> colorProvider = FutureProvider((ref) async {
   final current = ref.watch(nowPlayingProvider.select((value) => value.value?.coverUri));
   if (current != null) {
-    final colors = PaletteGenerator.fromImageProvider(
-      (current.scheme == "file" ? FileImage(File.fromUri(current)) : NetworkImage(current.toString())) as ImageProvider
-    );
-    return (await colors).colors.toSet();
+    late final PaletteGenerator colors;
+    try {
+      colors = await PaletteGenerator.fromImageProvider(
+        (current.scheme == "file" ? FileImage(File.fromUri(current)) : NetworkImage(current.toString())) as ImageProvider
+      );
+    } catch(e) {
+      errors.add(e.toString());
+      return {Colors.grey, Colors.yellow, const Color(0xff000000)};
+    }
+    return colors.colors.toSet();
   } else {
-    return {const Color(0xff424242), const Color(0xff424224), const Color(0xff000000)};
+    return {Colors.grey, Colors.yellow, const Color(0xff000000)};
   }
 });
 
@@ -46,7 +52,7 @@ class _NowPlayingViewState extends ConsumerState<NowPlayingView> {
     //   PaletteColor(Theme.of(context).colorScheme.primary, 500),
     //   PaletteColor(Theme.of(context).canvasColor, 100),
     // ];
-    final colors = ref.watch(colorProvider).asData?.value ?? {PaletteColor(Theme.of(context).colorScheme.primaryContainer, 500).color, PaletteColor(Theme.of(context).canvasColor, 100).color, Colors.black};
+    final colors = ref.watch(colorProvider).asData?.value ?? {Colors.grey, Colors.yellow, const Color(0xff000000)};
     final b = Theme.of(context).brightness;
     // final vibrant = b == Brightness.light ? snapshot.data?.lightVibrantColor : snapshot.data?.darkVibrantColor;
     // final _colors = snapshot.data?.colors ?? [];
