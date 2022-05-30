@@ -495,7 +495,7 @@ packages:
       path: "../just_audio_mpv"
       relative: true
     source: path
-    version: "0.1.3"
+    version: "0.1.4"
   just_audio_platform_interface:
     dependency: transitive
     description:
