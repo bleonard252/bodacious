@@ -20,6 +20,7 @@ import 'package:bodacious/views/library/details/album.dart';
 import 'package:bodacious/views/library/details/artist.dart';
 import 'package:bodacious/views/library/root.dart';
 import 'package:bodacious/views/main_menu.dart';
+import 'package:bodacious/views/mpv_crash.dart';
 import 'package:bodacious/views/now_playing.dart';
 import 'package:bodacious/views/settings/library.dart';
 import 'package:bodacious/views/settings/personalization.dart';
@@ -64,6 +65,10 @@ void main() async {
   db = BoDatabase();
   config = Config(await SharedPreferences.getInstance());
   await db.executor.ensureOpen(db);
+
+  if (Platform.isLinux && Process.runSync("which", ["mpv"]).exitCode != 0) {
+    return runApp(const MPVMissingCrash());
+  }
 
   try {
     player = await AudioService.init<BodaciousAudioHandler>(
