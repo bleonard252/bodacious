@@ -163,8 +163,15 @@ class _HomeViewState extends State<HomeView> {
                   ),
                 ),
               ],
-              body: (isSearching) ? SearchResultsView(query: query)
-              : Container()
+              body: (isSearching) ? SearchResultsView(
+                query: query,
+                reSearch: (newQuery) {
+                  searchBoxController.text = newQuery;
+                  setState(() => query = newQuery);
+                },
+              )
+              : Container(),
+              floatHeaderSlivers: false,
             )
           )
         )
