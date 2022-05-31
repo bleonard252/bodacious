@@ -1,6 +1,5 @@
 
 import 'dart:async';
-import 'dart:math';
 
 import 'package:bodacious/main.dart';
 import 'package:bodacious/models/artist_data.dart';
@@ -10,8 +9,6 @@ import 'package:bodacious/widgets/item/song.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:fuzzywuzzy/fuzzywuzzy.dart' as fuzzy;
-import 'package:go_router/go_router.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:woozy_search/woozy_search.dart';
 
@@ -59,7 +56,6 @@ class SearchResultsView extends ConsumerWidget {
     : query.split(" ").contains("is:album") ? "album"
     : query.split(" ").contains("is:artist") ? "artist"
     : null;
-    print(typeFilter);
     if (to == "") return typeFilter != null;
     return typeFilter == to;
   }
@@ -193,7 +189,7 @@ class SearchResultsView extends ConsumerWidget {
             }
           ),
           if (!isFiltered() && (results.valueOrNull ?? []).where((element) => element.isTrack).length > 5) SliverToBoxAdapter(child: Container(
-            constraints: BoxConstraints.expand(height: 48),
+            constraints: const BoxConstraints.expand(height: 48),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
