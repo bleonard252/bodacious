@@ -28,8 +28,8 @@ final searchEngine = FutureProvider.family<List<SearchResult>, String>((ref, que
   final List<TrackMetadata> tracks = theFutureIsNow[0] as dynamic;
   final List<AlbumMetadata> albums = theFutureIsNow[1] as dynamic;
   final List<ArtistMetadata> artists = theFutureIsNow[2] as dynamic;
-  // double ratio(String str) => fuzzy.partialRatio(query, str) / 100;
-  // const limit = 0.4;
+  //double ratio(String str) => fuzzy.partialRatio(query, str) / 100;
+  const limit = 0.6;
   // final trackResults = tracks.where((element) => element.title != null && ratio(element.title!) >= limit).map((e) => SearchResult.track(e, accuracy: ratio(e.title!)));
   // final albumResults = albums.where((element) => ratio(element.name) >= limit).map((e) => SearchResult.album(e, accuracy: ratio(e.name)));
   // final artistResults = artists.where((element) => ratio(element.name) >= limit).map((e) => SearchResult.artist(e, accuracy: ratio(e.name)));
@@ -40,7 +40,7 @@ final searchEngine = FutureProvider.family<List<SearchResult>, String>((ref, que
   for (var element in tracks) {if (element.title != null) finder.addEntry(element.title!, value: SearchResult.track(element));}
   for (var element in albums) {finder.addEntry(element.name, value: SearchResult.album(element));}
   for (var element in artists) {finder.addEntry(element.name, value: SearchResult.artist(element));}
-  return finder.search(query).map((e) => e.value!.withAccuracy(e.score)).toList();
+  return finder.search(query).map((e) => e.value!.withAccuracy(e.score)).takeWhile((value) => value.accuracy >= limit).toList();
 });
 
 /// This widget should be rendered in the Home view,
@@ -75,15 +75,15 @@ class SearchResultsView extends ConsumerWidget {
       );
     }
 
-    if (results.valueOrNull?.isEmpty == true && results.valueOrNull == null) {
+    if (results.valueOrNull?.isEmpty == true || results.valueOrNull == null) {
       return Center(
         child: Column(
-          children: const [
-            Padding(
+          children: [
+            const Padding(
               padding: EdgeInsets.all(8.0),
               child: Icon(MdiIcons.ghost, color: Colors.blue),
             ),
-            Text("No results for your search", textAlign: TextAlign.center, style: TextStyle(color: Colors.blue))
+            Text("No results for your search", textAlign: TextAlign.center, style: Theme.of(context).textTheme.bodyText1?.copyWith(color: Colors.blue, shadows: [const Shadow(blurRadius: 2, color: Colors.white)]))
           ]
         )
       );
