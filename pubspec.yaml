@@ -57,6 +57,7 @@ dependencies:
   mime: ^1.0.1
   #on_audio_query: ^2.6.0 # for finding songs from Android and iOS system libraries
   fuzzywuzzy: ^0.2.0
+  woozy_search: ^2.0.3
 
   # Database deps
   drift: ^1.6.0
