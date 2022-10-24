@@ -28,14 +28,7 @@ final searchEngine = FutureProvider.family<List<SearchResult>, String>((ref, que
   final List<TrackMetadata> tracks = theFutureIsNow[0] as dynamic;
   final List<AlbumMetadata> albums = theFutureIsNow[1] as dynamic;
   final List<ArtistMetadata> artists = theFutureIsNow[2] as dynamic;
-  //double ratio(String str) => fuzzy.partialRatio(query, str) / 100;
   const limit = 0.6;
-  // final trackResults = tracks.where((element) => element.title != null && ratio(element.title!) >= limit).map((e) => SearchResult.track(e, accuracy: ratio(e.title!)));
-  // final albumResults = albums.where((element) => ratio(element.name) >= limit).map((e) => SearchResult.album(e, accuracy: ratio(e.name)));
-  // final artistResults = artists.where((element) => ratio(element.name) >= limit).map((e) => SearchResult.artist(e, accuracy: ratio(e.name)));
-  // final results = [...trackResults, ...albumResults, ...artistResults];
-  // results.sort((a, b) => b.accuracy.compareTo(a.accuracy));
-  // return results;
   final finder = Woozy<SearchResult>(limit: double.maxFinite.truncate());
   for (var element in tracks) {if (element.title != null) finder.addEntry(element.title!, value: SearchResult.track(element));}
   for (var element in albums) {finder.addEntry(element.name, value: SearchResult.album(element));}
