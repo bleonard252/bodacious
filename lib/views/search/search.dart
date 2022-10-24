@@ -1,4 +1,5 @@
 
+import 'dart:async';
 import 'dart:math';
 
 import 'package:bodacious/main.dart';
@@ -10,6 +11,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fuzzywuzzy/fuzzywuzzy.dart' as fuzzy;
+import 'package:go_router/go_router.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:woozy_search/woozy_search.dart';
 
@@ -28,11 +30,17 @@ final searchEngine = FutureProvider.family<List<SearchResult>, String>((ref, que
   final List<TrackMetadata> tracks = theFutureIsNow[0] as dynamic;
   final List<AlbumMetadata> albums = theFutureIsNow[1] as dynamic;
   final List<ArtistMetadata> artists = theFutureIsNow[2] as dynamic;
-  const limit = 0.6;
+  const limit = 0.5;
   final finder = Woozy<SearchResult>(limit: double.maxFinite.truncate());
-  for (var element in tracks) {if (element.title != null) finder.addEntry(element.title!, value: SearchResult.track(element));}
-  for (var element in albums) {finder.addEntry(element.name, value: SearchResult.album(element));}
-  for (var element in artists) {finder.addEntry(element.name, value: SearchResult.artist(element));}
+  query = query.replaceAll(RegExp(r'\s?is\:\w+'), '');
+  //query = query.replaceAll(r' ?is:\w+', '');
+  final typeFilter = query.split(" ").contains("is:track") ? "track"
+  : query.split(" ").contains("is:album") ? "album"
+  : query.split(" ").contains("is:artist") ? "artist"
+  : null;
+  if ((typeFilter??"track") == "track") for (var element in tracks) {if (element.title != null) finder.addEntry(element.title!, value: SearchResult.track(element));}
+  if ((typeFilter??"album") == "album") for (var element in albums) {finder.addEntry(element.name, value: SearchResult.album(element));}
+  if ((typeFilter??"artist") == "artist") for (var element in artists) {finder.addEntry(element.name, value: SearchResult.artist(element));}
   return finder.search(query).map((e) => e.value!.withAccuracy(e.score)).takeWhile((value) => value.accuracy >= limit).toList();
 });
 
@@ -40,9 +48,21 @@ final searchEngine = FutureProvider.family<List<SearchResult>, String>((ref, que
 /// in place of the recommendations.
 // ignore: must_be_immutable
 class SearchResultsView extends ConsumerWidget {
+  final FutureOr<void> Function(String newQuery) reSearch;
   final String query;
-  SearchResultsView({super.key, required this.query});
+  SearchResultsView({super.key, required this.query, required this.reSearch});
   SearchResult? _topResult;
+  //String? filterTo;
+
+  bool isFiltered({String? to = ""}) {
+    final typeFilter = query.split(" ").contains("is:track") ? "track"
+    : query.split(" ").contains("is:album") ? "album"
+    : query.split(" ").contains("is:artist") ? "artist"
+    : null;
+    print(typeFilter);
+    if (to == "") return typeFilter != null;
+    return typeFilter == to;
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -86,11 +106,13 @@ class SearchResultsView extends ConsumerWidget {
     return Material(
       color: Colors.transparent,
       child: CustomScrollView(
+        primary: false,
         slivers: [
           if (results.isRefreshing) SliverToBoxAdapter(child: ConstrainedBox(
             constraints: const BoxConstraints.expand(height: 64),
             child: const Center(child: CircularProgressIndicator(value: null)),
           )),
+
           if ((results.valueOrNull ?? []).take(3).any((element) => element.accuracy > 0.8)) SliverToBoxAdapter(child: Padding(
             padding: const EdgeInsets.all(16.0) + const EdgeInsets.only(top: 32),
             child: Text("Top Result", style: Theme.of(context).textTheme.headline5),
@@ -137,7 +159,12 @@ class SearchResultsView extends ConsumerWidget {
           )),
           Builder(
             builder: (context) {
-              final list = (results.valueOrNull ?? []).where((element) => element.isTrack).take(5);
+              late final Iterable<SearchResult> list;
+              if (isFiltered(to: "track")) {
+                list = (results.valueOrNull ?? []).where((element) => element.isTrack);
+              } else {
+                list = (results.valueOrNull ?? []).where((element) => element.isTrack).take(5);
+              }
               return SliverList(
                 delegate: SliverChildBuilderDelegate((context, index) {
                   final result = list.elementAt(index);
@@ -165,6 +192,18 @@ class SearchResultsView extends ConsumerWidget {
               );
             }
           ),
+          if (!isFiltered() && (results.valueOrNull ?? []).where((element) => element.isTrack).length > 5) SliverToBoxAdapter(child: Container(
+            constraints: BoxConstraints.expand(height: 48),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                TextButton(onPressed: () => reSearch(query+" is:track"), child: const Padding(
+                  padding: EdgeInsets.all(4.0),
+                  child: Text("See all tracks"),
+                ))
+              ],
+            ),
+          )),
 
           if ((results.valueOrNull ?? []).any((element) => element.isAlbum)) SliverToBoxAdapter(child: Padding(
             padding: const EdgeInsets.all(16.0) + const EdgeInsets.only(top: 32),
@@ -172,7 +211,13 @@ class SearchResultsView extends ConsumerWidget {
           )),
           Builder(
             builder: (context) {
-              final list = (results.valueOrNull ?? []).where((element) => element.isAlbum).take(5);
+              //final list = (results.valueOrNull ?? []).where((element) => element.isAlbum).take(5);
+              late final Iterable<SearchResult> list;
+              if (isFiltered(to: "album")) {
+                list = (results.valueOrNull ?? []).where((element) => element.isAlbum);
+              } else {
+                list = (results.valueOrNull ?? []).where((element) => element.isAlbum).take(5);
+              }
               return SliverList(
                 delegate: SliverChildBuilderDelegate((context, index) {
                   final result = list.elementAt(index);
@@ -192,6 +237,15 @@ class SearchResultsView extends ConsumerWidget {
               );
             }
           ),
+          if (!isFiltered() && (results.valueOrNull ?? []).where((element) => element.isAlbum).length > 5) SliverToBoxAdapter(child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              TextButton(onPressed: () => reSearch(query+" is:album"), child: const Padding(
+                padding: EdgeInsets.all(4.0),
+                child: Text("See all albums"),
+              ))
+            ],
+          )),
 
           if ((results.valueOrNull ?? []).any((element) => element.isArtist)) SliverToBoxAdapter(child: Padding(
             padding: const EdgeInsets.all(16.0) + const EdgeInsets.only(top: 32),
@@ -199,7 +253,13 @@ class SearchResultsView extends ConsumerWidget {
           )),
           Builder(
             builder: (context) {
-              final list = (results.valueOrNull ?? []).where((element) => element.isArtist).take(5);
+              //final list = (results.valueOrNull ?? []).where((element) => element.isArtist).take(5);
+              late final Iterable<SearchResult> list;
+              if (isFiltered(to: "artist")) {
+                list = (results.valueOrNull ?? []).where((element) => element.isArtist);
+              } else {
+                list = (results.valueOrNull ?? []).where((element) => element.isArtist).take(5);
+              }
               return SliverList(
                 delegate: SliverChildBuilderDelegate((context, index) {
                   final result = list.elementAt(index);
@@ -219,6 +279,15 @@ class SearchResultsView extends ConsumerWidget {
               );
             }
           ),
+          if (!isFiltered() && (results.valueOrNull ?? []).where((element) => element.isArtist).length > 5) SliverToBoxAdapter(child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              TextButton(onPressed: () => reSearch(query+" is:artist"), child: const Padding(
+                padding: EdgeInsets.all(4.0),
+                child: Text("See all artists"),
+              ))
+            ],
+          )),
         ],
       ),
     );
