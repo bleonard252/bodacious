@@ -12,11 +12,11 @@ class TrackTable extends Table {
   TextColumn get id => text().withLength(max: 20, min: 7).clientDefault(() => nanoid(13))();
   TextColumn get title => text().nullable()();
   TextColumn get artistName => text().nullable()();
-  TextColumn get trackArtistId => text().references(ArtistTable, #id)();
+  TextColumn get trackArtistId => text().nullable().references(ArtistTable, #id)();
   TextColumn get albumArtistName => text().nullable()();
-  TextColumn get albumArtistId => text().references(ArtistTable, #id)();
+  TextColumn get albumArtistId => text().nullable().references(ArtistTable, #id)();
   TextColumn get albumName => text().nullable()();
-  TextColumn get albumId => text().references(AlbumTable, #id)();
+  TextColumn get albumId => text().nullable().references(AlbumTable, #id)();
   IntColumn get trackNo => integer().withDefault(const Constant(0))();
   IntColumn get discNo => integer().withDefault(const Constant(0))();
   TextColumn get description => text().nullable()();

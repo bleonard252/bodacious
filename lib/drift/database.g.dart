@@ -354,7 +354,7 @@ class AlbumTableCompanion extends UpdateCompanion<AlbumMetadata> {
   final Value<String> id;
   final Value<String> name;
   final Value<String> artistName;
-  final Value<String> artistId;
+  final Value<String?> artistId;
   final Value<Uri?> coverUri;
   final Value<Uri?> coverUriRemote;
   final Value<String?> coverSource;
@@ -385,7 +385,7 @@ class AlbumTableCompanion extends UpdateCompanion<AlbumMetadata> {
     this.id = const Value.absent(),
     required String name,
     required String artistName,
-    required String artistId,
+    this.artistId = const Value.absent(),
     this.coverUri = const Value.absent(),
     this.coverUriRemote = const Value.absent(),
     this.coverSource = const Value.absent(),
@@ -397,13 +397,12 @@ class AlbumTableCompanion extends UpdateCompanion<AlbumMetadata> {
     this.spotifyId = const Value.absent(),
     this.metadataSource = const Value.absent(),
   })  : name = Value(name),
-        artistName = Value(artistName),
-        artistId = Value(artistId);
+        artistName = Value(artistName);
   static Insertable<AlbumMetadata> custom({
     Expression<String>? id,
     Expression<String>? name,
     Expression<String>? artistName,
-    Expression<String>? artistId,
+    Expression<String?>? artistId,
     Expression<Uri?>? coverUri,
     Expression<Uri?>? coverUriRemote,
     Expression<String?>? coverSource,
@@ -437,7 +436,7 @@ class AlbumTableCompanion extends UpdateCompanion<AlbumMetadata> {
       {Value<String>? id,
       Value<String>? name,
       Value<String>? artistName,
-      Value<String>? artistId,
+      Value<String?>? artistId,
       Value<Uri?>? coverUri,
       Value<Uri?>? coverUriRemote,
       Value<String?>? coverSource,
@@ -479,7 +478,7 @@ class AlbumTableCompanion extends UpdateCompanion<AlbumMetadata> {
       map['artist_name'] = Variable<String>(artistName.value);
     }
     if (artistId.present) {
-      map['artist_id'] = Variable<String>(artistId.value);
+      map['artist_id'] = Variable<String?>(artistId.value);
     }
     if (coverUri.present) {
       final converter = $AlbumTableTable.$converter0;
@@ -567,9 +566,9 @@ class $AlbumTableTable extends AlbumTable
   final VerificationMeta _artistIdMeta = const VerificationMeta('artistId');
   @override
   late final GeneratedColumn<String?> artistId = GeneratedColumn<String?>(
-      'artist_id', aliasedName, false,
+      'artist_id', aliasedName, true,
       type: const StringType(),
-      requiredDuringInsert: true,
+      requiredDuringInsert: false,
       defaultConstraints: 'REFERENCES artist_table (id)');
   final VerificationMeta _coverUriMeta = const VerificationMeta('coverUri');
   @override
@@ -675,8 +674,6 @@ class $AlbumTableTable extends AlbumTable
     if (data.containsKey('artist_id')) {
       context.handle(_artistIdMeta,
           artistId.isAcceptableOrUnknown(data['artist_id']!, _artistIdMeta));
-    } else if (isInserting) {
-      context.missing(_artistIdMeta);
     }
     context.handle(_coverUriMeta, const VerificationResult.success());
     context.handle(_coverUriRemoteMeta, const VerificationResult.success());
@@ -738,7 +735,7 @@ class $AlbumTableTable extends AlbumTable
       artistName: const StringType()
           .mapFromDatabaseResponse(data['${effectivePrefix}artist_name'])!,
       artistId: const StringType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}artist_id'])!,
+          .mapFromDatabaseResponse(data['${effectivePrefix}artist_id']),
       name: const StringType()
           .mapFromDatabaseResponse(data['${effectivePrefix}name'])!,
       coverUri: $AlbumTableTable.$converter0.mapToDart(const StringType()
@@ -777,11 +774,11 @@ class TrackTableCompanion extends UpdateCompanion<TrackMetadata> {
   final Value<String> id;
   final Value<String?> title;
   final Value<String?> artistName;
-  final Value<String> trackArtistId;
+  final Value<String?> trackArtistId;
   final Value<String?> albumArtistName;
-  final Value<String> albumArtistId;
+  final Value<String?> albumArtistId;
   final Value<String?> albumName;
-  final Value<String> albumId;
+  final Value<String?> albumId;
   final Value<int> trackNo;
   final Value<int> discNo;
   final Value<String?> description;
@@ -826,11 +823,11 @@ class TrackTableCompanion extends UpdateCompanion<TrackMetadata> {
     this.id = const Value.absent(),
     this.title = const Value.absent(),
     this.artistName = const Value.absent(),
-    required String trackArtistId,
+    this.trackArtistId = const Value.absent(),
     this.albumArtistName = const Value.absent(),
-    required String albumArtistId,
+    this.albumArtistId = const Value.absent(),
     this.albumName = const Value.absent(),
-    required String albumId,
+    this.albumId = const Value.absent(),
     this.trackNo = const Value.absent(),
     this.discNo = const Value.absent(),
     this.description = const Value.absent(),
@@ -846,19 +843,16 @@ class TrackTableCompanion extends UpdateCompanion<TrackMetadata> {
     this.spotifyId = const Value.absent(),
     this.source = const Value.absent(),
     this.metadataSource = const Value.absent(),
-  })  : trackArtistId = Value(trackArtistId),
-        albumArtistId = Value(albumArtistId),
-        albumId = Value(albumId),
-        uri = Value(uri);
+  }) : uri = Value(uri);
   static Insertable<TrackMetadata> custom({
     Expression<String>? id,
     Expression<String?>? title,
     Expression<String?>? artistName,
-    Expression<String>? trackArtistId,
+    Expression<String?>? trackArtistId,
     Expression<String?>? albumArtistName,
-    Expression<String>? albumArtistId,
+    Expression<String?>? albumArtistId,
     Expression<String?>? albumName,
-    Expression<String>? albumId,
+    Expression<String?>? albumId,
     Expression<int>? trackNo,
     Expression<int>? discNo,
     Expression<String?>? description,
@@ -906,11 +900,11 @@ class TrackTableCompanion extends UpdateCompanion<TrackMetadata> {
       {Value<String>? id,
       Value<String?>? title,
       Value<String?>? artistName,
-      Value<String>? trackArtistId,
+      Value<String?>? trackArtistId,
       Value<String?>? albumArtistName,
-      Value<String>? albumArtistId,
+      Value<String?>? albumArtistId,
       Value<String?>? albumName,
-      Value<String>? albumId,
+      Value<String?>? albumId,
       Value<int>? trackNo,
       Value<int>? discNo,
       Value<String?>? description,
@@ -966,19 +960,19 @@ class TrackTableCompanion extends UpdateCompanion<TrackMetadata> {
       map['artist_name'] = Variable<String?>(artistName.value);
     }
     if (trackArtistId.present) {
-      map['track_artist_id'] = Variable<String>(trackArtistId.value);
+      map['track_artist_id'] = Variable<String?>(trackArtistId.value);
     }
     if (albumArtistName.present) {
       map['album_artist_name'] = Variable<String?>(albumArtistName.value);
     }
     if (albumArtistId.present) {
-      map['album_artist_id'] = Variable<String>(albumArtistId.value);
+      map['album_artist_id'] = Variable<String?>(albumArtistId.value);
     }
     if (albumName.present) {
       map['album_name'] = Variable<String?>(albumName.value);
     }
     if (albumId.present) {
-      map['album_id'] = Variable<String>(albumId.value);
+      map['album_id'] = Variable<String?>(albumId.value);
     }
     if (trackNo.present) {
       map['track_no'] = Variable<int>(trackNo.value);
@@ -1093,9 +1087,9 @@ class $TrackTableTable extends TrackTable
       const VerificationMeta('trackArtistId');
   @override
   late final GeneratedColumn<String?> trackArtistId = GeneratedColumn<String?>(
-      'track_artist_id', aliasedName, false,
+      'track_artist_id', aliasedName, true,
       type: const StringType(),
-      requiredDuringInsert: true,
+      requiredDuringInsert: false,
       defaultConstraints: 'REFERENCES artist_table (id)');
   final VerificationMeta _albumArtistNameMeta =
       const VerificationMeta('albumArtistName');
@@ -1107,9 +1101,9 @@ class $TrackTableTable extends TrackTable
       const VerificationMeta('albumArtistId');
   @override
   late final GeneratedColumn<String?> albumArtistId = GeneratedColumn<String?>(
-      'album_artist_id', aliasedName, false,
+      'album_artist_id', aliasedName, true,
       type: const StringType(),
-      requiredDuringInsert: true,
+      requiredDuringInsert: false,
       defaultConstraints: 'REFERENCES artist_table (id)');
   final VerificationMeta _albumNameMeta = const VerificationMeta('albumName');
   @override
@@ -1119,9 +1113,9 @@ class $TrackTableTable extends TrackTable
   final VerificationMeta _albumIdMeta = const VerificationMeta('albumId');
   @override
   late final GeneratedColumn<String?> albumId = GeneratedColumn<String?>(
-      'album_id', aliasedName, false,
+      'album_id', aliasedName, true,
       type: const StringType(),
-      requiredDuringInsert: true,
+      requiredDuringInsert: false,
       defaultConstraints: 'REFERENCES album_table (id)');
   final VerificationMeta _trackNoMeta = const VerificationMeta('trackNo');
   @override
@@ -1268,8 +1262,6 @@ class $TrackTableTable extends TrackTable
           _trackArtistIdMeta,
           trackArtistId.isAcceptableOrUnknown(
               data['track_artist_id']!, _trackArtistIdMeta));
-    } else if (isInserting) {
-      context.missing(_trackArtistIdMeta);
     }
     if (data.containsKey('album_artist_name')) {
       context.handle(
@@ -1282,8 +1274,6 @@ class $TrackTableTable extends TrackTable
           _albumArtistIdMeta,
           albumArtistId.isAcceptableOrUnknown(
               data['album_artist_id']!, _albumArtistIdMeta));
-    } else if (isInserting) {
-      context.missing(_albumArtistIdMeta);
     }
     if (data.containsKey('album_name')) {
       context.handle(_albumNameMeta,
@@ -1292,8 +1282,6 @@ class $TrackTableTable extends TrackTable
     if (data.containsKey('album_id')) {
       context.handle(_albumIdMeta,
           albumId.isAcceptableOrUnknown(data['album_id']!, _albumIdMeta));
-    } else if (isInserting) {
-      context.missing(_albumIdMeta);
     }
     if (data.containsKey('track_no')) {
       context.handle(_trackNoMeta,
@@ -1371,13 +1359,13 @@ class $TrackTableTable extends TrackTable
       albumArtistName: const StringType()
           .mapFromDatabaseResponse(data['${effectivePrefix}album_artist_name']),
       albumArtistId: const StringType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}album_artist_id'])!,
+          .mapFromDatabaseResponse(data['${effectivePrefix}album_artist_id']),
       trackArtistId: const StringType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}track_artist_id'])!,
+          .mapFromDatabaseResponse(data['${effectivePrefix}track_artist_id']),
       albumName: const StringType()
           .mapFromDatabaseResponse(data['${effectivePrefix}album_name']),
       albumId: const StringType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}album_id'])!,
+          .mapFromDatabaseResponse(data['${effectivePrefix}album_id']),
       trackNo: const IntType()
           .mapFromDatabaseResponse(data['${effectivePrefix}track_no'])!,
       discNo: const IntType()

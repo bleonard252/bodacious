@@ -63,7 +63,8 @@ mixin _$ArtistMetadata {
 abstract class $ArtistMetadataCopyWith<$Res> {
   factory $ArtistMetadataCopyWith(
           ArtistMetadata value, $Res Function(ArtistMetadata) then) =
-      _$ArtistMetadataCopyWithImpl<$Res>;
+      _$ArtistMetadataCopyWithImpl<$Res, ArtistMetadata>;
+  @useResult
   $Res call(
       {String id,
       String name,
@@ -79,18 +80,20 @@ abstract class $ArtistMetadataCopyWith<$Res> {
 }
 
 /// @nodoc
-class _$ArtistMetadataCopyWithImpl<$Res>
+class _$ArtistMetadataCopyWithImpl<$Res, $Val extends ArtistMetadata>
     implements $ArtistMetadataCopyWith<$Res> {
   _$ArtistMetadataCopyWithImpl(this._value, this._then);
 
-  final ArtistMetadata _value;
   // ignore: unused_field
-  final $Res Function(ArtistMetadata) _then;
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
 
+  @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? id = freezed,
-    Object? name = freezed,
+    Object? id = null,
+    Object? name = null,
     Object? coverUri = freezed,
     Object? coverUriRemote = freezed,
     Object? coverSource = freezed,
@@ -102,51 +105,51 @@ class _$ArtistMetadataCopyWithImpl<$Res>
     Object? metadataSource = freezed,
   }) {
     return _then(_value.copyWith(
-      id: id == freezed
+      id: null == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
               as String,
-      name: name == freezed
+      name: null == name
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
               as String,
-      coverUri: coverUri == freezed
+      coverUri: freezed == coverUri
           ? _value.coverUri
           : coverUri // ignore: cast_nullable_to_non_nullable
               as Uri?,
-      coverUriRemote: coverUriRemote == freezed
+      coverUriRemote: freezed == coverUriRemote
           ? _value.coverUriRemote
           : coverUriRemote // ignore: cast_nullable_to_non_nullable
               as Uri?,
-      coverSource: coverSource == freezed
+      coverSource: freezed == coverSource
           ? _value.coverSource
           : coverSource // ignore: cast_nullable_to_non_nullable
               as String?,
-      description: description == freezed
+      description: freezed == description
           ? _value.description
           : description // ignore: cast_nullable_to_non_nullable
               as String?,
-      descriptionSource: descriptionSource == freezed
+      descriptionSource: freezed == descriptionSource
           ? _value.descriptionSource
           : descriptionSource // ignore: cast_nullable_to_non_nullable
               as String?,
-      albumCount: albumCount == freezed
+      albumCount: freezed == albumCount
           ? _value.albumCount
           : albumCount // ignore: cast_nullable_to_non_nullable
               as int?,
-      trackCount: trackCount == freezed
+      trackCount: freezed == trackCount
           ? _value.trackCount
           : trackCount // ignore: cast_nullable_to_non_nullable
               as int?,
-      spotifyId: spotifyId == freezed
+      spotifyId: freezed == spotifyId
           ? _value.spotifyId
           : spotifyId // ignore: cast_nullable_to_non_nullable
               as String?,
-      metadataSource: metadataSource == freezed
+      metadataSource: freezed == metadataSource
           ? _value.metadataSource
           : metadataSource // ignore: cast_nullable_to_non_nullable
               as String?,
-    ));
+    ) as $Val);
   }
 }
 
@@ -157,6 +160,7 @@ abstract class _$$_ArtistMetadataCopyWith<$Res>
           _$_ArtistMetadata value, $Res Function(_$_ArtistMetadata) then) =
       __$$_ArtistMetadataCopyWithImpl<$Res>;
   @override
+  @useResult
   $Res call(
       {String id,
       String name,
@@ -173,19 +177,17 @@ abstract class _$$_ArtistMetadataCopyWith<$Res>
 
 /// @nodoc
 class __$$_ArtistMetadataCopyWithImpl<$Res>
-    extends _$ArtistMetadataCopyWithImpl<$Res>
+    extends _$ArtistMetadataCopyWithImpl<$Res, _$_ArtistMetadata>
     implements _$$_ArtistMetadataCopyWith<$Res> {
   __$$_ArtistMetadataCopyWithImpl(
       _$_ArtistMetadata _value, $Res Function(_$_ArtistMetadata) _then)
-      : super(_value, (v) => _then(v as _$_ArtistMetadata));
+      : super(_value, _then);
 
-  @override
-  _$_ArtistMetadata get _value => super._value as _$_ArtistMetadata;
-
+  @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? id = freezed,
-    Object? name = freezed,
+    Object? id = null,
+    Object? name = null,
     Object? coverUri = freezed,
     Object? coverUriRemote = freezed,
     Object? coverSource = freezed,
@@ -197,47 +199,47 @@ class __$$_ArtistMetadataCopyWithImpl<$Res>
     Object? metadataSource = freezed,
   }) {
     return _then(_$_ArtistMetadata(
-      id: id == freezed
+      id: null == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
               as String,
-      name: name == freezed
+      name: null == name
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
               as String,
-      coverUri: coverUri == freezed
+      coverUri: freezed == coverUri
           ? _value.coverUri
           : coverUri // ignore: cast_nullable_to_non_nullable
               as Uri?,
-      coverUriRemote: coverUriRemote == freezed
+      coverUriRemote: freezed == coverUriRemote
           ? _value.coverUriRemote
           : coverUriRemote // ignore: cast_nullable_to_non_nullable
               as Uri?,
-      coverSource: coverSource == freezed
+      coverSource: freezed == coverSource
           ? _value.coverSource
           : coverSource // ignore: cast_nullable_to_non_nullable
               as String?,
-      description: description == freezed
+      description: freezed == description
           ? _value.description
           : description // ignore: cast_nullable_to_non_nullable
               as String?,
-      descriptionSource: descriptionSource == freezed
+      descriptionSource: freezed == descriptionSource
           ? _value.descriptionSource
           : descriptionSource // ignore: cast_nullable_to_non_nullable
               as String?,
-      albumCount: albumCount == freezed
+      albumCount: freezed == albumCount
           ? _value.albumCount
           : albumCount // ignore: cast_nullable_to_non_nullable
               as int?,
-      trackCount: trackCount == freezed
+      trackCount: freezed == trackCount
           ? _value.trackCount
           : trackCount // ignore: cast_nullable_to_non_nullable
               as int?,
-      spotifyId: spotifyId == freezed
+      spotifyId: freezed == spotifyId
           ? _value.spotifyId
           : spotifyId // ignore: cast_nullable_to_non_nullable
               as String?,
-      metadataSource: metadataSource == freezed
+      metadataSource: freezed == metadataSource
           ? _value.metadataSource
           : metadataSource // ignore: cast_nullable_to_non_nullable
               as String?,
@@ -338,50 +340,55 @@ class _$_ArtistMetadata extends _ArtistMetadata with DiagnosticableTreeMixin {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$_ArtistMetadata &&
-            const DeepCollectionEquality().equals(other.id, id) &&
-            const DeepCollectionEquality().equals(other.name, name) &&
-            const DeepCollectionEquality().equals(other.coverUri, coverUri) &&
-            const DeepCollectionEquality()
-                .equals(other.coverUriRemote, coverUriRemote) &&
-            const DeepCollectionEquality()
-                .equals(other.coverSource, coverSource) &&
-            const DeepCollectionEquality()
-                .equals(other.description, description) &&
-            const DeepCollectionEquality()
-                .equals(other.descriptionSource, descriptionSource) &&
-            const DeepCollectionEquality()
-                .equals(other.albumCount, albumCount) &&
-            const DeepCollectionEquality()
-                .equals(other.trackCount, trackCount) &&
-            const DeepCollectionEquality().equals(other.spotifyId, spotifyId) &&
-            const DeepCollectionEquality()
-                .equals(other.metadataSource, metadataSource));
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.name, name) || other.name == name) &&
+            (identical(other.coverUri, coverUri) ||
+                other.coverUri == coverUri) &&
+            (identical(other.coverUriRemote, coverUriRemote) ||
+                other.coverUriRemote == coverUriRemote) &&
+            (identical(other.coverSource, coverSource) ||
+                other.coverSource == coverSource) &&
+            (identical(other.description, description) ||
+                other.description == description) &&
+            (identical(other.descriptionSource, descriptionSource) ||
+                other.descriptionSource == descriptionSource) &&
+            (identical(other.albumCount, albumCount) ||
+                other.albumCount == albumCount) &&
+            (identical(other.trackCount, trackCount) ||
+                other.trackCount == trackCount) &&
+            (identical(other.spotifyId, spotifyId) ||
+                other.spotifyId == spotifyId) &&
+            (identical(other.metadataSource, metadataSource) ||
+                other.metadataSource == metadataSource));
   }
 
   @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(
       runtimeType,
-      const DeepCollectionEquality().hash(id),
-      const DeepCollectionEquality().hash(name),
-      const DeepCollectionEquality().hash(coverUri),
-      const DeepCollectionEquality().hash(coverUriRemote),
-      const DeepCollectionEquality().hash(coverSource),
-      const DeepCollectionEquality().hash(description),
-      const DeepCollectionEquality().hash(descriptionSource),
-      const DeepCollectionEquality().hash(albumCount),
-      const DeepCollectionEquality().hash(trackCount),
-      const DeepCollectionEquality().hash(spotifyId),
-      const DeepCollectionEquality().hash(metadataSource));
+      id,
+      name,
+      coverUri,
+      coverUriRemote,
+      coverSource,
+      description,
+      descriptionSource,
+      albumCount,
+      trackCount,
+      spotifyId,
+      metadataSource);
 
   @JsonKey(ignore: true)
   @override
+  @pragma('vm:prefer-inline')
   _$$_ArtistMetadataCopyWith<_$_ArtistMetadata> get copyWith =>
       __$$_ArtistMetadataCopyWithImpl<_$_ArtistMetadata>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$_ArtistMetadataToJson(this);
+    return _$$_ArtistMetadataToJson(
+      this,
+    );
   }
 }
 
@@ -408,45 +415,45 @@ abstract class _ArtistMetadata extends ArtistMetadata {
   /// The database ID of the artist.
   /// It is 7-20 characters long but is generally 10 characters long.
   /// These IDs are unique but not ordered.
-  String get id => throw _privateConstructorUsedError;
+  String get id;
   @override
 
   /// The artist's name.
-  String get name => throw _privateConstructorUsedError;
+  String get name;
   @override
 
   /// The URI to the artist icon.
-  Uri? get coverUri => throw _privateConstructorUsedError;
+  Uri? get coverUri;
   @override
 
   /// A remote URI to the cover, such as from Spotify.
   /// Generally the URL used to download the cover from [coverSource].
   /// This is used with Discord RPC.
-  Uri? get coverUriRemote => throw _privateConstructorUsedError;
+  Uri? get coverUriRemote;
   @override
 
   /// Can be "spotify", "metadata", "neighbor", "mse", "lastfm", "genius", or other sources.
-  String? get coverSource => throw _privateConstructorUsedError;
+  String? get coverSource;
   @override
 
   /// A biography for the artist.
-  String? get description => throw _privateConstructorUsedError;
+  String? get description;
   @override
 
   /// Where the biography came from.
-  String? get descriptionSource => throw _privateConstructorUsedError;
+  String? get descriptionSource;
   @override
 
   /// The total number of albums by this artist (or albums present in the library).
-  int? get albumCount => throw _privateConstructorUsedError;
+  int? get albumCount;
   @override
 
   /// The total number of tracks by this artist (or tracks present in the library).
-  int? get trackCount => throw _privateConstructorUsedError;
+  int? get trackCount;
   @override
-  String? get spotifyId => throw _privateConstructorUsedError;
+  String? get spotifyId;
   @override
-  String? get metadataSource => throw _privateConstructorUsedError;
+  String? get metadataSource;
   @override
   @JsonKey(ignore: true)
   _$$_ArtistMetadataCopyWith<_$_ArtistMetadata> get copyWith =>

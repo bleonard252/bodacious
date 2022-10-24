@@ -12,7 +12,7 @@ class AlbumTable extends Table {
   TextColumn get id => text().withLength(max: 20, min: 7).clientDefault(() => nanoid(12))();
   TextColumn get name => text()();
   TextColumn get artistName => text()();
-  TextColumn get artistId => text().references(ArtistTable, #id)();
+  TextColumn get artistId => text().nullable().references(ArtistTable, #id)();
   TextColumn get coverUri => text().map(UriConverter()).nullable()();
   TextColumn get coverUriRemote => text().map(UriConverter()).nullable()();
   TextColumn get coverSource => text().nullable()();

@@ -28,14 +28,14 @@ class TrackMetadata with _$TrackMetadata implements Insertable<TrackMetadata> {
     /// The name of the artist of the album.
     String? albumArtistName,
     /// The database ID of the album artist.
-    @Default("") String albumArtistId,
+    String? albumArtistId,
     /// The database ID of the track artist.
     /// This is usually the same as [albumArtistId].
-    @Default("") String trackArtistId,
+    String? trackArtistId,
     /// The album's name. Also used with [artistName] to look up the album in the database.
     String? albumName,
     /// The album's database ID.
-    @Default("") String albumId,
+    String? albumId,
     /// The position of the track on the named album.
     int? trackNo,
     @Default(0) int discNo,

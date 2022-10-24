@@ -17,7 +17,7 @@ class AlbumMetadata with _$AlbumMetadata implements Insertable<AlbumMetadata> {
     @Default("") String id,
     /// The artist's name, used to group this album and make it unique.
     required String artistName,
-    @Default("") String artistId,
+    String? artistId,
     /// The album's name.
     required String name,
     /// The URI to the album cover.

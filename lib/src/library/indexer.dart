@@ -303,13 +303,13 @@ class _IndexerIsolate {
 
         if (record.artistName != record.albumArtistName) {
           final albumArtist = await registerArtistMetadata(record, true);
-          record = record.copyWith(albumArtistId: albumArtist!.id);
+          record = record.copyWith(albumArtistId: (albumArtist ?? artist).id);
         } else {
           record = record.copyWith(albumArtistId: record.trackArtistId);
         }
 
         final album = await registerAlbumMetadata(record);
-        record = record.copyWith(albumId: album!.id);
+        if (album != null) record = record.copyWith(albumId: album.id);
 
         //await tr_rec.put(db, record.toJson());
         await db.into(db.trackTable).insertOnConflictUpdate(record);

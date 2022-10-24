@@ -10,7 +10,7 @@ _$_AlbumMetadata _$$_AlbumMetadataFromJson(Map<String, dynamic> json) =>
     _$_AlbumMetadata(
       id: json['id'] as String? ?? "",
       artistName: json['artistName'] as String,
-      artistId: json['artistId'] as String? ?? "",
+      artistId: json['artistId'] as String?,
       name: json['name'] as String,
       coverUri: json['coverUri'] == null
           ? null

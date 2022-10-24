@@ -35,17 +35,17 @@ mixin _$TrackMetadata {
   String? get albumArtistName => throw _privateConstructorUsedError;
 
   /// The database ID of the album artist.
-  String get albumArtistId => throw _privateConstructorUsedError;
+  String? get albumArtistId => throw _privateConstructorUsedError;
 
   /// The database ID of the track artist.
   /// This is usually the same as [albumArtistId].
-  String get trackArtistId => throw _privateConstructorUsedError;
+  String? get trackArtistId => throw _privateConstructorUsedError;
 
   /// The album's name. Also used with [artistName] to look up the album in the database.
   String? get albumName => throw _privateConstructorUsedError;
 
   /// The album's database ID.
-  String get albumId => throw _privateConstructorUsedError;
+  String? get albumId => throw _privateConstructorUsedError;
 
   /// The position of the track on the named album.
   int? get trackNo => throw _privateConstructorUsedError;
@@ -111,16 +111,17 @@ mixin _$TrackMetadata {
 abstract class $TrackMetadataCopyWith<$Res> {
   factory $TrackMetadataCopyWith(
           TrackMetadata value, $Res Function(TrackMetadata) then) =
-      _$TrackMetadataCopyWithImpl<$Res>;
+      _$TrackMetadataCopyWithImpl<$Res, TrackMetadata>;
+  @useResult
   $Res call(
       {String id,
       String? title,
       String? artistName,
       String? albumArtistName,
-      String albumArtistId,
-      String trackArtistId,
+      String? albumArtistId,
+      String? trackArtistId,
       String? albumName,
-      String albumId,
+      String? albumId,
       int? trackNo,
       int discNo,
       String? description,
@@ -141,17 +142,19 @@ abstract class $TrackMetadataCopyWith<$Res> {
 }
 
 /// @nodoc
-class _$TrackMetadataCopyWithImpl<$Res>
+class _$TrackMetadataCopyWithImpl<$Res, $Val extends TrackMetadata>
     implements $TrackMetadataCopyWith<$Res> {
   _$TrackMetadataCopyWithImpl(this._value, this._then);
 
-  final TrackMetadata _value;
   // ignore: unused_field
-  final $Res Function(TrackMetadata) _then;
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
 
+  @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? id = freezed,
+    Object? id = null,
     Object? title = freezed,
     Object? artistName = freezed,
     Object? albumArtistName = freezed,
@@ -160,11 +163,11 @@ class _$TrackMetadataCopyWithImpl<$Res>
     Object? albumName = freezed,
     Object? albumId = freezed,
     Object? trackNo = freezed,
-    Object? discNo = freezed,
+    Object? discNo = null,
     Object? description = freezed,
     Object? descriptionSource = freezed,
     Object? coverData = freezed,
-    Object? uri = freezed,
+    Object? uri = null,
     Object? coverBytes = freezed,
     Object? coverUri = freezed,
     Object? coverUriRemote = freezed,
@@ -172,113 +175,113 @@ class _$TrackMetadataCopyWithImpl<$Res>
     Object? duration = freezed,
     Object? year = freezed,
     Object? releaseDate = freezed,
-    Object? available = freezed,
+    Object? available = null,
     Object? spotifyId = freezed,
     Object? source = freezed,
     Object? metadataSource = freezed,
   }) {
     return _then(_value.copyWith(
-      id: id == freezed
+      id: null == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
               as String,
-      title: title == freezed
+      title: freezed == title
           ? _value.title
           : title // ignore: cast_nullable_to_non_nullable
               as String?,
-      artistName: artistName == freezed
+      artistName: freezed == artistName
           ? _value.artistName
           : artistName // ignore: cast_nullable_to_non_nullable
               as String?,
-      albumArtistName: albumArtistName == freezed
+      albumArtistName: freezed == albumArtistName
           ? _value.albumArtistName
           : albumArtistName // ignore: cast_nullable_to_non_nullable
               as String?,
-      albumArtistId: albumArtistId == freezed
+      albumArtistId: freezed == albumArtistId
           ? _value.albumArtistId
           : albumArtistId // ignore: cast_nullable_to_non_nullable
-              as String,
-      trackArtistId: trackArtistId == freezed
+              as String?,
+      trackArtistId: freezed == trackArtistId
           ? _value.trackArtistId
           : trackArtistId // ignore: cast_nullable_to_non_nullable
-              as String,
-      albumName: albumName == freezed
+              as String?,
+      albumName: freezed == albumName
           ? _value.albumName
           : albumName // ignore: cast_nullable_to_non_nullable
               as String?,
-      albumId: albumId == freezed
+      albumId: freezed == albumId
           ? _value.albumId
           : albumId // ignore: cast_nullable_to_non_nullable
-              as String,
-      trackNo: trackNo == freezed
+              as String?,
+      trackNo: freezed == trackNo
           ? _value.trackNo
           : trackNo // ignore: cast_nullable_to_non_nullable
               as int?,
-      discNo: discNo == freezed
+      discNo: null == discNo
           ? _value.discNo
           : discNo // ignore: cast_nullable_to_non_nullable
               as int,
-      description: description == freezed
+      description: freezed == description
           ? _value.description
           : description // ignore: cast_nullable_to_non_nullable
               as String?,
-      descriptionSource: descriptionSource == freezed
+      descriptionSource: freezed == descriptionSource
           ? _value.descriptionSource
           : descriptionSource // ignore: cast_nullable_to_non_nullable
               as String?,
-      coverData: coverData == freezed
+      coverData: freezed == coverData
           ? _value.coverData
           : coverData // ignore: cast_nullable_to_non_nullable
               as ImageDescriptor?,
-      uri: uri == freezed
+      uri: null == uri
           ? _value.uri
           : uri // ignore: cast_nullable_to_non_nullable
               as Uri,
-      coverBytes: coverBytes == freezed
+      coverBytes: freezed == coverBytes
           ? _value.coverBytes
           : coverBytes // ignore: cast_nullable_to_non_nullable
               as List<int>?,
-      coverUri: coverUri == freezed
+      coverUri: freezed == coverUri
           ? _value.coverUri
           : coverUri // ignore: cast_nullable_to_non_nullable
               as Uri?,
-      coverUriRemote: coverUriRemote == freezed
+      coverUriRemote: freezed == coverUriRemote
           ? _value.coverUriRemote
           : coverUriRemote // ignore: cast_nullable_to_non_nullable
               as Uri?,
-      coverSource: coverSource == freezed
+      coverSource: freezed == coverSource
           ? _value.coverSource
           : coverSource // ignore: cast_nullable_to_non_nullable
               as String?,
-      duration: duration == freezed
+      duration: freezed == duration
           ? _value.duration
           : duration // ignore: cast_nullable_to_non_nullable
               as Duration?,
-      year: year == freezed
+      year: freezed == year
           ? _value.year
           : year // ignore: cast_nullable_to_non_nullable
               as int?,
-      releaseDate: releaseDate == freezed
+      releaseDate: freezed == releaseDate
           ? _value.releaseDate
           : releaseDate // ignore: cast_nullable_to_non_nullable
               as DateTime?,
-      available: available == freezed
+      available: null == available
           ? _value.available
           : available // ignore: cast_nullable_to_non_nullable
               as bool,
-      spotifyId: spotifyId == freezed
+      spotifyId: freezed == spotifyId
           ? _value.spotifyId
           : spotifyId // ignore: cast_nullable_to_non_nullable
               as String?,
-      source: source == freezed
+      source: freezed == source
           ? _value.source
           : source // ignore: cast_nullable_to_non_nullable
               as String?,
-      metadataSource: metadataSource == freezed
+      metadataSource: freezed == metadataSource
           ? _value.metadataSource
           : metadataSource // ignore: cast_nullable_to_non_nullable
               as String?,
-    ));
+    ) as $Val);
   }
 }
 
@@ -289,15 +292,16 @@ abstract class _$$_TrackMetadataCopyWith<$Res>
           _$_TrackMetadata value, $Res Function(_$_TrackMetadata) then) =
       __$$_TrackMetadataCopyWithImpl<$Res>;
   @override
+  @useResult
   $Res call(
       {String id,
       String? title,
       String? artistName,
       String? albumArtistName,
-      String albumArtistId,
-      String trackArtistId,
+      String? albumArtistId,
+      String? trackArtistId,
       String? albumName,
-      String albumId,
+      String? albumId,
       int? trackNo,
       int discNo,
       String? description,
@@ -319,18 +323,16 @@ abstract class _$$_TrackMetadataCopyWith<$Res>
 
 /// @nodoc
 class __$$_TrackMetadataCopyWithImpl<$Res>
-    extends _$TrackMetadataCopyWithImpl<$Res>
+    extends _$TrackMetadataCopyWithImpl<$Res, _$_TrackMetadata>
     implements _$$_TrackMetadataCopyWith<$Res> {
   __$$_TrackMetadataCopyWithImpl(
       _$_TrackMetadata _value, $Res Function(_$_TrackMetadata) _then)
-      : super(_value, (v) => _then(v as _$_TrackMetadata));
+      : super(_value, _then);
 
-  @override
-  _$_TrackMetadata get _value => super._value as _$_TrackMetadata;
-
+  @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? id = freezed,
+    Object? id = null,
     Object? title = freezed,
     Object? artistName = freezed,
     Object? albumArtistName = freezed,
@@ -339,11 +341,11 @@ class __$$_TrackMetadataCopyWithImpl<$Res>
     Object? albumName = freezed,
     Object? albumId = freezed,
     Object? trackNo = freezed,
-    Object? discNo = freezed,
+    Object? discNo = null,
     Object? description = freezed,
     Object? descriptionSource = freezed,
     Object? coverData = freezed,
-    Object? uri = freezed,
+    Object? uri = null,
     Object? coverBytes = freezed,
     Object? coverUri = freezed,
     Object? coverUriRemote = freezed,
@@ -351,109 +353,109 @@ class __$$_TrackMetadataCopyWithImpl<$Res>
     Object? duration = freezed,
     Object? year = freezed,
     Object? releaseDate = freezed,
-    Object? available = freezed,
+    Object? available = null,
     Object? spotifyId = freezed,
     Object? source = freezed,
     Object? metadataSource = freezed,
   }) {
     return _then(_$_TrackMetadata(
-      id: id == freezed
+      id: null == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
               as String,
-      title: title == freezed
+      title: freezed == title
           ? _value.title
           : title // ignore: cast_nullable_to_non_nullable
               as String?,
-      artistName: artistName == freezed
+      artistName: freezed == artistName
           ? _value.artistName
           : artistName // ignore: cast_nullable_to_non_nullable
               as String?,
-      albumArtistName: albumArtistName == freezed
+      albumArtistName: freezed == albumArtistName
           ? _value.albumArtistName
           : albumArtistName // ignore: cast_nullable_to_non_nullable
               as String?,
-      albumArtistId: albumArtistId == freezed
+      albumArtistId: freezed == albumArtistId
           ? _value.albumArtistId
           : albumArtistId // ignore: cast_nullable_to_non_nullable
-              as String,
-      trackArtistId: trackArtistId == freezed
+              as String?,
+      trackArtistId: freezed == trackArtistId
           ? _value.trackArtistId
           : trackArtistId // ignore: cast_nullable_to_non_nullable
-              as String,
-      albumName: albumName == freezed
+              as String?,
+      albumName: freezed == albumName
           ? _value.albumName
           : albumName // ignore: cast_nullable_to_non_nullable
               as String?,
-      albumId: albumId == freezed
+      albumId: freezed == albumId
           ? _value.albumId
           : albumId // ignore: cast_nullable_to_non_nullable
-              as String,
-      trackNo: trackNo == freezed
+              as String?,
+      trackNo: freezed == trackNo
           ? _value.trackNo
           : trackNo // ignore: cast_nullable_to_non_nullable
               as int?,
-      discNo: discNo == freezed
+      discNo: null == discNo
           ? _value.discNo
           : discNo // ignore: cast_nullable_to_non_nullable
               as int,
-      description: description == freezed
+      description: freezed == description
           ? _value.description
           : description // ignore: cast_nullable_to_non_nullable
               as String?,
-      descriptionSource: descriptionSource == freezed
+      descriptionSource: freezed == descriptionSource
           ? _value.descriptionSource
           : descriptionSource // ignore: cast_nullable_to_non_nullable
               as String?,
-      coverData: coverData == freezed
+      coverData: freezed == coverData
           ? _value.coverData
           : coverData // ignore: cast_nullable_to_non_nullable
               as ImageDescriptor?,
-      uri: uri == freezed
+      uri: null == uri
           ? _value.uri
           : uri // ignore: cast_nullable_to_non_nullable
               as Uri,
-      coverBytes: coverBytes == freezed
+      coverBytes: freezed == coverBytes
           ? _value._coverBytes
           : coverBytes // ignore: cast_nullable_to_non_nullable
               as List<int>?,
-      coverUri: coverUri == freezed
+      coverUri: freezed == coverUri
           ? _value.coverUri
           : coverUri // ignore: cast_nullable_to_non_nullable
               as Uri?,
-      coverUriRemote: coverUriRemote == freezed
+      coverUriRemote: freezed == coverUriRemote
           ? _value.coverUriRemote
           : coverUriRemote // ignore: cast_nullable_to_non_nullable
               as Uri?,
-      coverSource: coverSource == freezed
+      coverSource: freezed == coverSource
           ? _value.coverSource
           : coverSource // ignore: cast_nullable_to_non_nullable
               as String?,
-      duration: duration == freezed
+      duration: freezed == duration
           ? _value.duration
           : duration // ignore: cast_nullable_to_non_nullable
               as Duration?,
-      year: year == freezed
+      year: freezed == year
           ? _value.year
           : year // ignore: cast_nullable_to_non_nullable
               as int?,
-      releaseDate: releaseDate == freezed
+      releaseDate: freezed == releaseDate
           ? _value.releaseDate
           : releaseDate // ignore: cast_nullable_to_non_nullable
               as DateTime?,
-      available: available == freezed
+      available: null == available
           ? _value.available
           : available // ignore: cast_nullable_to_non_nullable
               as bool,
-      spotifyId: spotifyId == freezed
+      spotifyId: freezed == spotifyId
           ? _value.spotifyId
           : spotifyId // ignore: cast_nullable_to_non_nullable
               as String?,
-      source: source == freezed
+      source: freezed == source
           ? _value.source
           : source // ignore: cast_nullable_to_non_nullable
               as String?,
-      metadataSource: metadataSource == freezed
+      metadataSource: freezed == metadataSource
           ? _value.metadataSource
           : metadataSource // ignore: cast_nullable_to_non_nullable
               as String?,
@@ -469,10 +471,10 @@ class _$_TrackMetadata extends _TrackMetadata with DiagnosticableTreeMixin {
       this.title,
       this.artistName,
       this.albumArtistName,
-      this.albumArtistId = "",
-      this.trackArtistId = "",
+      this.albumArtistId,
+      this.trackArtistId,
       this.albumName,
-      this.albumId = "",
+      this.albumId,
       this.trackNo,
       this.discNo = 0,
       this.description,
@@ -517,14 +519,12 @@ class _$_TrackMetadata extends _TrackMetadata with DiagnosticableTreeMixin {
 
   /// The database ID of the album artist.
   @override
-  @JsonKey()
-  final String albumArtistId;
+  final String? albumArtistId;
 
   /// The database ID of the track artist.
   /// This is usually the same as [albumArtistId].
   @override
-  @JsonKey()
-  final String trackArtistId;
+  final String? trackArtistId;
 
   /// The album's name. Also used with [artistName] to look up the album in the database.
   @override
@@ -532,8 +532,7 @@ class _$_TrackMetadata extends _TrackMetadata with DiagnosticableTreeMixin {
 
   /// The album's database ID.
   @override
-  @JsonKey()
-  final String albumId;
+  final String? albumId;
 
   /// The position of the track on the named album.
   @override
@@ -660,83 +659,92 @@ class _$_TrackMetadata extends _TrackMetadata with DiagnosticableTreeMixin {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$_TrackMetadata &&
-            const DeepCollectionEquality().equals(other.id, id) &&
-            const DeepCollectionEquality().equals(other.title, title) &&
-            const DeepCollectionEquality()
-                .equals(other.artistName, artistName) &&
-            const DeepCollectionEquality()
-                .equals(other.albumArtistName, albumArtistName) &&
-            const DeepCollectionEquality()
-                .equals(other.albumArtistId, albumArtistId) &&
-            const DeepCollectionEquality()
-                .equals(other.trackArtistId, trackArtistId) &&
-            const DeepCollectionEquality().equals(other.albumName, albumName) &&
-            const DeepCollectionEquality().equals(other.albumId, albumId) &&
-            const DeepCollectionEquality().equals(other.trackNo, trackNo) &&
-            const DeepCollectionEquality().equals(other.discNo, discNo) &&
-            const DeepCollectionEquality()
-                .equals(other.description, description) &&
-            const DeepCollectionEquality()
-                .equals(other.descriptionSource, descriptionSource) &&
-            const DeepCollectionEquality().equals(other.coverData, coverData) &&
-            const DeepCollectionEquality().equals(other.uri, uri) &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.title, title) || other.title == title) &&
+            (identical(other.artistName, artistName) ||
+                other.artistName == artistName) &&
+            (identical(other.albumArtistName, albumArtistName) ||
+                other.albumArtistName == albumArtistName) &&
+            (identical(other.albumArtistId, albumArtistId) ||
+                other.albumArtistId == albumArtistId) &&
+            (identical(other.trackArtistId, trackArtistId) ||
+                other.trackArtistId == trackArtistId) &&
+            (identical(other.albumName, albumName) ||
+                other.albumName == albumName) &&
+            (identical(other.albumId, albumId) || other.albumId == albumId) &&
+            (identical(other.trackNo, trackNo) || other.trackNo == trackNo) &&
+            (identical(other.discNo, discNo) || other.discNo == discNo) &&
+            (identical(other.description, description) ||
+                other.description == description) &&
+            (identical(other.descriptionSource, descriptionSource) ||
+                other.descriptionSource == descriptionSource) &&
+            (identical(other.coverData, coverData) ||
+                other.coverData == coverData) &&
+            (identical(other.uri, uri) || other.uri == uri) &&
             const DeepCollectionEquality()
                 .equals(other._coverBytes, _coverBytes) &&
-            const DeepCollectionEquality().equals(other.coverUri, coverUri) &&
-            const DeepCollectionEquality()
-                .equals(other.coverUriRemote, coverUriRemote) &&
-            const DeepCollectionEquality()
-                .equals(other.coverSource, coverSource) &&
-            const DeepCollectionEquality().equals(other.duration, duration) &&
-            const DeepCollectionEquality().equals(other.year, year) &&
-            const DeepCollectionEquality()
-                .equals(other.releaseDate, releaseDate) &&
-            const DeepCollectionEquality().equals(other.available, available) &&
-            const DeepCollectionEquality().equals(other.spotifyId, spotifyId) &&
-            const DeepCollectionEquality().equals(other.source, source) &&
-            const DeepCollectionEquality()
-                .equals(other.metadataSource, metadataSource));
+            (identical(other.coverUri, coverUri) ||
+                other.coverUri == coverUri) &&
+            (identical(other.coverUriRemote, coverUriRemote) ||
+                other.coverUriRemote == coverUriRemote) &&
+            (identical(other.coverSource, coverSource) ||
+                other.coverSource == coverSource) &&
+            (identical(other.duration, duration) ||
+                other.duration == duration) &&
+            (identical(other.year, year) || other.year == year) &&
+            (identical(other.releaseDate, releaseDate) ||
+                other.releaseDate == releaseDate) &&
+            (identical(other.available, available) ||
+                other.available == available) &&
+            (identical(other.spotifyId, spotifyId) ||
+                other.spotifyId == spotifyId) &&
+            (identical(other.source, source) || other.source == source) &&
+            (identical(other.metadataSource, metadataSource) ||
+                other.metadataSource == metadataSource));
   }
 
   @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hashAll([
         runtimeType,
-        const DeepCollectionEquality().hash(id),
-        const DeepCollectionEquality().hash(title),
-        const DeepCollectionEquality().hash(artistName),
-        const DeepCollectionEquality().hash(albumArtistName),
-        const DeepCollectionEquality().hash(albumArtistId),
-        const DeepCollectionEquality().hash(trackArtistId),
-        const DeepCollectionEquality().hash(albumName),
-        const DeepCollectionEquality().hash(albumId),
-        const DeepCollectionEquality().hash(trackNo),
-        const DeepCollectionEquality().hash(discNo),
-        const DeepCollectionEquality().hash(description),
-        const DeepCollectionEquality().hash(descriptionSource),
-        const DeepCollectionEquality().hash(coverData),
-        const DeepCollectionEquality().hash(uri),
+        id,
+        title,
+        artistName,
+        albumArtistName,
+        albumArtistId,
+        trackArtistId,
+        albumName,
+        albumId,
+        trackNo,
+        discNo,
+        description,
+        descriptionSource,
+        coverData,
+        uri,
         const DeepCollectionEquality().hash(_coverBytes),
-        const DeepCollectionEquality().hash(coverUri),
-        const DeepCollectionEquality().hash(coverUriRemote),
-        const DeepCollectionEquality().hash(coverSource),
-        const DeepCollectionEquality().hash(duration),
-        const DeepCollectionEquality().hash(year),
-        const DeepCollectionEquality().hash(releaseDate),
-        const DeepCollectionEquality().hash(available),
-        const DeepCollectionEquality().hash(spotifyId),
-        const DeepCollectionEquality().hash(source),
-        const DeepCollectionEquality().hash(metadataSource)
+        coverUri,
+        coverUriRemote,
+        coverSource,
+        duration,
+        year,
+        releaseDate,
+        available,
+        spotifyId,
+        source,
+        metadataSource
       ]);
 
   @JsonKey(ignore: true)
   @override
+  @pragma('vm:prefer-inline')
   _$$_TrackMetadataCopyWith<_$_TrackMetadata> get copyWith =>
       __$$_TrackMetadataCopyWithImpl<_$_TrackMetadata>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$_TrackMetadataToJson(this);
+    return _$$_TrackMetadataToJson(
+      this,
+    );
   }
 }
 
@@ -746,10 +754,10 @@ abstract class _TrackMetadata extends TrackMetadata {
       final String? title,
       final String? artistName,
       final String? albumArtistName,
-      final String albumArtistId,
-      final String trackArtistId,
+      final String? albumArtistId,
+      final String? trackArtistId,
       final String? albumName,
-      final String albumId,
+      final String? albumId,
       final int? trackNo,
       final int discNo,
       final String? description,
@@ -777,97 +785,97 @@ abstract class _TrackMetadata extends TrackMetadata {
   /// The database ID of the track.
   /// It is 7-20 characters long but is generally 13 characters long.
   /// These IDs are unique but not ordered.
-  String get id => throw _privateConstructorUsedError;
+  String get id;
   @override
 
   /// The song's title.
-  String? get title => throw _privateConstructorUsedError;
+  String? get title;
   @override
 
   /// The track artist's name.
-  String? get artistName => throw _privateConstructorUsedError;
+  String? get artistName;
   @override
 
   /// The name of the artist of the album.
-  String? get albumArtistName => throw _privateConstructorUsedError;
+  String? get albumArtistName;
   @override
 
   /// The database ID of the album artist.
-  String get albumArtistId => throw _privateConstructorUsedError;
+  String? get albumArtistId;
   @override
 
   /// The database ID of the track artist.
   /// This is usually the same as [albumArtistId].
-  String get trackArtistId => throw _privateConstructorUsedError;
+  String? get trackArtistId;
   @override
 
   /// The album's name. Also used with [artistName] to look up the album in the database.
-  String? get albumName => throw _privateConstructorUsedError;
+  String? get albumName;
   @override
 
   /// The album's database ID.
-  String get albumId => throw _privateConstructorUsedError;
+  String? get albumId;
   @override
 
   /// The position of the track on the named album.
-  int? get trackNo => throw _privateConstructorUsedError;
+  int? get trackNo;
   @override
-  int get discNo => throw _privateConstructorUsedError;
+  int get discNo;
   @override
 
   /// Extra details about a given track, such as its origins and meaning.
-  String? get description => throw _privateConstructorUsedError;
+  String? get description;
   @override
 
   /// Where the [description] came from.
-  String? get descriptionSource => throw _privateConstructorUsedError;
+  String? get descriptionSource;
   @override
 
   /// Holds the data for a cover image. **DO NOT** STORE THIS IN THE DATABASE!
 //@Deprecated("Don't use this, just use coverBytes or coverFile instead!")
   @JsonKey(ignore: true)
-  ImageDescriptor? get coverData => throw _privateConstructorUsedError;
+  ImageDescriptor? get coverData;
   @override
 
   /// The URI to the track. Used by the library (database) to find the file
   /// when it's time to play it, and for fallback details.
-  Uri get uri => throw _privateConstructorUsedError;
+  Uri get uri;
   @override
 
   /// The raw bytes of the cover image. **DO NOT** STORE THIS IN THE DATABASE!
   @JsonKey(ignore: true)
-  List<int>? get coverBytes => throw _privateConstructorUsedError;
+  List<int>? get coverBytes;
   @override
 
   /// The URI to the cover.
-  Uri? get coverUri => throw _privateConstructorUsedError;
+  Uri? get coverUri;
   @override
 
   /// A remote URI to the cover, such as from Spotify.
   /// Generally the URL used to download the cover from [coverSource].
   /// This is used with Discord RPC.
-  Uri? get coverUriRemote => throw _privateConstructorUsedError;
+  Uri? get coverUriRemote;
   @override
 
   /// Can be "album" in addition to album cover sources.
   /// "album" here indicates the cover is the same as the album's.
-  String? get coverSource => throw _privateConstructorUsedError;
+  String? get coverSource;
   @override
 
   /// The track's duration.
-  Duration? get duration => throw _privateConstructorUsedError;
+  Duration? get duration;
   @override
 
   /// The year the track was released. Prefer to show [releaseDate] wherever given.
-  int? get year => throw _privateConstructorUsedError;
+  int? get year;
   @override
 
   /// The release date of this track.
-  DateTime? get releaseDate => throw _privateConstructorUsedError;
+  DateTime? get releaseDate;
   @override
-  bool get available => throw _privateConstructorUsedError;
+  bool get available;
   @override
-  String? get spotifyId => throw _privateConstructorUsedError;
+  String? get spotifyId;
   @override
 
   /// The source of the audio for this track.
@@ -875,9 +883,9 @@ abstract class _TrackMetadata extends TrackMetadata {
   /// ripped or bought from Bandcamp or Amazon.
   /// This can also be "spotify" or "youtube" to indicate the audio should be
   /// sourced from those services respectively (but it doesn't work yet).
-  String? get source => throw _privateConstructorUsedError;
+  String? get source;
   @override
-  String? get metadataSource => throw _privateConstructorUsedError;
+  String? get metadataSource;
   @override
   @JsonKey(ignore: true)
   _$$_TrackMetadataCopyWith<_$_TrackMetadata> get copyWith =>
