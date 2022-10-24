@@ -12,7 +12,9 @@ let
     cmdline-tools-latest
     build-tools-30-0-3
     platform-tools
+    platforms-android-30
     platforms-android-31
+    platforms-android-28
     tools
     patcher-v4
     emulator

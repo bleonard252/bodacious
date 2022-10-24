@@ -492,10 +492,10 @@ packages:
   just_audio_mpv:
     dependency: "direct main"
     description:
-      path: "../just_audio_mpv"
-      relative: true
-    source: path
-    version: "0.1.5"
+      name: just_audio_mpv
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.0.1-pre.1"
   just_audio_platform_interface:
     dependency: transitive
     description:

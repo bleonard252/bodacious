@@ -299,11 +299,11 @@ class _IndexerIsolate {
         }
 
         final artist = await registerArtistMetadata(record);
-        record = record.copyWith(trackArtistId: artist!.id);
+        if (artist != null) record = record.copyWith(trackArtistId: artist.id);
 
         if (record.artistName != record.albumArtistName) {
           final albumArtist = await registerArtistMetadata(record, true);
-          record = record.copyWith(albumArtistId: (albumArtist ?? artist).id);
+          if ((albumArtist ?? artist) != null) record = record.copyWith(albumArtistId: (albumArtist ?? artist)?.id);
         } else {
           record = record.copyWith(albumArtistId: record.trackArtistId);
         }

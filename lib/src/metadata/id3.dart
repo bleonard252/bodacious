@@ -14,7 +14,12 @@ import 'package:mime/mime.dart';
 Future<TrackMetadata> loadID3FromBytes(List<int> bytes, File file, {String? cacheDir}) async {
   final mp3 = MP3Instance(bytes);
   if (bytes.length > 3) {
-    mp3.parseTagsSync();
+    try {
+      mp3.parseTagsSync();
+    } catch(e) {
+      print(e);
+      return TrackMetadata(uri: file.absolute.uri); // failed to parse, so use an empty item instead
+    }
   }
   final rawTags = mp3.getMetaTags() ?? {};
   // if (kDebugMode) {
