@@ -1,0 +1,1 @@
+Bodacious is a collector's music app written in Flutter that looks as good as it sounds. By default, you pick your music libraries, so your ringtones aren't mixed in with your music. You can download Bodacious for Linux on its GitHub page under Releases.
