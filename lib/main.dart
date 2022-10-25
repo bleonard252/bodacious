@@ -14,11 +14,11 @@ import 'package:bodacious/src/library/indexer.dart';
 import 'package:bodacious/src/media/audio_service.dart';
 import 'package:bodacious/src/navigate_observer.dart';
 import 'package:bodacious/src/online/lastfm.dart';
-import 'package:bodacious/views/errorlist.dart';
 import 'package:bodacious/views/home.dart';
 import 'package:bodacious/views/library/details/album.dart';
 import 'package:bodacious/views/library/details/artist.dart';
 import 'package:bodacious/views/library/root.dart';
+import 'package:bodacious/views/logs.dart';
 import 'package:bodacious/views/main_menu.dart';
 import 'package:bodacious/views/mpv_crash.dart';
 import 'package:bodacious/views/now_playing.dart';
@@ -40,6 +40,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lastfm/lastfm.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:pinelogger/pinelogger.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:window_manager/window_manager.dart';
@@ -51,6 +52,8 @@ late final Config config;
 late final BodaciousAudioHandler player;
 late final DiscordRPC discord;
 final APIKeys apiKeys = APIKeys();
+
+final Pinelogger appLogger = Pinelogger("Bodacious");
 
 late final ReplaySubject<String> errors = ReplaySubject();
 
@@ -70,12 +73,14 @@ void main() async {
     return runApp(const MPVMissingCrash());
   }
 
+  final _bgsinitLogger = appLogger.independentChild("BackgroundPlayer.init");
   try {
     player = await AudioService.init<BodaciousAudioHandler>(
       builder: () {
         if (Platform.isAndroid || Platform.isIOS || Platform.isLinux || Platform.isWindows || kIsWeb) {
           return JustAudioHandler();
         } else {
+          _bgsinitLogger.error("Platform not supported", error: Platform.operatingSystem);
           throw UnsupportedError("Platform not supported");
         }
       },
@@ -89,25 +94,28 @@ void main() async {
         notificationColor: Colors.amber,
       )
     );
+  // ignore: empty_catches
+  } on UnsupportedError {
   } on MissingPluginException {
-    if (kDebugMode) {
-      print("Audio service is not available on this device");
-    }
+    _bgsinitLogger.warning("Platform not supported", error: Platform.operatingSystem);
   }
   nowPlayingProvider = StreamProvider<TrackMetadata>((ref) async* {
+    final log = appLogger.independentChild("nowPlayingProvider");
     final stream = player.mediaItem;
     final nothingPlaying = TrackMetadata.empty();
     yield nothingPlaying;
     await for (final update in stream) {
+      log.verbose("\"Now Playing\" update received, processing");
       if (update == null) continue;
       if (update is BodaciousMediaItem) {
         //yield update.parent;
         continue;
       }
       if (update.id.contains("://") && !update.id.startsWith("file:///")) {
-        if (kDebugMode) {
-          print(update.id+" is not a supported URI.");
-        }
+        // if (kDebugMode) {
+        //   print(update.id+" is not a supported URI.");
+        // }
+        log.warning("Unsupported URI encountered in update.", error: update.id);
         yield nothingPlaying.copyWith(title: Uri.tryParse(update.id)?.pathSegments.lastOrNull);
       }
       if (!ref.state.hasValue) yield nothingPlaying.copyWith(uri: Uri.file(update.id));
@@ -129,10 +137,13 @@ void main() async {
       }
     }
   });
-  if (Platform.isWindows || Platform.isLinux) startDiscordRpc().catchError((error) {errors.add(error.toString());}); // this just runs in the background
-  startLastFmNowPlaying().catchError((error) {errors.add(error.toString());});
-  startScrobbling().catchError((error) {errors.add(error.toString());});
+  final discordLog = appLogger.independentChild("DiscordRPC");
+  if (Platform.isWindows || Platform.isLinux) startDiscordRpc().catchError((error) {discordLog.error(error);}); // this just runs in the background
+  final lastFmLog = appLogger.independentChild("LastFM");
+  startLastFmNowPlaying().catchError((error) {lastFmLog.error(error);});
+  startScrobbling().catchError((error) {lastFmLog.child("scrobble").error(error);});
   queueProvider = StreamProvider<Queue<TrackMetadata>>((ref) async* {
+    final log = appLogger.independentChild("nowPlayingProvider").child("queueProvider");
     final stream = player.queue;
     yield Queue(entries: []);
     await for (final update in stream) {
@@ -147,9 +158,10 @@ void main() async {
           continue;
         }
         if (update.id.contains("://") && !update.id.startsWith("file:///")) {
-          if (kDebugMode) {
-            print(update.id+" is not a supported URI.");
-          }
+          // if (kDebugMode) {
+          //   print(update.id+" is not a supported URI.");
+          // }
+          log.warning("Unsupported URI found in queue", error: update.id);
           continue;
         }
         // final _dbEntry = await songStore.findFirst(db, finder: Finder(filter: Filter.equals('uri', Uri.file(update.id).toString())));
@@ -172,7 +184,7 @@ void main() async {
     child: MyApp(),
   ));
 
-  TheIndexer.spawn().catchError((error) => errors.add(error.toString()));
+  TheIndexer.spawn().catchError((error, stack) => appLogger.independentChild("Indexer").error(error, stackTrace: stack));
 
   if (config.lastFmToken != null && apiKeys.lastfmApiKey != null) {
     lastfm = LastFMAuthorized(
@@ -270,69 +282,79 @@ class OuterFrame extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (FrameSize.of(context)) {
-      return Column(
-        children: [
-          Expanded(
-            child: Row(children: [
-              StatefulBuilder(
-                builder: (context, setState) {
-                  return SizedBox(
-                    width: 240,
-                    child: Material(
-                      color: Theme.of(context).colorScheme.surface,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.max,
-                        children: [
-                          Expanded(
-                            child: CustomScrollView(
-                              slivers: [
-                                SliverToBoxAdapter(
-                                  child: SafeArea(
-                                    bottom: false,
+      return WillPopScope(
+        onWillPop: () async {
+          if (goRouter.location == "/") return true;
+          goRouter.pop();
+          if (goRouter.location == "/") {
+            ScaffoldMessenger.maybeOf(context)?.showSnackBar(const SnackBar(content: Text("Tap back again to close Bodacious")));
+          }
+          return false;
+        },
+        child: Column(
+          children: [
+            Expanded(
+              child: Row(children: [
+                StatefulBuilder(
+                  builder: (context, setState) {
+                    return SizedBox(
+                      width: 240,
+                      child: Material(
+                        color: Theme.of(context).colorScheme.surface,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.max,
+                          children: [
+                            Expanded(
+                              child: CustomScrollView(
+                                slivers: [
+                                  SliverToBoxAdapter(
+                                    child: SafeArea(
+                                      bottom: false,
+                                      child: ListTile(
+                                        leading: const Icon(MdiIcons.home, size: 36),
+                                        title: const Text("Home"),
+                                        selected: goRouter.location == "/",
+                                        onTap: () {
+                                          goRouter.go("/");
+                                          setState(() {});
+                                        },
+                                      ),
+                                    )
+                                  ),
+                                  SliverToBoxAdapter(
                                     child: ListTile(
-                                      leading: const Icon(MdiIcons.home, size: 36),
-                                      title: const Text("Home"),
-                                      selected: goRouter.location == "/",
+                                      leading: const Icon(MdiIcons.musicBoxMultiple, size: 36),
+                                      title: const Text("Library"),
+                                      selected: goRouter.location.startsWith("/library"),
                                       onTap: () {
-                                        goRouter.go("/");
+                                        goRouter.go("/library");
                                         setState(() {});
                                       },
-                                    ),
-                                  )
-                                ),
-                                SliverToBoxAdapter(
-                                  child: ListTile(
-                                    leading: const Icon(MdiIcons.musicBoxMultiple, size: 36),
-                                    title: const Text("Library"),
-                                    selected: goRouter.location.startsWith("/library"),
-                                    onTap: () {
-                                      goRouter.go("/library");
-                                      setState(() {});
-                                    },
-                                  )
-                                ),
-                                const SliverList(delegate: SliverChildListDelegate.fixed([])),
-                              ]
+                                    )
+                                  ),
+                                  const SliverList(delegate: SliverChildListDelegate.fixed([])),
+                                ]
+                              ),
                             ),
-                          ),
-                          if (config.wideCompactNowPlaying) const NowPlayingSidebar()
-                        ],
-                      ),
-                    )
-                  );
-                }
-              ),
-              Expanded(
-                child: ClipRect(
-                  child: Builder(builder: (context) => buildNavigator(context)),
+                            if (config.wideCompactNowPlaying) const NowPlayingSidebar()
+                          ],
+                        ),
+                      )
+                    );
+                  }
                 ),
-              )
-            ]),
-          ),
-          if (!config.wideCompactNowPlaying) const SafeArea(top: false, child: NowPlayingBar())
-        ],
+                Expanded(
+                  child: ClipRect(
+                    child: Builder(builder: (context) => buildNavigator(context)),
+                  ),
+                )
+              ]),
+            ),
+            if (!config.wideCompactNowPlaying) const SafeArea(top: false, child: NowPlayingBar())
+          ],
+        ),
       );
     } else {
       return Column(children: [
@@ -411,7 +433,8 @@ class OuterFrame extends StatelessWidget {
         ])
       ]),
       GoRoute(path: "/menu", builder: (context, state) => const MobileMainMenu()),
-      GoRoute(path: "/error_list", builder: (context, state) => const ErrorListView()),
+      //GoRoute(path: "/error_list", builder: (context, state) => const ErrorListView()),
+      GoRoute(path: "/logs", builder: (context, state) => const LogView()),
       GoRoute(path: "/now_playing", builder: (context, state) => const NowPlayingView()),
       GoRoute(path: "/settings", builder: (context, state) => const SettingsHome(), routes: [
         GoRoute(path: "library", builder: (context, state) => const LibrarySettingsView()),

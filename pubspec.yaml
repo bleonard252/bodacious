@@ -7,7 +7,7 @@ publish_to: 'none'
 
 # Increment the build number (after +) by at least one for every release.
 # Follow semver.
-version: 0.7.0+6
+version: 0.8.0+7
 
 environment:
   sdk: ">=2.17.0-150.0.dev <3.0.0"
@@ -37,6 +37,8 @@ dependencies:
   rxdart: ^0.27.3
   url_launcher: ^6.1.0
   flinq: ^2.0.2
+  pinelogger: ^1.1.0
+  pinelogger_flutter: ^1.0.0
 
   # Service Deps
   dart_discord_rpc:
