@@ -7,6 +7,7 @@ import 'package:bodacious/main.dart';
 import 'package:bodacious/models/album_data.dart';
 import 'package:bodacious/src/config.dart';
 import 'package:bodacious/src/library/cache_dir.dart';
+import 'package:bodacious/src/library/indexer_logger.dart';
 import 'package:bodacious/src/metadata/id3.dart';
 import 'package:dio/dio.dart';
 import 'package:drift/drift.dart';
@@ -17,6 +18,7 @@ import 'package:lastfm/lastfm.dart';
 import 'package:mime/mime.dart';
 import 'package:nanoid/non_secure.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:pinelogger/pinelogger.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:spotify/spotify.dart';
 import 'package:xml/xml.dart';
@@ -38,6 +40,8 @@ abstract class TheIndexer {
   
   /// Don't try to touch the isolate before this aight
   static Future<void> spawn({bool force = false}) async {
+    final ReceivePort logReceiver = ReceivePort("Isolate Pinelogger pipe");
+    final isoLogger = IsolatedPinelogReceiver.asIndependentChildOf(appLogger, receivePort: logReceiver, name: "Indexer");
     final _dbPath = await () async {
       late String dbPath;
       try {
@@ -63,35 +67,34 @@ abstract class TheIndexer {
           cacheDir: message["cacheDir"],
           config: message["config"],
           force: message["force"],
-          apiKeys: message["api_keys"]
-        )(message["sendPort"]);
+          apiKeys: message["api_keys"],
+        )(message["sendPort"], message["log_port"]);
       }, {
         "sendPort": progressReceiver.sendPort,
         "dbDir": _dbPath,
         "cacheDir": _cacheDir,
         "config": ROConfig(config),
         "force": force,
-        "api_keys": apiKeys
+        "api_keys": apiKeys,
+        "log_port": logReceiver.sendPort
       });
       if (progress.valueOrNull?.state != IndexerState.FINISHED) {
-        _sendPortKinda.add(IndexerProgressReport(
+        progressReceiver.sendPort.send(IndexerProgressReport(
           state: IndexerState.STOPPED,
           currentFilename: progress.valueOrNull?.currentFilename,
           max: progress.valueOrNull?.max ?? 1,
           value: progress.valueOrNull?.value ?? 0
         ));
+        isoLogger.error("The indexer has stopped without finishing!");
       }
     } catch(e, st) {
-      _sendPortKinda.add(IndexerProgressReport(
+      progressReceiver.sendPort.send(IndexerProgressReport(
         state: IndexerState.STOPPED,
         currentFilename: progress.valueOrNull?.currentFilename,
         max: progress.valueOrNull?.max ?? 1,
         value: progress.valueOrNull?.value ?? 0
       ));
-      // ignore: avoid_print
-      print(e);
-      // ignore: avoid_print
-      print(st);
+      isoLogger.error("The indexer has stopped!", error: e, stackTrace: st);
     }
   }
 }
@@ -121,6 +124,7 @@ class _IndexerIsolate {
   });
 
   late final BoDatabase db;
+  late final Pinelogger? logger;
   final ROConfig config;
   final APIKeys apiKeys;
 
@@ -129,7 +133,9 @@ class _IndexerIsolate {
 
   /// This makes this class function as a function.
   /// And gee I wonder why I did that.
-  Future<void> call(SendPort sendProgressReport) async {
+  Future<void> call(SendPort sendProgressReport, SendPort logPort) async {
+    final log = IsolatedPinelogger(logPort);
+    log.info("Indexer started");
     // if (kDebugMode) {
     //   print("This is not complete and may appear to hang");
     //   //sendProgressReport.send(const IndexerProgressReport(state: IndexerState.STARTING, max));
@@ -151,7 +157,7 @@ class _IndexerIsolate {
       final List<String> _dbfolders = List.castFrom<dynamic, String>(config.libraries);
       for (final f in _dbfolders) {
         if (!await Directory(f).exists()) {
-          if (kDebugMode) {print("INDEXER ERROR: `"+f+"` does not exist!");}
+          log.warning("Directory does not exist. Marking all contained tracks as unavailable.", error: f);
           await (
             db.update(db.trackTable)
             ..where((tbl) => tbl.uri.like(Uri.file(f).toString()+"%"))
@@ -206,6 +212,7 @@ class _IndexerIsolate {
           value: validFiles.indexOf(file),
           currentFilename: file.uri.pathSegments.last
         ));
+        log.verbose("Reading metadata from ${file.uri.pathSegments.last}", error: file.uri.toString());
         // final _matches = await songStore.find(db, finder: Finder(filter: Filter.custom(
         //   // Find this file in the database.
         //   (record) => record.value.uri == file.absolute.uri.toString()
@@ -256,7 +263,8 @@ class _IndexerIsolate {
               //   c.complete();
               // }
             } catch(e) {
-              if (kDebugMode) {print(e);}
+              log.child("MetaTyper").error(e);
+              // Clear&close the byte-reader, set to no metadata type, and move on.
               _metaByteReader.cancel();
               c.complete();
               metaBytes.clear();

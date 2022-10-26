@@ -105,7 +105,7 @@ class HomeView extends StatelessWidget {
                                   case "settings":
                                     context.go("/settings");
                                     break;
-                                  case "error_list":
+                                  case "logs":
                                     context.go("/logs");
                                     break;
                                   case "about":
