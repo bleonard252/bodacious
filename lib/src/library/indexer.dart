@@ -471,7 +471,7 @@ class _IndexerIsolate {
             await Directory(_dir).create();
             late final File coverFile;
             if (_cover != null) {
-              coverFile = File(_dir+"/"+base64Encode(artist.codeUnits)+"_spotify.jpg");
+              coverFile = File(_dir+"/"+base64Encode(utf8.encode(artist))+"_spotify.jpg");
               await Dio().download(_cover, coverFile.absolute.uri.toFilePath());
             }
             await (db.artistTable.update()
