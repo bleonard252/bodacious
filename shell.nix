@@ -32,7 +32,7 @@ mkShell {
   export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/build-tools
   sdkmanager --sdk_root=$ANDROID_HOME
   # appimage-builder
-  wget -nc -O build/appimage-builder-x86_64.AppImage https://github.com/AppImageCrafters/appimage-builder/releases/download/v1.0.0-beta.1/appimage-builder-1.0.0-677acbd-x86_64.AppImage
+  wget -nc -O build/appimage-builder-x86_64.AppImage https://github.com/AppImageCrafters/appimage-builder/releases/download/Continuous/appimage-builder-1.1.1.dev32+g2709a3b-x86_64.AppImage
   chmod +x build/appimage-builder-x86_64.AppImage
   '';
 }

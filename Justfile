@@ -23,6 +23,7 @@ release-appimage:
   mkdir -p build/linux/x64/release/appimage/
   echo If this is not found, run: sudo pip install appimage-builder
   ./build/appimage-builder-x86_64.AppImage --skip-test
+  @rm bodacious-x86_64.AppImage
   echo AppImage released to build/linux/x64/release/appimage/bodacious-x86_64.AppImage
 # Build the app in release mode
 release *TARGETS='apk': test-all prebuild

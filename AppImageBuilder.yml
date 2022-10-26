@@ -6,7 +6,7 @@ AppDir:
     id: xyz.u1024256.bodacious
     name: Bodacious
     icon: xyz.u1024256.bodacious
-    version: 0.7.0
+    version: 0.8.0
     exec: bodacious
     exec_args: $@
   apt:
@@ -52,10 +52,13 @@ AppDir:
       command: ./AppRun
       use_host_x: true
   after_runtime:
-  - sed -i 's/Utility/Audio/' AppDir/xyz.u1024256.bodacious.desktop
+  - sed -i 's/Utility/AudioVideo;Audio/' AppDir/xyz.u1024256.bodacious.desktop
   - sed -i '/Exec=/a StartupWMClass=bodacious' AppDir/xyz.u1024256.bodacious.desktop
   - mkdir -p AppDir/usr/share/applications
   - cp AppDir/xyz.u1024256.bodacious.desktop AppDir/usr/share/applications/
+  - mkdir AppDir/usr/share/metainfo
+  - cp xyz.u1024256.bodacious.metainfo.xml AppDir/usr/share/metainfo/
+  - cp xyz.u1024256.bodacious.metainfo.xml AppDir/usr/share/metainfo/xyz.u1024256.bodacious.appdata.xml
 AppImage:
   arch: x86_64
   update-information: guess

@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component type="desktop-application">
   <id>xyz.u1024256.bodacious</id>
+
+  <url type="bugtracker">https://github.com/bleonard252/bodacious/issues/new</url>
+  <url type="vcs-browser">https://github.com/bleonard252/bodacious/</url>
   
   <name>Bodacious</name>
   <summary>Listen to your music, your way</summary>
@@ -20,26 +23,23 @@
     </p>
     <p>
       Features include:
-      <ul>
-        <li>Custom libraries: choose where you want your music to come from</li>
-        <li>Familiar UI</li>
-        <li>Last.fm scrobbling (enable in Settings)</li>
-        <li>Last.fm, MusicBrainz, and Spotify metadata at your fingertips (enable in Settings)</li>
-        <li>(Desktop only) Discord Rich Presence</li>
-        <li>Queue control (mostly)</li>
-        <li>Most* of your basic features (apparently equalizers are essential now?)</li>
-      </ul>
     </p>
-    <p>
-      Coming soon:
-      <ul>
-        <li>Reorder items in the queue</li>
-        <li>Custom metadata: set custom covers, names, and descriptions for music, which (if you want) can only display in Bodacious</li>
-        <li>MSE support: Music Synchronized Effects are a new way to use your existing app as a visualizer. MSE files can instruct Bodacious to change the background, cover, or lyrics on the fly to add a little more visual pizzazz to your music.</li>
-        <li>Equalizer. I personally never use this but whatever</li>
-      </ul>
-    </p>
+    <ul>
+      <li>Custom libraries: choose where you want your music to come from</li>
+      <li>Familiar UI</li>
+      <li>Last.fm scrobbling (enable in Settings)</li>
+      <li>Last.fm, MusicBrainz, and Spotify metadata at your fingertips (enable in Settings)</li>
+      <li>(Desktop only) Discord Rich Presence</li>
+      <li>Queue control (mostly)</li>
+      <li>Most* of your basic features (apparently equalizers are essential now?)</li>
+    </ul>
   </description>
   
   <launchable type="desktop-id">xyz.u1024256.bodacious.desktop</launchable>
+
+  <content_rating>none</content_rating>
+
+  <releases>
+    <release version="0.8.0" date="2022-10-26" />
+  </releases>
 </component>
