@@ -1,0 +1,5 @@
+* IMPORTANT: When first opening the app after this update, the app database will be reset. Your music will stay intact. This should never happen again and I'm sorry for the inconvenience.
+* Numerous bug fixes
+* Clear button in the queue: does exactly what you'd expect
+* Now Playing screen now selects its colors differently
+* For the technical: the Errors screen has been replaced with a working Logs screen
