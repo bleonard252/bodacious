@@ -22,7 +22,7 @@ release-appimage:
   cp assets/brand/ic_foreground_small.png AppDir/usr/share/icons/hicolor/64x64/xyz.u1024256.bodacious.png
   mkdir -p build/linux/x64/release/appimage/
   echo If this is not found, run: sudo pip install appimage-builder
-  appimage-builder --skip-test
+  ./build/appimage-builder-x86_64.AppImage --skip-test
   echo AppImage released to build/linux/x64/release/appimage/bodacious-x86_64.AppImage
 # Build the app in release mode
 release *TARGETS='apk': test-all prebuild
