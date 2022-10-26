@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>xyz.u1024256.bodacious</id>
+  
+  <name>Bodacious</name>
+  <summary>Listen to your music, your way</summary>
+  
+  <metadata_license>MIT</metadata_license>
+  <project_license>MIT</project_license>
+  
+  <supports>
+    <control>pointing</control>
+    <control>keyboard</control>
+    <control>touch</control>
+  </supports>
+  
+  <description>
+    <p>
+      Bodacious is a multi-platform music player for playing your local files first and foremost. Its design is inspired by Spotify, it&apos;s built with Flutter, and it&apos;s open source, which means if you think Bodacious is missing a feature, you can add it yourself!
+    </p>
+    <p>
+      Features include:
+      <ul>
+        <li>Custom libraries: choose where you want your music to come from</li>
+        <li>Familiar UI</li>
+        <li>Last.fm scrobbling (enable in Settings)</li>
+        <li>Last.fm, MusicBrainz, and Spotify metadata at your fingertips (enable in Settings)</li>
+        <li>(Desktop only) Discord Rich Presence</li>
+        <li>Queue control (mostly)</li>
+        <li>Most* of your basic features (apparently equalizers are essential now?)</li>
+      </ul>
+    </p>
+    <p>
+      Coming soon:
+      <ul>
+        <li>Reorder items in the queue</li>
+        <li>Custom metadata: set custom covers, names, and descriptions for music, which (if you want) can only display in Bodacious</li>
+        <li>MSE support: Music Synchronized Effects are a new way to use your existing app as a visualizer. MSE files can instruct Bodacious to change the background, cover, or lyrics on the fly to add a little more visual pizzazz to your music.</li>
+        <li>Equalizer. I personally never use this but whatever</li>
+      </ul>
+    </p>
+  </description>
+  
+  <launchable type="desktop-id">xyz.u1024256.bodacious.desktop</launchable>
+</component>
