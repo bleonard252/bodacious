@@ -1,1 +1,16 @@
-Bodacious is a collector's music app written in Flutter that looks as good as it sounds. By default, you pick your music libraries, so your ringtones aren't mixed in with your music. You can download Bodacious for Linux on its GitHub page under Releases.
+<i>Bodacious</i> is a multi-platform music player for playing your local files first and foremost. Its design is inspired by Spotify, it’s built with Flutter, and it’s open source, which means if you think Bodacious is missing a feature, you can add it yourself! An AppImage version for Linux is available on GitHub with the source code.
+
+<br>Features include:
+
+* Custom libraries: choose where you want your music to come from
+* Familiar UI
+* Most of your basic features (apparently equalizers are essential now?)
+
+<br>Coming soon:
+
+* Custom metadata: set custom covers, names, and descriptions for Bodacious
+* MSE support: Music Synchronized Effects are a new way to use your existing app as a visualizer. MSE files can instruct Bodacious to change the background, cover, or lyrics on the fly to add a little more visual pizzazz to your music.
+* Equalizer. I personally never use this but whatever
+* Last.fm scrobbling
+* Last.fm, MusicBrainz, Genius, and Spotify metadata at your fingertips
+* Stream music with a Spotify Premium subscription
