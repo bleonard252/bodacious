@@ -14,6 +14,7 @@ import 'package:bodacious/src/library/indexer.dart';
 import 'package:bodacious/src/media/audio_service.dart';
 import 'package:bodacious/src/navigate_observer.dart';
 import 'package:bodacious/src/online/lastfm.dart';
+import 'package:bodacious/views/about.dart';
 import 'package:bodacious/views/home.dart';
 import 'package:bodacious/views/library/details/album.dart';
 import 'package:bodacious/views/library/details/artist.dart';
@@ -433,6 +434,12 @@ class OuterFrame extends StatelessWidget {
         ])
       ]),
       GoRoute(path: "/menu", builder: (context, state) => const MobileMainMenu()),
+      GoRoute(path: "/about", builder: (context, state) => const AboutScreen()),
+      GoRoute(path: "/licenses", builder: (context, state) => LicensePage(
+        applicationName: "Bodacious",
+        applicationIcon: Image.asset("assets/brand/ic_foreground.png", fit: BoxFit.contain),
+        applicationLegalese: "Copyright 2022 Blake Leonard. Licensed under the MIT license.",
+      )),
       //GoRoute(path: "/error_list", builder: (context, state) => const ErrorListView()),
       GoRoute(path: "/logs", builder: (context, state) => const LogView()),
       GoRoute(path: "/now_playing", builder: (context, state) => const NowPlayingView()),

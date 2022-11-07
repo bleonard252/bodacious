@@ -103,6 +103,7 @@ flutter:
   assets:
     - assets/bubblebg.png
     - assets/brand/ic_foreground.png
+    - assets/version.txt
 
     # LICENSE
     # The Error Pineapple character and art are © 2022 Blake Leonard, All Rights Reserved.

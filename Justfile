@@ -7,7 +7,7 @@ preflight:
   which appimage-builder # if you don't have it, run: pip install appimage-builder
 
 # Build the app in debug mode
-build *TARGETS='appbundle': _generate
+build *TARGETS='appbundle': _generate _prerelversion
   for target in {{TARGETS}}; do fvm flutter build $target --debug --dart-define DISCORD_APP_ID=$DISCORD_APP_ID --dart-define LASTFM_API_KEY=$LASTFM_API_KEY --dart-define LASTFM_SECRET=$LASTFM_SECRET --dart-define SPOTIFY_API_KEY=$SPOTIFY_API_KEY --dart-define SPOTIFY_SECRET=$SPOTIFY_SECRET; done
 release-appimage:
   #!/usr/bin/env bash
@@ -27,16 +27,16 @@ release-appimage:
   echo AppImage released to build/linux/x64/release/appimage/bodacious-x86_64.AppImage
 # Build the app in release mode
 release *TARGETS='apk': test-all prebuild
-  @#TODO: set version in version.txt
   for target in {{TARGETS}}; do fvm flutter build $target --release --dart-define DISCORD_APP_ID=$DISCORD_APP_ID --dart-define LASTFM_API_KEY=$LASTFM_API_KEY --dart-define LASTFM_SECRET=$LASTFM_SECRET --dart-define SPOTIFY_API_KEY=$SPOTIFY_API_KEY --dart-define SPOTIFY_SECRET=$SPOTIFY_SECRET; done
+  # if you didn't, you should run `just version release` instead
 # Run pre-build checks
-prebuild: _generate && _check
-  @# fvm flutter pub run fvm flutter_launcher_icons:main
+prebuild: _generate _check
+  @# fvm flutter pub run flutter_launcher_icons:main
 # Install the app to a target device. Might be helpful to build it first
 install:
   fvm flutter install
 # Build, install, and run. Powered by `fvm flutter run`
-run: prebuild _run
+run: prebuild _prerelversion _run
 # Run the app in profiling mode.
 profile:
   fvm flutter run --profile --dart-define DISCORD_APP_ID=$DISCORD_APP_ID --dart-define LASTFM_API_KEY=$LASTFM_API_KEY --dart-define LASTFM_SECRET=$LASTFM_SECRET --dart-define SPOTIFY_API_KEY=$SPOTIFY_API_KEY --dart-define SPOTIFY_SECRET=$SPOTIFY_SECRET
@@ -57,6 +57,13 @@ _check:
   if [[ "$DISCORD_APP_ID" == "" ]]; then echo "Discord App ID not set."; NEED_API=true; fi
   #
   if [[ "$NEED_API" == "false" ]]; then echo "All API keys are set! You are ready to go."; else exit 1; fi
+
+version:
+  awk '/^version:[ ]*/ {print $2}' pubspec.yaml | sed 's![+].*!!' > assets/version.txt
+_prerelversion:
+  # This adds -dev+git.COMMIT (where COMMIT is a truncated hash) to the version number.
+  echo '-dev+git.' >> assets/version.txt
+  git log HEAD^1..HEAD --pretty --oneline | awk '{print $1}' >> assets/version.txt
 
 # Run metadata gathering tests
 test-metadata:
