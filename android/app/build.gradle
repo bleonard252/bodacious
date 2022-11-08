@@ -42,6 +42,10 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
+    aaptOptions {
+        cruncherEnabled = false
+    }
+
     compileSdkVersion flutter.compileSdkVersion
     ndkVersion flutter.ndkVersion
 
@@ -69,6 +73,7 @@ android {
     flavorDimensions "app"
     productFlavors {
         standard {
+            getIsDefault().set(true)
             dimension "app"
         }
         fdroid {
