@@ -43,8 +43,8 @@ class _LogViewState extends State<LogView> {
       }
       if (filters == []) {
         matchesAnyFilter = true;
-        if (filters == [] && log.logger.name.split(".").contains("gameStateProvider")) matchesAnyFilter = false;
-        if (filters == [] && log.logger.name.split(".").contains("UI Loggy - ObsWebSocket")) matchesAnyFilter = false;
+        if (filters == [] && log.logger.name.split(".").contains("nowPlayingProvider")) matchesAnyFilter = false;
+        if (filters == [] && log.logger.name.split(".").contains("Indexer")) matchesAnyFilter = false;
         // inverted filters here. turning them all off shows what doesn't match any filters.
       }
 

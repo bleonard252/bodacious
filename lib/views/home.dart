@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
+import '../widgets/frame_size.dart';
 import '../widgets/indexer_progress.dart';
 
 class HomeView extends StatelessWidget {
@@ -61,7 +62,7 @@ class HomeView extends StatelessWidget {
                     ),
                   ),
                   actions: [
-                    Builder(
+                    if (FrameSize.of(context)) Builder(
                       builder: (context) {
                         return Padding(
                           padding: const EdgeInsets.only(right: 12.0),

@@ -282,132 +282,133 @@ class OuterFrame extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (FrameSize.of(context)) {
-      return WillPopScope(
-        onWillPop: () async {
-          if (goRouter.location == "/") return true;
-          goRouter.pop();
-          if (goRouter.location == "/") {
-            ScaffoldMessenger.maybeOf(context)?.showSnackBar(const SnackBar(content: Text("Tap back again to close Bodacious")));
-          }
-          return false;
-        },
-        child: Column(
-          children: [
-            Expanded(
-              child: Row(children: [
-                StatefulBuilder(
-                  builder: (context, setState) {
-                    return SizedBox(
-                      width: 240,
-                      child: Material(
-                        color: Theme.of(context).colorScheme.surface,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.max,
-                          children: [
-                            Expanded(
-                              child: CustomScrollView(
-                                slivers: [
-                                  SliverToBoxAdapter(
-                                    child: SafeArea(
-                                      bottom: false,
-                                      child: ListTile(
-                                        leading: const Icon(MdiIcons.home, size: 36),
-                                        title: const Text("Home"),
-                                        selected: goRouter.location == "/",
-                                        onTap: () {
-                                          goRouter.go("/");
-                                          setState(() {});
-                                        },
-                                      ),
-                                    )
-                                  ),
-                                  SliverToBoxAdapter(
+    return WillPopScope(
+      onWillPop: () async {
+        final location = goRouter.location.split("/");
+        //appLogger.independentChild("Indexer").debug(goRouter.location, error: location);
+        print(location);
+        if (goRouter.location == "/") return true;
+        location.removeLast();
+        print(location.join("/"));
+        goRouter.go("/"+location.join("/"));
+        if (goRouter.location == "/") {
+          ScaffoldMessenger.maybeOf(context)?.showSnackBar(const SnackBar(content: Text("Tap back again to close Bodacious")));
+        }
+        return false;
+      },
+      child: (FrameSize.of(context)) ? Column(
+        children: [
+          Expanded(
+            child: Row(children: [
+              StatefulBuilder(
+                builder: (context, setState) {
+                  return SizedBox(
+                    width: 240,
+                    child: Material(
+                      color: Theme.of(context).colorScheme.surface,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.max,
+                        children: [
+                          Expanded(
+                            child: CustomScrollView(
+                              slivers: [
+                                SliverToBoxAdapter(
+                                  child: SafeArea(
+                                    bottom: false,
                                     child: ListTile(
-                                      leading: const Icon(MdiIcons.musicBoxMultiple, size: 36),
-                                      title: const Text("Library"),
-                                      selected: goRouter.location.startsWith("/library"),
+                                      leading: const Icon(MdiIcons.home, size: 36),
+                                      title: const Text("Home"),
+                                      selected: goRouter.location == "/",
                                       onTap: () {
-                                        goRouter.go("/library");
+                                        goRouter.go("/");
                                         setState(() {});
                                       },
-                                    )
-                                  ),
-                                  const SliverList(delegate: SliverChildListDelegate.fixed([])),
-                                ]
-                              ),
+                                    ),
+                                  )
+                                ),
+                                SliverToBoxAdapter(
+                                  child: ListTile(
+                                    leading: const Icon(MdiIcons.musicBoxMultiple, size: 36),
+                                    title: const Text("Library"),
+                                    selected: goRouter.location.startsWith("/library"),
+                                    onTap: () {
+                                      goRouter.go("/library");
+                                      setState(() {});
+                                    },
+                                  )
+                                ),
+                                const SliverList(delegate: SliverChildListDelegate.fixed([])),
+                              ]
                             ),
-                            if (config.wideCompactNowPlaying) const NowPlayingSidebar()
-                          ],
-                        ),
-                      )
-                    );
-                  }
+                          ),
+                          if (config.wideCompactNowPlaying) const NowPlayingSidebar()
+                        ],
+                      ),
+                    )
+                  );
+                }
+              ),
+              Expanded(
+                child: ClipRect(
+                  child: Builder(builder: (context) => buildNavigator(context)),
                 ),
-                Expanded(
-                  child: ClipRect(
-                    child: Builder(builder: (context) => buildNavigator(context)),
-                  ),
-                )
-              ]),
-            ),
-            if (!config.wideCompactNowPlaying) const SafeArea(top: false, child: NowPlayingBar())
-          ],
-        ),
-      );
-    } else {
-      return Column(children: [
+              )
+            ]),
+          ),
+          if (!config.wideCompactNowPlaying) const SafeArea(top: false, child: NowPlayingBar())
+        ],
+      ) : Column(children: [
         Expanded(child: ClipRect(child: Builder(builder: (context) => buildNavigator(context)))),
         SafeArea(
-          top: false,
-          child: StreamBuilder(
-            stream: _observer.stream,
-            builder: (context, snapshot) {
-              final shouldBeSelected = goRouter.location == "/menu" || goRouter.location == "/" || goRouter.location.startsWith("/library");
-              return Column(children: [
-                if (!goRouter.location.startsWith("/now_playing")) const NowPlayingBar(),
-                BottomNavigationBar(
-                  backgroundColor: Theme.of(context).colorScheme.surface,
-                  elevation: 0,
-                  currentIndex:
-                    goRouter.location == "/" ? 0 :
-                    goRouter.location.startsWith("/library") ? 1
-                    : 2,
-                  // all this for a drop of blood?
-                  selectedItemColor: shouldBeSelected
-                  ? Theme.of(context).bottomNavigationBarTheme.selectedItemColor ?? Theme.of(context).colorScheme.primary
-                  : Theme.of(context).bottomNavigationBarTheme.unselectedItemColor ?? Theme.of(context).unselectedWidgetColor,
-                  selectedIconTheme: shouldBeSelected
-                  ? Theme.of(context).bottomNavigationBarTheme.selectedIconTheme
-                  : Theme.of(context).bottomNavigationBarTheme.unselectedIconTheme,
-                  selectedFontSize: shouldBeSelected
-                  ? Theme.of(context).bottomNavigationBarTheme.selectedLabelStyle?.fontSize ?? 14.0
-                  : Theme.of(context).bottomNavigationBarTheme.unselectedLabelStyle?.fontSize ?? 12.0,
-                  type: BottomNavigationBarType.fixed,
-                  items: const [
-                    BottomNavigationBarItem(icon: Icon(MdiIcons.home), label: "Home"),
-                    BottomNavigationBarItem(icon: Icon(MdiIcons.musicBoxMultiple), label: "Library"),
-                    BottomNavigationBarItem(icon: Icon(MdiIcons.menu), label: "Menu"),
-                    //BottomNavigationBarItem(icon: SizedBox(width: 0), label: "")
-                  ],
-                  onTap: (i) {
-                    if (i == 0) { // Home
-                      goRouter.go("/");
-                    } else if (i == 1) { // Library
-                      goRouter.go("/library");
-                    } else if (i == 2) {
-                      goRouter.push("/menu");
-                    }
-                  },
-                )
-              ]);
-            }
-          ),
-        )
-      ]);
-    }
+        top: false,
+        child: StreamBuilder(
+          stream: _observer.stream,
+          builder: (context, snapshot) {
+            final shouldBeSelected = goRouter.location == "/menu" || goRouter.location == "/" || goRouter.location.startsWith("/library");
+            return Column(children: [
+              if (!goRouter.location.startsWith("/now_playing")) const NowPlayingBar(),
+              BottomNavigationBar(
+                backgroundColor: Theme.of(context).colorScheme.surface,
+                elevation: 0,
+                currentIndex:
+                  goRouter.location == "/" ? 0 :
+                  goRouter.location.startsWith("/library") ? 1
+                  : 2,
+                // all this for a drop of blood?
+                selectedItemColor: shouldBeSelected
+                ? Theme.of(context).bottomNavigationBarTheme.selectedItemColor ?? Theme.of(context).colorScheme.primary
+                : Theme.of(context).bottomNavigationBarTheme.unselectedItemColor ?? Theme.of(context).unselectedWidgetColor,
+                selectedIconTheme: shouldBeSelected
+                ? Theme.of(context).bottomNavigationBarTheme.selectedIconTheme
+                : Theme.of(context).bottomNavigationBarTheme.unselectedIconTheme,
+                selectedFontSize: shouldBeSelected
+                ? Theme.of(context).bottomNavigationBarTheme.selectedLabelStyle?.fontSize ?? 14.0
+                : Theme.of(context).bottomNavigationBarTheme.unselectedLabelStyle?.fontSize ?? 12.0,
+                type: BottomNavigationBarType.fixed,
+                items: const [
+                  BottomNavigationBarItem(icon: Icon(MdiIcons.home), label: "Home"),
+                  BottomNavigationBarItem(icon: Icon(MdiIcons.musicBoxMultiple), label: "Library"),
+                  BottomNavigationBarItem(icon: Icon(MdiIcons.menu), label: "Menu"),
+                  //BottomNavigationBarItem(icon: SizedBox(width: 0), label: "")
+                ],
+                onTap: (i) {
+                  if (i == 0) { // Home
+                    goRouter.go("/");
+                  } else if (i == 1) { // Library
+                    goRouter.go("/library");
+                  } else if (i == 2) {
+                    goRouter.push("/menu");
+                  }
+                },
+              )
+            ]);
+          }
+        ),
+      )
+      ])
+    );
   }
 
   Widget buildNavigator(BuildContext context) {
