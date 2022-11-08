@@ -392,7 +392,12 @@ class _IndexerIsolate {
 
     late final Response ct;
     try {
-      ct = await Dio().get("http://detectportal.firefox.com/success.txt", options: Options(validateStatus: (status) => true));
+      if (apiKeys.discordAppId.exists() || apiKeys.lastfmApiKey.exists() || apiKeys.spotifyClientId.exists()) {
+        // If there's no API keys, there's nothing to look up, so no point in trying.
+        ct = await Dio().get("http://detectportal.firefox.com/success.txt", options: Options(validateStatus: (status) => true));
+      } else {
+        ct = Response(requestOptions: RequestOptions(path: ""), statusCode: 0);
+      }
     } on DioError {
       ct = Response(requestOptions: RequestOptions(path: ""), statusCode: 0);
     }
@@ -604,4 +609,11 @@ enum IndexerState {
   STOPPED,
   /// The indexer has finished and exited.
   FINISHED
+}
+
+
+extension on String? {
+  bool exists() {
+    return this?.isNotEmpty ?? false;
+  }
 }
