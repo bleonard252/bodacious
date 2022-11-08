@@ -30,7 +30,13 @@ class _QueueViewState extends ConsumerState<QueueView> {
         leading: FrameSize.of(context) ? null : Tooltip(
           message: "Back to Now Playing",
           child: IconButton(
-            onPressed: () => widget.setParentState?.call(() => context.go("/now_playing")),
+            onPressed: () => widget.setParentState?.call(() {
+              try {
+                GoRouter.of(context).pop(); 
+              } catch(_) {
+                context.go("/now_playing");
+              }
+            }),
             icon: const Icon(MdiIcons.arrowLeft)
           ),
         ),
