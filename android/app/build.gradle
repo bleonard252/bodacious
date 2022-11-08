@@ -66,6 +66,17 @@ android {
         versionName flutterVersionName
     }
 
+    flavorDimensions "app"
+    productFlavors {
+        standard {
+            dimension "app"
+        }
+        fdroid {
+            dimension "app"
+            applicationId "xyz.u1024256.bodacious.fdroid"
+        }
+    }
+
     signingConfigs {
         release {
             if (keystorePropertiesFile.exists()) {

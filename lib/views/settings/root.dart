@@ -1,3 +1,4 @@
+import 'package:bodacious/main.dart';
 import "package:flutter/material.dart";
 import 'package:go_router/go_router.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
@@ -38,6 +39,7 @@ class SettingsHome extends StatelessWidget {
               backgroundColor: Colors.pink,
               child: Icon(MdiIcons.speaker, color: Colors.black),
             ),
+            enabled: false,
             title: const Text("Behavior"),
             subtitle: const Text("How would Bo work best for you?"),
             onTap: () => context.go("/settings/behavior")
@@ -47,6 +49,7 @@ class SettingsHome extends StatelessWidget {
               backgroundColor: Colors.blue,
               child: Icon(MdiIcons.web, color: Colors.black),
             ),
+            enabled: apiKeys.discordAppId.exists() || apiKeys.lastfmApiKey.exists() || apiKeys.spotifyClientId.exists(),
             title: const Text("Services"),
             subtitle: const Text("Last.fm and Spotify integrations"),
             onTap: () => context.go("/settings/services")
@@ -54,5 +57,11 @@ class SettingsHome extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+extension on String? {
+  bool exists() {
+    return this?.isNotEmpty ?? false;
   }
 }
