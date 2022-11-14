@@ -17,7 +17,7 @@ class SongLibraryList extends ConsumerWidget {
       builder: (context, snapshot) {
         return CustomScrollView(
           slivers: [
-            if (snapshot.connectionState != ConnectionState.done) SliverToBoxAdapter(child: Container())
+            if (!snapshot.hasData) SliverToBoxAdapter(child: Container())
             else SliverList(
               //itemExtent: 72.0,
               delegate: SliverChildBuilderDelegate(
