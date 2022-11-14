@@ -124,6 +124,15 @@ class JustAudioHandler extends BodaciousAudioHandler {
     );
   }
   @override
+  addQueueItems(List<MediaItem> mediaItems) async {
+    if (player.audioSource is! just.ConcatenatingAudioSource) {
+      player.setAudioSource(just.ConcatenatingAudioSource(children: []));
+    }
+    await (player.audioSource as just.ConcatenatingAudioSource).addAll(
+      mediaItems.map((mediaItem) => just.AudioSource.uri(Uri.parse(mediaItem.id))).toList()
+    );
+  }
+  @override
   updateQueue(List<MediaItem> queue, [int? index]) async {
     player.setAudioSource(just.ConcatenatingAudioSource(children: [
       for (final mediaItem in queue)

@@ -84,9 +84,10 @@ class AlbumWidget extends ConsumerWidget {
                       break;
                     case "queue":
                       final tracks = await db.tryGetAlbumTracks(album.name, by: album.artistName);
-                      for (int i = 0; i < tracks.length; i++) {
-                        player.addQueueItem(tracks[i].asMediaItem());
-                      }
+                      player.addQueueItems(tracks.map((e) => e.asMediaItem()).toList());
+                      // for (int i = 0; i < tracks.length; i++) {
+                      //   player.addQueueItem(tracks[i].asMediaItem());
+                      // }
                       break;
                     default:
                   }

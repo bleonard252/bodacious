@@ -27,6 +27,7 @@ class _QueueViewState extends ConsumerState<QueueView> {
       backgroundColor: Colors.transparent,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         leading: FrameSize.of(context) ? null : Tooltip(
           message: "Back to Now Playing",
           child: IconButton(
