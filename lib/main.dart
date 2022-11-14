@@ -6,8 +6,6 @@ import 'package:audio_service/audio_service.dart';
 import 'package:bodacious/background/discordrpc.dart';
 import 'package:bodacious/background/scrobble.dart';
 import 'package:bodacious/drift/database.dart';
-import 'package:bodacious/models/album_data.dart';
-import 'package:bodacious/models/artist_data.dart';
 import 'package:bodacious/models/track_data.dart';
 import 'package:bodacious/src/config.dart';
 import 'package:bodacious/src/library/indexer.dart';
@@ -39,6 +37,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:just_audio_mpv/just_audio_mpv.dart';
 import 'package:lastfm/lastfm.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:pinelogger/pinelogger.dart';
@@ -73,6 +72,19 @@ void main() async {
   if (Platform.isLinux && Process.runSync("which", ["mpv"]).exitCode != 0) {
     return runApp(const MPVMissingCrash());
   }
+
+  final _mpvlogger = appLogger.independentChild("just_audio_mpv");
+  const _logLevelMap = {
+    JAMPV_LogLevel.debug: Severity.debug,
+    JAMPV_LogLevel.info: Severity.info,
+    JAMPV_LogLevel.warning: Severity.warning,
+    JAMPV_LogLevel.error: Severity.error,
+    JAMPV_LogLevel.verbose: Severity.verbose,
+    JAMPV_LogLevel.none: Severity.debug,
+  };
+  mpvLog = (message, {error, level = JAMPV_LogLevel.debug, stackTrace}) {
+    _mpvlogger.log(message, severity: _logLevelMap[level]!, error: error, stackTrace: stackTrace);
+  };
 
   final _bgsinitLogger = appLogger.independentChild("BackgroundPlayer.init");
   try {
@@ -146,9 +158,12 @@ void main() async {
   queueProvider = StreamProvider<Queue<TrackMetadata>>((ref) async* {
     final log = appLogger.independentChild("nowPlayingProvider").child("queueProvider");
     final stream = player.queue;
-    yield Queue(entries: []);
+    yield Queue(entries: [], position: 0);
     await for (final update in stream) {
-      if (update.isEmpty) yield Queue(entries: []);
+      if (update.isEmpty) {
+        log.verbose("Queue is empty");
+        yield Queue(entries: [], position: 0);
+      }
       
       if (listEquals(update,ref.state.value?.entries.map((value) => value.asMediaItem()).toList())) continue;
         // if the update is the same as the existing queue, don't update it
@@ -176,7 +191,7 @@ void main() async {
         ).getSingleOrNull();
         futures.add(_dbEntry);
       }
-      
+
       yield Queue(entries: (await Future.wait<TrackMetadata?>(futures)).whereType<TrackMetadata>().toList(), position: player.currentIndex);
     }
   });
@@ -188,12 +203,13 @@ void main() async {
   TheIndexer.spawn().catchError((error, stack) => appLogger.independentChild("Indexer").error(error, stackTrace: stack));
 
   if (config.lastFmToken != null && apiKeys.lastfmApiKey != null) {
+    final v = (await rootBundle.loadString("assets/version.txt")).replaceAll(RegExp("[\r\n]"), "");
     lastfm = LastFMAuthorized(
       apiKeys.lastfmApiKey!,
       secret: apiKeys.lastfmSecret!,
       sessionKey: config.lastFmToken!,
       username: config.lastFmUsername!,
-      userAgent: "Bodacious/0.5.0 <https://github.com/bleonard252/bodacious>"
+      userAgent: "Bodacious/$v <https://github.com/bleonard252/bodacious>"
     );
   }
 
