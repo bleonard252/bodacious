@@ -30,7 +30,7 @@ class SongLibraryList extends ConsumerWidget {
                     ..limit(1, offset: index)
                   ).getSingle(),
                   builder: (context, snapshot) {
-                    final track = snapshot.data ?? TrackMetadata(uri: Uri(), title: "Loading...");
+                    final track = snapshot.data ?? TrackMetadata(uri: Uri(), title: "Loading...", artistName: "");
                     return SongWidget(
                       track,
                       selected: ref.watch(nowPlayingProvider).value?.uri == track.uri,
