@@ -28,27 +28,31 @@ class _LogViewState extends State<LogView> {
   Widget build(BuildContext context) {
     final logs = appLogger;
     final filteredLogs = logs.messages.where((log) {
-      bool matchesAnyFilter = false;
-      if (filters == [...LogViewFilter.values]) matchesAnyFilter = true;
-      // if all filters are selected, show everything.
-      if (filters.contains(LogViewFilter.nowPlayingProvider) && !matchesAnyFilter) {
-        if (log.logger.name.split(".").contains("nowPlayingProvider")) {
-          matchesAnyFilter = true;
-        }
-      }
-      if (filters.contains(LogViewFilter.indexer) && !matchesAnyFilter) {
-        if (log.logger.name.split(".").contains("Indexer")) {
-          matchesAnyFilter = true;
-        }
-      }
-      if (filters == []) {
-        matchesAnyFilter = true;
-        if (filters == [] && log.logger.name.split(".").contains("nowPlayingProvider")) matchesAnyFilter = false;
-        if (filters == [] && log.logger.name.split(".").contains("Indexer")) matchesAnyFilter = false;
-        // inverted filters here. turning them all off shows what doesn't match any filters.
-      }
+      isSevereEnough() => log.severity >= minSeverity;
+      final crumb = log.logger.name.split(".");
 
-      return matchesAnyFilter && log.severity >= minSeverity;
+      if (crumb[0] == "nowPlayingProvider") {
+        if (filters.contains(LogViewFilter.nowPlayingProvider)) {
+          return isSevereEnough();
+        } else {
+          return false;
+        }
+      }
+      if (crumb[0] == "Indexer") {
+        if (filters.contains(LogViewFilter.indexer)) {
+          return isSevereEnough();
+        } else {
+          return false;
+        }
+      }
+      if (crumb[0] == "just_audio_mpv") {
+        if (filters.contains(LogViewFilter.mpv)) {
+          return isSevereEnough();
+        } else {
+          return false;
+        }
+      }
+      return true;
     }).toList();
 
     return Theme(

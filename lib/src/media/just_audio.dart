@@ -150,6 +150,16 @@ class JustAudioHandler extends BodaciousAudioHandler {
     );
   }
   @override
+  insertQueueItems(int index, List<MediaItem> mediaItems) async {
+    if (player.audioSource is! just.ConcatenatingAudioSource) {
+      player.setAudioSource(just.ConcatenatingAudioSource(children: []));
+    }
+    await (player.audioSource as just.ConcatenatingAudioSource).insertAll(
+      index,
+      mediaItems.map((mediaItem) => just.AudioSource.uri(Uri.parse(mediaItem.id))).toList()
+    );
+  }
+  @override
   removeQueueItemAt(int index) async {
     if (player.audioSource is! just.ConcatenatingAudioSource) {
       return;
@@ -169,6 +179,7 @@ class JustAudioHandler extends BodaciousAudioHandler {
       just.AudioSource.uri(trackMetadata.uri)
     ]));
   }
+
 
   @override
   setShuffleMode(AudioServiceShuffleMode shuffleMode) => player.setShuffleModeEnabled(shuffleMode == AudioServiceShuffleMode.all);

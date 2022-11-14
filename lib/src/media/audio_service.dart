@@ -39,4 +39,10 @@ abstract class BodaciousAudioHandler extends BaseAudioHandler with SeekHandler {
 
   @override
   updateQueue(List<MediaItem> queue, [int? index]) async => super.updateQueue(queue);
+
+  Future<void> insertQueueItems(int index, List<MediaItem> mediaItems) async {
+    for (final mediaItem in mediaItems.reversed) {
+      await insertQueueItem(index, mediaItem);
+    }
+  }
 }

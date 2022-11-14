@@ -1,6 +1,8 @@
 import 'dart:io';
 
 import 'package:bodacious/models/album_data.dart';
+import 'package:bodacious/models/track_data.dart';
+import 'package:bodacious/widgets/frame_size.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -23,6 +25,7 @@ class AlbumWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final logger = appLogger.independentChild("AlbumWidget");
     final _subtitle = buildChildren();
     return SizedBox(
       height: _subtitle.isEmpty ? 64.0 : 72.0,
@@ -75,12 +78,30 @@ class AlbumWidget extends ConsumerWidget {
                 ]).then((value) async {
                   switch (value) {
                     case "playnext":
-                      final q = ref.read(queueProvider).value;
-                      final tracks = await db.tryGetAlbumTracks(album.name, by: album.artistName);
-                      final x = (q?.position ?? 0);
-                      for (int i = 0; i < tracks.length; i++) {
-                        player.insertQueueItem(x+i, tracks[i].asMediaItem());
+                      var q = ref.read(queueProvider).value;
+                      if (q == null) logger.warning("Queue is null! Waiting up to 250ms to try again.");
+                      if (player.queue.value.isNotEmpty) {
+                        logger.verbose("Attempting to get full queue");
+                        q ??= await ref.read(queueProvider.stream).firstWhere((element) => element.entries.isNotEmpty).timeout(const Duration(milliseconds: 250), onTimeout: () {
+                          logger.error("Failed to get queue", error: "Timed out");
+                          return Queue<TrackMetadata>(entries: [], position: 0);
+                        }).catchError((error, stackTrace) {
+                          logger.error("Failed to get queue", error: error, stackTrace: stackTrace);
+                          return Queue<TrackMetadata>(entries: [], position: 0);
+                        });
+                      } else if (player.queue.value.isEmpty) {
+                        logger.debug("Nothing is playing, playing now: ${album.name}", error: q);
+                        final tracks = await db.tryGetAlbumTracks(album.name, by: album.artistName);
+                        player.addQueueItems(tracks.map((e) => e.asMediaItem()).toList());
+                        break;
                       }
+                      logger.debug("Playing all next: ${album.name}", error: q);
+                      final tracks = await db.tryGetAlbumTracks(album.name, by: album.artistName);
+                      final x = (q?.position ?? player.currentIndex ?? 0);
+                      player.insertQueueItems(x+1, tracks.map((e) => e.asMediaItem()).toList());
+                      // for (int i = 0; i < tracks.length; i++) {
+                      //   player.insertQueueItem(x+i+1, tracks[i].asMediaItem());
+                      // }
                       break;
                     case "queue":
                       final tracks = await db.tryGetAlbumTracks(album.name, by: album.artistName);

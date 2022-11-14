@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/widgets.dart';
 
 class FrameSize extends InheritedWidget {
@@ -26,8 +28,15 @@ class Queue<T> {
   /// The current position of the queue.
   final int? position;
 
+  get length => entries.length;
+
   Queue({
     required this.entries,
     this.position
   }) : assert((position == null || position < entries.length || position == 0) && (position == null || position >= 0), "Queue position out of range");
+
+  @override
+  String toString() {
+    return "Queue(entries: $length ${length != 1 ? "entries" : "entry"}, position: $position)";
+  }
 }
