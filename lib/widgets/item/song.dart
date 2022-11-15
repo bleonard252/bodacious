@@ -65,7 +65,7 @@ class SongWidget extends ConsumerWidget {
                   ),
                   if (selected) ...[
                     Positioned.fill(child: Container(color: Colors.black54)),
-                    const Positioned.fill(child: Center(child: Icon(MdiIcons.equalizer))),
+                    Positioned.fill(child: Center(child: Icon(MdiIcons.equalizer, color: Theme.of(context).colorScheme.primary))),
                   ]
                   else if (showTrackNo && track.trackNo != null && track.trackNo != 0) ...[
                     Positioned.fill(child: Container(color: Colors.black54)),

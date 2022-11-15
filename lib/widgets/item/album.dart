@@ -28,7 +28,7 @@ class AlbumWidget extends ConsumerWidget {
     final logger = appLogger.independentChild("AlbumWidget");
     final _subtitle = buildChildren();
     return SizedBox(
-      height: _subtitle.isEmpty ? 64.0 : 72.0,
+      height: _subtitle.isEmpty ? 64.0 : 80.0,
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         leading: album.coverUri?.scheme == "file" ? Image(

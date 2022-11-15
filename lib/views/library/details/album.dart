@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:audio_service/audio_service.dart';
 import 'package:bodacious/main.dart';
 import 'package:bodacious/models/album_data.dart';
 import 'package:bodacious/models/artist_data.dart';
@@ -31,9 +32,9 @@ class AlbumDetailsWrapper extends StatelessWidget {
         child: Center(
           child: Column(
             children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: const Icon(MdiIcons.alertCircle, color: Colors.red),
+              const Padding(
+                padding: EdgeInsets.all(8.0),
+                child: Icon(MdiIcons.alertCircle, color: Colors.red),
               ),
               Text(snapshot.error.toString(), textAlign: TextAlign.center, style: const TextStyle(color: Colors.red))
             ]
@@ -119,7 +120,7 @@ class AlbumDetailsViewState extends State<AlbumDetailsView> {
               //   ),
               //   //title: Text(album.name),
               // ),
-              const SliverToBoxAdapter(child: SizedBox(height: 56)),
+              const SliverToBoxAdapter(child: SizedBox(height: 72)),
               SliverToBoxAdapter(child: (FrameSize.of(context)) ? Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Row(
@@ -158,11 +159,12 @@ class AlbumDetailsViewState extends State<AlbumDetailsView> {
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: Theme.of(context).textTheme.headline6
-                            )
+                            ),
+                            playButtons(album)
                           ],
                         ),
                       ),
-                    )
+                    ),
                   ]
                 ),
               ) : Padding(
@@ -198,7 +200,8 @@ class AlbumDetailsViewState extends State<AlbumDetailsView> {
                       overflow: TextOverflow.ellipsis,
                       style: Theme.of(context).textTheme.headline6,
                       textAlign: TextAlign.center,
-                    )
+                    ),
+                    playButtons(album)
                   ]
                 ),
               )),
@@ -274,4 +277,39 @@ class AlbumDetailsViewState extends State<AlbumDetailsView> {
       }
     );
   }
+
+  playButtons([AlbumMetadata? album]) => Builder(
+    builder: ((context) => Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          TextButton(onPressed: () async {
+            // Play All
+            final traxx = await db.tryGetAlbumTracks((album ?? widget.album).name, by: (album ?? widget.album).artistName);
+            await player.stop();
+            await player.updateQueue(traxx.map((p0) => p0.asMediaItem()).toList(), 0);
+            await player.play();
+          }, child: const Padding(
+            padding: EdgeInsets.all(16.0),
+            child: Text("Play All"),
+          )),
+          const SizedBox(width: 16),
+          FloatingActionButton.extended(
+            onPressed: () async {
+              final traxx = await db.tryGetAlbumTracks((album ?? widget.album).name, by: (album ?? widget.album).artistName);
+              await player.stop();
+              await player.updateQueue(traxx.map((p0) => p0.asMediaItem()).toList(), 0);
+              await player.setShuffleMode(AudioServiceShuffleMode.all);
+              await player.play();
+            },
+            backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+            label: const Text("Shuffle"),
+            icon: const Icon(MdiIcons.shuffle)
+          )
+        ],
+      ),
+    ))
+  );
 }
