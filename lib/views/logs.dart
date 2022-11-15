@@ -187,7 +187,7 @@ class _LogViewState extends State<LogView> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(log.logger.name, style: Theme.of(context).textTheme.bodySmall),
-                          if (log.message is String || log.message is Error) Text(log.message, style: TextStyle(color: log.severity.color, fontFamily: 'monospace'))
+                          if (log.message is String || log.message is Error) Text(log.message, style: TextStyle(color: log.severity.color, fontFamily: 'monospace'), maxLines: 2, overflow: TextOverflow.fade)
                           else Text("Something happened", style: TextStyle(color: log.severity.color)),
                         ],
                       ),
@@ -196,7 +196,7 @@ class _LogViewState extends State<LogView> {
                         children: [
                           //Text(log.level.toString()),
                           if (log.error is String) Text(log.error as String)
-                          else if (log.error != null) Text(log.error.toString(), style: const TextStyle(fontFamily: 'monospace')),
+                          else if (log.error != null) Text(log.error.toString(), style: const TextStyle(fontFamily: 'monospace'), maxLines: 3, overflow: TextOverflow.fade),
                           Text("${log.severity.shortName} @ ${log.timestamp.toIso8601String()}", style: Theme.of(context).textTheme.bodySmall),
                         ],
                       ),

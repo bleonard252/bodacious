@@ -7,21 +7,25 @@ import 'package:bodacious/src/library/cache_dir.dart';
 import 'package:bodacious/src/metadata/infer.dart';
 import 'package:flac_metadata/flacstream.dart';
 import 'package:flac_metadata/metadata.dart';
-import 'package:id3/id3.dart';
+import 'package:flinq/flinq.dart';
+import 'package:id3tag/id3tag.dart' as id3;
+//import 'package:id3/id3.dart';
 
 import 'package:mime/mime.dart';
 
 Future<TrackMetadata> loadID3FromBytes(List<int> bytes, File file, {String? cacheDir}) async {
-  final mp3 = MP3Instance(bytes);
-  if (bytes.length > 3) {
-    try {
-      mp3.parseTagsSync();
-    } catch(e) {
-      print(e);
-      return TrackMetadata(uri: file.absolute.uri); // failed to parse, so use an empty item instead
-    }
-  }
-  final rawTags = mp3.getMetaTags() ?? {};
+  //final mp3 = MP3Instance(bytes);
+  // if (bytes.length > 3) {
+  //   try {
+  //     mp3.parseTagsSync();
+  //   } catch(e) {
+  //     print(e);
+  //     return TrackMetadata(uri: file.absolute.uri); // failed to parse, so use an empty item instead
+  //   }
+  // }
+  // final rawTags = mp3.getMetaTags() ?? {};
+  final mp3 = id3.ID3TagReader(file);
+  final mp3Tag = await mp3.readTag();
   // if (kDebugMode) {
   //   print(rawTags);
   // }
@@ -30,7 +34,7 @@ Future<TrackMetadata> loadID3FromBytes(List<int> bytes, File file, {String? cach
   // Decode images
   //ui.ImageDescriptor.encoded(rawTags["APIC"])
   //base64Decode(source)
-  final apic = rawTags["APIC"]?["base64"];
+  final apic = mp3Tag.pictures.firstOrNullWhere((e) => e.picType == 'FrontCover');//rawTags["APIC"]?["base64"];
   //ui.ImageDescriptor? descriptor;
   //ByteData? coverBytes;
   Uint8List? coverBytes2;
@@ -38,8 +42,8 @@ Future<TrackMetadata> loadID3FromBytes(List<int> bytes, File file, {String? cach
   if (apic != null) {
     //descriptor = await ui.ImageDescriptor.encoded(await ui.ImmutableBuffer.fromUint8List(base64Decode(apic)));
     //coverBytes = await (await (await descriptor.instantiateCodec()).getNextFrame()).image.toByteData(format: ui.ImageByteFormat.png);
-    coverMime2 = rawTags["APIC"]["mime"];
-    coverBytes2 = base64Decode(apic);
+    coverMime2 = apic.mime;
+    coverBytes2 = Uint8List.fromList(apic.imageData);
     // if (rawTags["APIC"]["mime"] == "image/jpeg") {
     //   coverBytes2 = base64Decode(apic);//img.decodeJpg(base64Decode(apic))?.getBytes(format: img.Format.argb);
     // } else if (rawTags["APIC"]["mime"] == "image/gif") {
@@ -89,7 +93,7 @@ Future<TrackMetadata> loadID3FromBytes(List<int> bytes, File file, {String? cach
     final _dir = cacheDir != null ? cacheDir+"/album_covers" : await getCacheDirectory("album_covers");
     final _b = coverBytes2; //?? coverBytes!.buffer.asUint8List();
     final _x = extensionFromMime(coverMime2 ?? MimeTypeResolver().lookup("cover", headerBytes: _b.sublist(0,20)) ?? "image/bmp");
-    coverFile = File(_dir+"/"+base64Encode(utf8.encode(flacdata["artist"] ?? rawTags["Artist"]))+"."+base64Encode(utf8.encode(flacdata["album"] ?? rawTags["Album"] ?? ""))+"."+_x);
+    coverFile = File(_dir+"/"+base64Encode(utf8.encode(flacdata["artist"] ?? mp3Tag.artist))+"."+base64Encode(utf8.encode(flacdata["album"] ?? mp3Tag.album ?? ""))+"."+_x);
     if (!await coverFile.exists()) {
       // if (kDebugMode) {
       //   print("Caching non-adjacent cover!");
@@ -101,18 +105,25 @@ Future<TrackMetadata> loadID3FromBytes(List<int> bytes, File file, {String? cach
   }
   coverFile ??= await inferCoverFile(file);
 
+
   // Output
   return TrackMetadata(
-    title: flacdata["title"] ?? rawTags["Title"],
-    artistName: flacdata["artist"] ?? rawTags["Artist"],
-    albumName: flacdata["album"] ?? rawTags["Album"],
-    albumArtistName: flacdata["albumartist"] ?? rawTags["TPE2"],
-    year: int.tryParse(flacdata["year"] ?? rawTags["Year"] ?? ""),
+    title: flacdata["title"] ?? mp3Tag.title,
+    artistName: flacdata["artist"] ?? mp3Tag.artist,
+    albumName: flacdata["album"] ?? mp3Tag.album,
+    albumArtistName: flacdata["albumartist"] ?? mp3Tag.albumArtist,
+    year: int.tryParse(flacdata["year"] ?? mp3Tag.year ?? ""),
     //coverData: descriptor,
-    trackNo: int.tryParse((flacdata["track"] ?? rawTags["Track"] ?? "").replaceFirst(RegExp(r"\/[0-9]*"), "")),
-    discNo: int.tryParse((flacdata["disc"]?.toString() ?? rawTags["Disc"] ?? "").replaceFirst(RegExp(r"\/[0-9]*"), "")) ?? 0,
+    trackNo: int.tryParse((flacdata["track"] ?? mp3Tag.trackNumber ?? "").replaceFirst(RegExp(r"\/[0-9]*"), "")),
+    discNo: int.tryParse((flacdata["disc"]?.toString() ?? mp3Tag.discNumber ?? "").replaceFirst(RegExp(r"\/[0-9]*"), "")) ?? 0,
     uri: file.absolute.uri,
     coverBytes: coverBytes2, //?? coverBytes?.buffer.asUint8List(),
     coverUri: coverFile?.absolute.uri
   );
+}
+
+extension on id3.ID3Tag {
+  get albumArtist => frameWithTypeAndName<id3.TextInformation>("TPE2")?.value;
+  get year => frameWithTypeAndName<id3.TextInformation>("TYER")?.value;
+  get discNumber => frameWithTypeAndName<id3.TextInformation>("TPOS")?.value.replaceAll(RegExp(r"/.*"), "");
 }

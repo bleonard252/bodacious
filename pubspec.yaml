@@ -15,11 +15,11 @@ environment:
 dependencies:
   # Audio Player Deps
   just_audio: ^0.9.20
-  just_audio_mpv: ^0.1.5
+  just_audio_mpv: ^0.1.6
   #just_audio_libwinmedia: ^0.0.4
   #just_audio_background: ^0.0.1-beta.5
   audio_service: ^0.18.4
-  
+
   # Widget & Flutter Deps
   go_router: ^3.0.5
   image: ^3.1.3
@@ -50,8 +50,7 @@ dependencies:
 
   # Library & Metadata Deps
   file_picker: ^4.5.1 # for picking directories (and files in early versions)
-  #whatever library database on this line
-  id3: ^1.0.2
+  id3tag: ^0.2.0
   integer: ^2.0.1
   flac_metadata: #^1.0.4
     git: https://github.com/bleonard252/flac_metadata
