@@ -235,7 +235,7 @@ class _IndexerIsolate {
             if (metaBytes.length >= 4 && String.fromCharCodes(metaBytes.getRange(0, 4)) == 'fLaC') {_class = "flac";}
             else if (metaBytes.length >= 3 && listEquals(metaBytes.getRange(0, 3).toList(), [73, 68, 51])) {_class = "id3";}
           }
-          if (metaBytes.length >= 10*1000000 /* 10MB */) {
+           /* if (metaBytes.length >= 10*1000000 /* 10MB */) {
             _metaByteReader.cancel();
             /* Really I have no idea why you'd need more than 10MB of TAGS in a file...
               If there is a case I might be able to bump it */
@@ -247,16 +247,19 @@ class _IndexerIsolate {
               to reduce the amount of data looked at to only the necessary data,
               so that the library could scan faster.
             */
-          }
+          } */
           if (_class == "flac") {
             _metaByteReader.cancel();
             c.complete();
             metaBytes.clear();
             // the FLAC metadata reader reads the file itself
             // so gathering the bytes for it is not important
-          } else if (_class == "id3" && metaBytes.length > 10) {
-            // Determine the length of the id3 segment
-            try {
+          } else if (_class == "id3") {
+            _metaByteReader.cancel();
+            c.complete();
+            metaBytes.clear();
+            /* try {
+              // Determine the length of the id3 segment
               //targetLength ??= (i32.parse(metaBytes.sublist(6,10).join(""), radix: 16)).roundToDouble()+10;
               // if (metaBytes.length >= targetLength!) {
               //   _metaByteReader.cancel();
@@ -270,7 +273,7 @@ class _IndexerIsolate {
               metaBytes.clear();
               _class = "none";
               return;
-            }
+            } */
           }
           if (metaBytes.length > 20 && _class == "none") {
             c.complete();
@@ -284,7 +287,7 @@ class _IndexerIsolate {
 
         //final _mseFile = File(file.path.replaceFirst(fileExtensionRegex, ".mse"));
         // final _mse = (await _mseFile.exists()) ? await parseMseFile(_mseFile.openRead()) : null;
-        final TrackMetadata? _id3 = (/* _mse == null && */ _class == "id3" || _class == "flac") ? await loadID3FromBytes(metaBytes, file, cacheDir: cacheDir) : null;
+        final TrackMetadata? _id3 = (/* _mse == null && */ _class == "id3" || _class == "flac") ? await loadID3Metadata(file, cacheDir: cacheDir, logger: log) : null;
         final TrackMetadata? _ctxmeta = (/* _mse == null && */ _id3 == null) ? inferMetadataFromContext(file.absolute.uri)
         .copyWith(coverUri: (await inferCoverFile(file))?.absolute.uri) : null;
         final _id = nanoid(13);

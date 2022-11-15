@@ -6,60 +6,45 @@ import 'package:bodacious/models/track_data.dart';
 import 'package:bodacious/src/library/cache_dir.dart';
 import 'package:bodacious/src/metadata/infer.dart';
 import 'package:flac_metadata/flacstream.dart';
-import 'package:flac_metadata/metadata.dart';
+// ignore: library_prefixes
+import 'package:flac_metadata/metadata.dart' as FLAC;
 import 'package:flinq/flinq.dart';
 import 'package:id3tag/id3tag.dart' as id3;
 //import 'package:id3/id3.dart';
 
 import 'package:mime/mime.dart';
+import 'package:pinelogger/pinelogger.dart';
 
-Future<TrackMetadata> loadID3FromBytes(List<int> bytes, File file, {String? cacheDir}) async {
-  //final mp3 = MP3Instance(bytes);
-  // if (bytes.length > 3) {
-  //   try {
-  //     mp3.parseTagsSync();
-  //   } catch(e) {
-  //     print(e);
-  //     return TrackMetadata(uri: file.absolute.uri); // failed to parse, so use an empty item instead
-  //   }
-  // }
-  // final rawTags = mp3.getMetaTags() ?? {};
-  final mp3 = id3.ID3TagReader(file);
-  final mp3Tag = await mp3.readTag();
-  // if (kDebugMode) {
-  //   print(rawTags);
-  // }
-  final flac = await FlacInfo(file).readMetadatas();
-  
-  // Decode images
-  //ui.ImageDescriptor.encoded(rawTags["APIC"])
-  //base64Decode(source)
+Future<TrackMetadata> loadID3Metadata(File file, {String? cacheDir, Pinelogger? logger}) async {
+  logger ??= Pinelogger("IndexerFallback");
+  logger = logger.child("loadID3Metadata");
+  late final id3.ID3Tag mp3Tag;
+  late final List<FLAC.Metadata> flac;
+  try {
+    final mp3 = id3.ID3TagReader(file);
+    mp3Tag = await mp3.readTag();
+  } catch(e) {
+    logger.error("Failed to load ID3 tag", error: e);
+  }
+  try {
+    flac = await FlacInfo(file).readMetadatas();
+  } catch(e) {
+    logger.error("Failed to load FLAC metadata", error: e);
+  }
+
   final apic = mp3Tag.pictures.firstOrNullWhere((e) => e.picType == 'FrontCover');//rawTags["APIC"]?["base64"];
-  //ui.ImageDescriptor? descriptor;
-  //ByteData? coverBytes;
   Uint8List? coverBytes2;
   String? coverMime2;
   if (apic != null) {
-    //descriptor = await ui.ImageDescriptor.encoded(await ui.ImmutableBuffer.fromUint8List(base64Decode(apic)));
-    //coverBytes = await (await (await descriptor.instantiateCodec()).getNextFrame()).image.toByteData(format: ui.ImageByteFormat.png);
     coverMime2 = apic.mime;
     coverBytes2 = Uint8List.fromList(apic.imageData);
-    // if (rawTags["APIC"]["mime"] == "image/jpeg") {
-    //   coverBytes2 = base64Decode(apic);//img.decodeJpg(base64Decode(apic))?.getBytes(format: img.Format.argb);
-    // } else if (rawTags["APIC"]["mime"] == "image/gif") {
-    //   coverBytes2 = Uint8List.fromList(base64Decode(apic)); // let Flutter do the decoding
-    // } else if (rawTags["APIC"]["mime"] == "image/png") {
-    //   coverBytes2 = img.decodePng(base64Decode(apic))?.getBytes(format: img.Format.argb); // let Flutter do the decoding
-    // } else {
-    //   coverBytes2 = img.decodeImage(base64Decode(apic))?.getBytes(format: img.Format.argb);
-    // }
   }
   
   final Map<String, dynamic> flacdata = {};
   for (final block in flac) {
     switch (block.blockType) {
-      case BlockType.VORBIS_COMMENT:
-        for (var element in (block as VorbisComment).comments) {
+      case FLAC.BlockType.VORBIS_COMMENT:
+        for (var element in (block as FLAC.VorbisComment).comments) {
           if (element.startsWith("TITLE=")) flacdata.putIfAbsent("title", () => element.replaceFirst("TITLE=", ""));
           if (element.startsWith("ARTIST=")) flacdata.putIfAbsent("artist", () => element.replaceFirst("ARTIST=", ""));
           if (element.startsWith("ALBUMARTIST=")) flacdata.putIfAbsent("albumartist", () => element.replaceFirst("ALBUMARTIST=", ""));
@@ -70,8 +55,8 @@ Future<TrackMetadata> loadID3FromBytes(List<int> bytes, File file, {String? cach
           if (element.startsWith("ORIGINALYEAR=")) flacdata.putIfAbsent("year", () => element.replaceFirst("ORIGINALYEAR=", ""));
         }
         break;
-      case BlockType.PICTURE:
-        if ((block as Picture).pictureType == 3) { // Cover (front)
+      case FLAC.BlockType.PICTURE:
+        if ((block as FLAC.Picture).pictureType == 3) { // Cover (front)
           //descriptor = await ui.ImageDescriptor.encoded(await ui.ImmutableBuffer.fromUint8List(block.image));
           // if (block.mimeString == "image/jpeg") {
           //   coverBytes2 = img.decodeJpg(block.image)?.getBytes();
