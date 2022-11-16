@@ -5,6 +5,7 @@ import 'package:bodacious/models/track_data.dart';
 import 'package:bodacious/widgets/cover_placeholder.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 class SongWidget extends ConsumerWidget {
@@ -113,6 +114,10 @@ class SongWidget extends ConsumerWidget {
                       )
                     ]).then((value) {
                       switch (value) {
+                        case "trackinfo":
+                          //ref.read(trackInfoDialogProvider).show(track);
+                          context.push("/library/${track.albumArtistId}/${track.albumId}/${track.id}", extra: track);
+                          break;
                         case "playnext":
                           final q = ref.read(queueProvider).value;
                           player.insertQueueItem((q?.position ?? 0)+1, track.asMediaItem());

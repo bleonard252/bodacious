@@ -16,6 +16,7 @@ import 'package:bodacious/views/about.dart';
 import 'package:bodacious/views/home.dart';
 import 'package:bodacious/views/library/details/album.dart';
 import 'package:bodacious/views/library/details/artist.dart';
+import 'package:bodacious/views/library/details/song.dart';
 import 'package:bodacious/views/library/root.dart';
 import 'package:bodacious/views/logs.dart';
 import 'package:bodacious/views/main_menu.dart';
@@ -451,7 +452,7 @@ class OuterFrame extends StatelessWidget {
         // GoRoute(path: "artists/:name", builder: (context, state) => ArtistDetailsView(artist: state.extra as ArtistMetadata))
         GoRoute(path: ":artistId", builder: (context, state) => ArtistDetailsWrapper(id: state.params["artistId"]!, data: state.extra), routes: [
           GoRoute(path: ":albumId", builder: (context, state) => AlbumDetailsWrapper(id: state.params["albumId"]!, data: state.extra), routes: [
-            //TODO: track metadata page
+            GoRoute(path: ":trackId", builder: (context, state) => TrackDetailsWrapper(id: state.params["trackId"]!, data: state.extra))
           ])
         ])
       ]),

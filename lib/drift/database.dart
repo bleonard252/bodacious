@@ -71,6 +71,25 @@ class BoDatabase extends _$BoDatabase {
     ).getSingleOrNull().then((v) => v?.readTableOrNull(artistTable)?.id);
   }
 
+  Future<ArtistMetadata?> tryGetArtistById(String id) {
+    return (
+      select(artistTable)
+      ..where((tbl) => tbl.id.equals(id))
+    ).getSingleOrNull();
+  }
+  Future<AlbumMetadata?> tryGetAlbumById(String id) {
+    return (
+      select(albumTable)
+      ..where((tbl) => tbl.id.equals(id))
+    ).getSingleOrNull();
+  }
+  Future<TrackMetadata?> tryGetTrackById(String id) {
+    return (
+      select(trackTable)
+      ..where((tbl) => tbl.id.equals(id))
+    ).getSingleOrNull();
+  }
+
   @override
   MigrationStrategy get migration => MigrationStrategy(
     beforeOpen: (d) async {

@@ -247,7 +247,7 @@ class _NowPlayingViewState extends ConsumerState<NowPlayingView> {
                                                 ),
                                                 Offset.zero & overlay.size,
                                               );
-                                              showMenu(context: context, position: position, items: [
+                                              showMenu<String?>(context: context, position: position, items: [
                                                 const PopupMenuItem(
                                                   child: Text("Track info"),
                                                   value: "trackinfo",
@@ -261,7 +261,14 @@ class _NowPlayingViewState extends ConsumerState<NowPlayingView> {
                                                 //   ),
                                                 //   enabled: false,
                                                 // ), fuck I forgot this don't go here
-                                              ]);
+                                              ]).then((value) {
+                                                switch (value) {
+                                                  case "trackinfo":
+                                                    final track = ref.read(nowPlayingProvider).valueOrNull;
+                                                    if (context.mounted) context.push("/library/${track?.albumArtistId}/${track?.albumId}/${track?.id}");
+                                                    break;
+                                                }
+                                              });
                                             }
                                           );
                                         }
