@@ -166,7 +166,7 @@ class _$TrackMetadataCopyWithImpl<$Res, $Val extends TrackMetadata>
     Object? discNo = null,
     Object? description = freezed,
     Object? descriptionSource = freezed,
-    Object? coverData = freezed,
+    Object? coverData = null,
     Object? uri = null,
     Object? coverBytes = freezed,
     Object? coverUri = freezed,
@@ -229,7 +229,7 @@ class _$TrackMetadataCopyWithImpl<$Res, $Val extends TrackMetadata>
           ? _value.descriptionSource
           : descriptionSource // ignore: cast_nullable_to_non_nullable
               as String?,
-      coverData: freezed == coverData
+      coverData: null == coverData
           ? _value.coverData
           : coverData // ignore: cast_nullable_to_non_nullable
               as ImageDescriptor?,
@@ -344,7 +344,7 @@ class __$$_TrackMetadataCopyWithImpl<$Res>
     Object? discNo = null,
     Object? description = freezed,
     Object? descriptionSource = freezed,
-    Object? coverData = freezed,
+    Object? coverData = null,
     Object? uri = null,
     Object? coverBytes = freezed,
     Object? coverUri = freezed,
@@ -407,7 +407,7 @@ class __$$_TrackMetadataCopyWithImpl<$Res>
           ? _value.descriptionSource
           : descriptionSource // ignore: cast_nullable_to_non_nullable
               as String?,
-      coverData: freezed == coverData
+      coverData: null == coverData
           ? _value.coverData
           : coverData // ignore: cast_nullable_to_non_nullable
               as ImageDescriptor?,
@@ -678,8 +678,7 @@ class _$_TrackMetadata extends _TrackMetadata with DiagnosticableTreeMixin {
                 other.description == description) &&
             (identical(other.descriptionSource, descriptionSource) ||
                 other.descriptionSource == descriptionSource) &&
-            (identical(other.coverData, coverData) ||
-                other.coverData == coverData) &&
+            const DeepCollectionEquality().equals(other.coverData, coverData) &&
             (identical(other.uri, uri) || other.uri == uri) &&
             const DeepCollectionEquality()
                 .equals(other._coverBytes, _coverBytes) &&
@@ -719,7 +718,7 @@ class _$_TrackMetadata extends _TrackMetadata with DiagnosticableTreeMixin {
         discNo,
         description,
         descriptionSource,
-        coverData,
+        const DeepCollectionEquality().hash(coverData),
         uri,
         const DeepCollectionEquality().hash(_coverBytes),
         coverUri,

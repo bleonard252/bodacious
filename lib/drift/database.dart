@@ -130,15 +130,18 @@ LazyDatabase _openConnection() {
 
 extension on TrackMetadata {
   Future<ArtistMetadata?> getArtist(BoDatabase db, [bool albumArtist = false]) {
+    if (albumArtist && albumArtistId == null) return Future.value(null);
+    if (trackArtistId == null) return Future.value(null);
     return (
       db.select(db.artistTable)
-      ..where((tbl) => tbl.id.equals(albumArtist ? albumArtistId : trackArtistId))
+      ..where((tbl) => tbl.id.equals(albumArtist ? albumArtistId! : trackArtistId!))
     ).getSingleOrNull();
   }
   Future<AlbumMetadata?> getAlbum(BoDatabase db) {
+    if (albumId == null) return Future.value(null);
     return (
       db.select(db.albumTable)
-      ..where((tbl) => tbl.id.equals(albumId))
+      ..where((tbl) => tbl.id.equals(albumId!))
     ).getSingleOrNull();
   }
 }
