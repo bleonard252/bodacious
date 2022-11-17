@@ -17,9 +17,8 @@ import '../../models/search_result.dart';
 import '../../models/track_data.dart';
 
 final searchEngine = FutureProvider.family<List<SearchResult>, String>((ref, query) async {
-  if (kDebugMode) {
-    print("Searching for: $query");
-  }
+  final logger = appLogger.independentChild("searchEngine");
+  logger.debug("Searching for: $query");
   final tracksFuture = db.select(db.trackTable).get();
   final albumsFuture = db.select(db.albumTable).get();
   final artistsFuture = db.select(db.artistTable).get();
@@ -29,12 +28,13 @@ final searchEngine = FutureProvider.family<List<SearchResult>, String>((ref, que
   final List<ArtistMetadata> artists = theFutureIsNow[2] as dynamic;
   const limit = 0.5;
   final finder = Woozy<SearchResult>(limit: double.maxFinite.truncate());
-  query = query.replaceAll(RegExp(r'\s?is\:\w+'), '');
   //query = query.replaceAll(r' ?is:\w+', '');
   final typeFilter = query.split(" ").contains("is:track") ? "track"
+  : query.split(" ").contains("is:song") ? "track"
   : query.split(" ").contains("is:album") ? "album"
   : query.split(" ").contains("is:artist") ? "artist"
   : null;
+  query = query.replaceAll(RegExp(r'\s?is\:\w+'), '');
   if ((typeFilter??"track") == "track") for (var element in tracks) {if (element.title != null) finder.addEntry(element.title!, value: SearchResult.track(element));}
   if ((typeFilter??"album") == "album") for (var element in albums) {finder.addEntry(element.name, value: SearchResult.album(element));}
   if ((typeFilter??"artist") == "artist") for (var element in artists) {finder.addEntry(element.name, value: SearchResult.artist(element));}
@@ -52,12 +52,18 @@ class SearchResultsView extends ConsumerWidget {
   //String? filterTo;
 
   bool isFiltered({String? to = ""}) {
+    final typeFilter = getFilter();
+    if (to == "") return typeFilter != null;
+    return typeFilter == to;
+  }
+
+  String? getFilter() {
     final typeFilter = query.split(" ").contains("is:track") ? "track"
+    : query.split(" ").contains("is:song") ? "track"
     : query.split(" ").contains("is:album") ? "album"
     : query.split(" ").contains("is:artist") ? "artist"
     : null;
-    if (to == "") return typeFilter != null;
-    return typeFilter == to;
+    return typeFilter;
   }
 
   @override
@@ -92,7 +98,7 @@ class SearchResultsView extends ConsumerWidget {
               padding: EdgeInsets.all(8.0),
               child: Icon(MdiIcons.ghost, color: Colors.blue),
             ),
-            Text("No results for your search", textAlign: TextAlign.center, style: Theme.of(context).textTheme.bodyText1?.copyWith(color: Colors.blue, shadows: [const Shadow(blurRadius: 2, color: Colors.white)]))
+            Text("No results for your search", textAlign: TextAlign.center, style: Theme.of(context).textTheme.bodyText1?.copyWith(color: Colors.blue, shadows: [const Shadow(blurRadius: 2, color: Colors.black)]))
           ]
         )
       );
@@ -104,7 +110,7 @@ class SearchResultsView extends ConsumerWidget {
       child: CustomScrollView(
         primary: false,
         slivers: [
-          if (results.isRefreshing) SliverToBoxAdapter(child: ConstrainedBox(
+          if (results.isRefreshing || results.isLoading) SliverToBoxAdapter(child: ConstrainedBox(
             constraints: const BoxConstraints.expand(height: 64),
             child: const Center(child: CircularProgressIndicator(value: null)),
           )),
@@ -149,7 +155,7 @@ class SearchResultsView extends ConsumerWidget {
             }
           ),
 
-          if ((results.valueOrNull ?? []).any((element) => element.isTrack)) SliverToBoxAdapter(child: Padding(
+          if ((getFilter() == "track" || !isFiltered()) && (results.valueOrNull ?? []).any((element) => element.isTrack)) SliverToBoxAdapter(child: Padding(
             padding: const EdgeInsets.all(16.0) + const EdgeInsets.only(top: 32),
             child: Text("Tracks", style: Theme.of(context).textTheme.headline5),
           )),
@@ -201,11 +207,11 @@ class SearchResultsView extends ConsumerWidget {
             ),
           )),
 
-          if ((results.valueOrNull ?? []).any((element) => element.isAlbum)) SliverToBoxAdapter(child: Padding(
+          if ((getFilter() == "album" || !isFiltered()) && (results.valueOrNull ?? []).any((element) => element.isAlbum)) SliverToBoxAdapter(child: Padding(
             padding: const EdgeInsets.all(16.0) + const EdgeInsets.only(top: 32),
             child: Text("Albums", style: Theme.of(context).textTheme.headline5),
           )),
-          Builder(
+          if (getFilter() == "album" || !isFiltered()) Builder(
             builder: (context) {
               //final list = (results.valueOrNull ?? []).where((element) => element.isAlbum).take(5);
               late final Iterable<SearchResult> list;
@@ -243,11 +249,11 @@ class SearchResultsView extends ConsumerWidget {
             ],
           )),
 
-          if ((results.valueOrNull ?? []).any((element) => element.isArtist)) SliverToBoxAdapter(child: Padding(
+          if ((getFilter() == "artist" || !isFiltered()) && (results.valueOrNull ?? []).any((element) => element.isArtist)) SliverToBoxAdapter(child: Padding(
             padding: const EdgeInsets.all(16.0) + const EdgeInsets.only(top: 32),
             child: Text("Artists", style: Theme.of(context).textTheme.headline5),
           )),
-          Builder(
+          if (getFilter() == "artist" || !isFiltered()) Builder(
             builder: (context) {
               //final list = (results.valueOrNull ?? []).where((element) => element.isArtist).take(5);
               late final Iterable<SearchResult> list;

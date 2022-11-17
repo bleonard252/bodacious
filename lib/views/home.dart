@@ -79,7 +79,20 @@ class _HomeViewState extends State<HomeView> {
                         borderSide: BorderSide.none,
                         borderRadius: BorderRadius.circular(8)
                       ),
-                      prefixIcon: const Icon(MdiIcons.magnify),
+                      prefixIcon: query.split(" ").contains("is:track") || query.split(" ").contains("is:song") ? const Icon(MdiIcons.musicNote)
+                      : query.split(" ").contains("is:album") ? const Icon(MdiIcons.album)
+                      : query.split(" ").contains("is:artist") ? const Icon(MdiIcons.accountCowboyHat) // easter egg :)
+                      : const Icon(MdiIcons.magnify),
+                      suffixIcon: isSearching ? IconButton(
+                        icon: const Icon(MdiIcons.close),
+                        tooltip: "Clear search",
+                        onPressed: () {
+                          setState(() {
+                            query = "";
+                            searchBoxController.clear();
+                          });
+                        },
+                      ) : null,
                       hintText: "Search your music..."
                     ),
                   ),
