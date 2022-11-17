@@ -35,31 +35,23 @@ class TrackTable extends Table {
 }
 class UriConverter extends TypeConverter<Uri, String> {
   @override
-  Uri? mapToDart(String? fromDb) {
-    if (fromDb != null) {
-      return Uri.tryParse(fromDb);
-    } else {
-      return null;
-    }
+  Uri fromSql(String fromDb) {
+    return Uri.parse(fromDb);
   }
 
   @override
-  String? mapToSql(Uri? value) {
-    return value?.toString();
+  String toSql(Uri value) {
+    return value.toString();
   }
 }
 class DurationConverter extends TypeConverter<Duration, int> {
   @override
-  Duration? mapToDart(int? fromDb) {
-    if (fromDb != null) {
-      return Duration(milliseconds: fromDb);
-    } else {
-      return null;
-    }
+  Duration fromSql(int fromDb) {
+    return Duration(milliseconds: fromDb);
   }
 
   @override
-  int? mapToSql(Duration? value) {
-    return value?.inMilliseconds;
+  int toSql(Duration value) {
+    return value.inMilliseconds;
   }
 }

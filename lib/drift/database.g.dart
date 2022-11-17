@@ -3,7 +3,7 @@
 part of 'database.dart';
 
 // **************************************************************************
-// MoorGenerator
+// DriftDatabaseGenerator
 // **************************************************************************
 
 // ignore_for_file: type=lint
@@ -48,15 +48,15 @@ class ArtistTableCompanion extends UpdateCompanion<ArtistMetadata> {
   static Insertable<ArtistMetadata> custom({
     Expression<String>? id,
     Expression<String>? name,
-    Expression<Uri?>? coverUri,
-    Expression<Uri?>? coverUriRemote,
-    Expression<String?>? coverSource,
-    Expression<String?>? description,
-    Expression<String?>? descriptionSource,
-    Expression<int?>? trackCount,
-    Expression<int?>? albumCount,
-    Expression<String?>? spotifyId,
-    Expression<String?>? metadataSource,
+    Expression<String>? coverUri,
+    Expression<String>? coverUriRemote,
+    Expression<String>? coverSource,
+    Expression<String>? description,
+    Expression<String>? descriptionSource,
+    Expression<int>? trackCount,
+    Expression<int>? albumCount,
+    Expression<String>? spotifyId,
+    Expression<String>? metadataSource,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -110,34 +110,34 @@ class ArtistTableCompanion extends UpdateCompanion<ArtistMetadata> {
       map['name'] = Variable<String>(name.value);
     }
     if (coverUri.present) {
-      final converter = $ArtistTableTable.$converter0;
-      map['cover_uri'] = Variable<String?>(converter.mapToSql(coverUri.value));
+      final converter = $ArtistTableTable.$converter0n;
+      map['cover_uri'] = Variable<String>(converter.toSql(coverUri.value));
     }
     if (coverUriRemote.present) {
-      final converter = $ArtistTableTable.$converter1;
+      final converter = $ArtistTableTable.$converter1n;
       map['cover_uri_remote'] =
-          Variable<String?>(converter.mapToSql(coverUriRemote.value));
+          Variable<String>(converter.toSql(coverUriRemote.value));
     }
     if (coverSource.present) {
-      map['cover_source'] = Variable<String?>(coverSource.value);
+      map['cover_source'] = Variable<String>(coverSource.value);
     }
     if (description.present) {
-      map['description'] = Variable<String?>(description.value);
+      map['description'] = Variable<String>(description.value);
     }
     if (descriptionSource.present) {
-      map['description_source'] = Variable<String?>(descriptionSource.value);
+      map['description_source'] = Variable<String>(descriptionSource.value);
     }
     if (trackCount.present) {
-      map['track_count'] = Variable<int?>(trackCount.value);
+      map['track_count'] = Variable<int>(trackCount.value);
     }
     if (albumCount.present) {
-      map['album_count'] = Variable<int?>(albumCount.value);
+      map['album_count'] = Variable<int>(albumCount.value);
     }
     if (spotifyId.present) {
-      map['spotify_id'] = Variable<String?>(spotifyId.value);
+      map['spotify_id'] = Variable<String>(spotifyId.value);
     }
     if (metadataSource.present) {
-      map['metadata_source'] = Variable<String?>(metadataSource.value);
+      map['metadata_source'] = Variable<String>(metadataSource.value);
     }
     return map;
   }
@@ -169,70 +169,70 @@ class $ArtistTableTable extends ArtistTable
   $ArtistTableTable(this.attachedDatabase, [this._alias]);
   final VerificationMeta _idMeta = const VerificationMeta('id');
   @override
-  late final GeneratedColumn<String?> id = GeneratedColumn<String?>(
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
       'id', aliasedName, false,
       additionalChecks:
           GeneratedColumn.checkTextLength(minTextLength: 7, maxTextLength: 20),
-      type: const StringType(),
+      type: DriftSqlType.string,
       requiredDuringInsert: false,
       clientDefault: () => nanoid(10));
   final VerificationMeta _nameMeta = const VerificationMeta('name');
   @override
-  late final GeneratedColumn<String?> name = GeneratedColumn<String?>(
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
       'name', aliasedName, false,
-      type: const StringType(), requiredDuringInsert: true);
+      type: DriftSqlType.string, requiredDuringInsert: true);
   final VerificationMeta _coverUriMeta = const VerificationMeta('coverUri');
   @override
-  late final GeneratedColumnWithTypeConverter<Uri, String?> coverUri =
-      GeneratedColumn<String?>('cover_uri', aliasedName, true,
-              type: const StringType(), requiredDuringInsert: false)
-          .withConverter<Uri>($ArtistTableTable.$converter0);
+  late final GeneratedColumnWithTypeConverter<Uri?, String> coverUri =
+      GeneratedColumn<String>('cover_uri', aliasedName, true,
+              type: DriftSqlType.string, requiredDuringInsert: false)
+          .withConverter<Uri?>($ArtistTableTable.$converter0n);
   final VerificationMeta _coverUriRemoteMeta =
       const VerificationMeta('coverUriRemote');
   @override
-  late final GeneratedColumnWithTypeConverter<Uri, String?> coverUriRemote =
-      GeneratedColumn<String?>('cover_uri_remote', aliasedName, true,
-              type: const StringType(), requiredDuringInsert: false)
-          .withConverter<Uri>($ArtistTableTable.$converter1);
+  late final GeneratedColumnWithTypeConverter<Uri?, String> coverUriRemote =
+      GeneratedColumn<String>('cover_uri_remote', aliasedName, true,
+              type: DriftSqlType.string, requiredDuringInsert: false)
+          .withConverter<Uri?>($ArtistTableTable.$converter1n);
   final VerificationMeta _coverSourceMeta =
       const VerificationMeta('coverSource');
   @override
-  late final GeneratedColumn<String?> coverSource = GeneratedColumn<String?>(
+  late final GeneratedColumn<String> coverSource = GeneratedColumn<String>(
       'cover_source', aliasedName, true,
-      type: const StringType(), requiredDuringInsert: false);
+      type: DriftSqlType.string, requiredDuringInsert: false);
   final VerificationMeta _descriptionMeta =
       const VerificationMeta('description');
   @override
-  late final GeneratedColumn<String?> description = GeneratedColumn<String?>(
+  late final GeneratedColumn<String> description = GeneratedColumn<String>(
       'description', aliasedName, true,
-      type: const StringType(), requiredDuringInsert: false);
+      type: DriftSqlType.string, requiredDuringInsert: false);
   final VerificationMeta _descriptionSourceMeta =
       const VerificationMeta('descriptionSource');
   @override
-  late final GeneratedColumn<String?> descriptionSource =
-      GeneratedColumn<String?>('description_source', aliasedName, true,
-          type: const StringType(), requiredDuringInsert: false);
+  late final GeneratedColumn<String> descriptionSource =
+      GeneratedColumn<String>('description_source', aliasedName, true,
+          type: DriftSqlType.string, requiredDuringInsert: false);
   final VerificationMeta _trackCountMeta = const VerificationMeta('trackCount');
   @override
-  late final GeneratedColumn<int?> trackCount = GeneratedColumn<int?>(
+  late final GeneratedColumn<int> trackCount = GeneratedColumn<int>(
       'track_count', aliasedName, true,
-      type: const IntType(), requiredDuringInsert: false);
+      type: DriftSqlType.int, requiredDuringInsert: false);
   final VerificationMeta _albumCountMeta = const VerificationMeta('albumCount');
   @override
-  late final GeneratedColumn<int?> albumCount = GeneratedColumn<int?>(
+  late final GeneratedColumn<int> albumCount = GeneratedColumn<int>(
       'album_count', aliasedName, true,
-      type: const IntType(), requiredDuringInsert: false);
+      type: DriftSqlType.int, requiredDuringInsert: false);
   final VerificationMeta _spotifyIdMeta = const VerificationMeta('spotifyId');
   @override
-  late final GeneratedColumn<String?> spotifyId = GeneratedColumn<String?>(
+  late final GeneratedColumn<String> spotifyId = GeneratedColumn<String>(
       'spotify_id', aliasedName, true,
-      type: const StringType(), requiredDuringInsert: false);
+      type: DriftSqlType.string, requiredDuringInsert: false);
   final VerificationMeta _metadataSourceMeta =
       const VerificationMeta('metadataSource');
   @override
-  late final GeneratedColumn<String?> metadataSource = GeneratedColumn<String?>(
+  late final GeneratedColumn<String> metadataSource = GeneratedColumn<String>(
       'metadata_source', aliasedName, true,
-      type: const StringType(), requiredDuringInsert: false);
+      type: DriftSqlType.string, requiredDuringInsert: false);
   @override
   List<GeneratedColumn> get $columns => [
         id,
@@ -316,28 +316,30 @@ class $ArtistTableTable extends ArtistTable
   ArtistMetadata map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return ArtistMetadata(
-      id: const StringType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}id'])!,
-      name: const StringType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}name'])!,
-      coverUri: $ArtistTableTable.$converter0.mapToDart(const StringType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}cover_uri'])),
-      coverUriRemote: $ArtistTableTable.$converter1.mapToDart(const StringType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}cover_uri_remote'])),
-      coverSource: const StringType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}cover_source']),
-      description: const StringType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}description']),
-      descriptionSource: const StringType().mapFromDatabaseResponse(
-          data['${effectivePrefix}description_source']),
-      albumCount: const IntType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}album_count']),
-      trackCount: const IntType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}track_count']),
-      spotifyId: const StringType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}spotify_id']),
-      metadataSource: const StringType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}metadata_source']),
+      id: attachedDatabase.options.types
+          .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
+      name: attachedDatabase.options.types
+          .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
+      coverUri: $ArtistTableTable.$converter0n.fromSql(attachedDatabase
+          .options.types
+          .read(DriftSqlType.string, data['${effectivePrefix}cover_uri'])),
+      coverUriRemote: $ArtistTableTable.$converter1n.fromSql(
+          attachedDatabase.options.types.read(
+              DriftSqlType.string, data['${effectivePrefix}cover_uri_remote'])),
+      coverSource: attachedDatabase.options.types
+          .read(DriftSqlType.string, data['${effectivePrefix}cover_source']),
+      description: attachedDatabase.options.types
+          .read(DriftSqlType.string, data['${effectivePrefix}description']),
+      descriptionSource: attachedDatabase.options.types.read(
+          DriftSqlType.string, data['${effectivePrefix}description_source']),
+      albumCount: attachedDatabase.options.types
+          .read(DriftSqlType.int, data['${effectivePrefix}album_count']),
+      trackCount: attachedDatabase.options.types
+          .read(DriftSqlType.int, data['${effectivePrefix}track_count']),
+      spotifyId: attachedDatabase.options.types
+          .read(DriftSqlType.string, data['${effectivePrefix}spotify_id']),
+      metadataSource: attachedDatabase.options.types
+          .read(DriftSqlType.string, data['${effectivePrefix}metadata_source']),
     );
   }
 
@@ -348,6 +350,10 @@ class $ArtistTableTable extends ArtistTable
 
   static TypeConverter<Uri, String> $converter0 = UriConverter();
   static TypeConverter<Uri, String> $converter1 = UriConverter();
+  static TypeConverter<Uri?, String?> $converter0n =
+      NullAwareTypeConverter.wrap($converter0);
+  static TypeConverter<Uri?, String?> $converter1n =
+      NullAwareTypeConverter.wrap($converter1);
 }
 
 class AlbumTableCompanion extends UpdateCompanion<AlbumMetadata> {
@@ -402,17 +408,17 @@ class AlbumTableCompanion extends UpdateCompanion<AlbumMetadata> {
     Expression<String>? id,
     Expression<String>? name,
     Expression<String>? artistName,
-    Expression<String?>? artistId,
-    Expression<Uri?>? coverUri,
-    Expression<Uri?>? coverUriRemote,
-    Expression<String?>? coverSource,
-    Expression<String?>? description,
-    Expression<String?>? descriptionSource,
-    Expression<int?>? trackCount,
-    Expression<int?>? year,
-    Expression<DateTime?>? releaseDate,
-    Expression<String?>? spotifyId,
-    Expression<String?>? metadataSource,
+    Expression<String>? artistId,
+    Expression<String>? coverUri,
+    Expression<String>? coverUriRemote,
+    Expression<String>? coverSource,
+    Expression<String>? description,
+    Expression<String>? descriptionSource,
+    Expression<int>? trackCount,
+    Expression<int>? year,
+    Expression<DateTime>? releaseDate,
+    Expression<String>? spotifyId,
+    Expression<String>? metadataSource,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -478,40 +484,40 @@ class AlbumTableCompanion extends UpdateCompanion<AlbumMetadata> {
       map['artist_name'] = Variable<String>(artistName.value);
     }
     if (artistId.present) {
-      map['artist_id'] = Variable<String?>(artistId.value);
+      map['artist_id'] = Variable<String>(artistId.value);
     }
     if (coverUri.present) {
-      final converter = $AlbumTableTable.$converter0;
-      map['cover_uri'] = Variable<String?>(converter.mapToSql(coverUri.value));
+      final converter = $AlbumTableTable.$converter0n;
+      map['cover_uri'] = Variable<String>(converter.toSql(coverUri.value));
     }
     if (coverUriRemote.present) {
-      final converter = $AlbumTableTable.$converter1;
+      final converter = $AlbumTableTable.$converter1n;
       map['cover_uri_remote'] =
-          Variable<String?>(converter.mapToSql(coverUriRemote.value));
+          Variable<String>(converter.toSql(coverUriRemote.value));
     }
     if (coverSource.present) {
-      map['cover_source'] = Variable<String?>(coverSource.value);
+      map['cover_source'] = Variable<String>(coverSource.value);
     }
     if (description.present) {
-      map['description'] = Variable<String?>(description.value);
+      map['description'] = Variable<String>(description.value);
     }
     if (descriptionSource.present) {
-      map['description_source'] = Variable<String?>(descriptionSource.value);
+      map['description_source'] = Variable<String>(descriptionSource.value);
     }
     if (trackCount.present) {
-      map['track_count'] = Variable<int?>(trackCount.value);
+      map['track_count'] = Variable<int>(trackCount.value);
     }
     if (year.present) {
-      map['year'] = Variable<int?>(year.value);
+      map['year'] = Variable<int>(year.value);
     }
     if (releaseDate.present) {
-      map['release_date'] = Variable<DateTime?>(releaseDate.value);
+      map['release_date'] = Variable<DateTime>(releaseDate.value);
     }
     if (spotifyId.present) {
-      map['spotify_id'] = Variable<String?>(spotifyId.value);
+      map['spotify_id'] = Variable<String>(spotifyId.value);
     }
     if (metadataSource.present) {
-      map['metadata_source'] = Variable<String?>(metadataSource.value);
+      map['metadata_source'] = Variable<String>(metadataSource.value);
     }
     return map;
   }
@@ -546,88 +552,88 @@ class $AlbumTableTable extends AlbumTable
   $AlbumTableTable(this.attachedDatabase, [this._alias]);
   final VerificationMeta _idMeta = const VerificationMeta('id');
   @override
-  late final GeneratedColumn<String?> id = GeneratedColumn<String?>(
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
       'id', aliasedName, false,
       additionalChecks:
           GeneratedColumn.checkTextLength(minTextLength: 7, maxTextLength: 20),
-      type: const StringType(),
+      type: DriftSqlType.string,
       requiredDuringInsert: false,
       clientDefault: () => nanoid(12));
   final VerificationMeta _nameMeta = const VerificationMeta('name');
   @override
-  late final GeneratedColumn<String?> name = GeneratedColumn<String?>(
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
       'name', aliasedName, false,
-      type: const StringType(), requiredDuringInsert: true);
+      type: DriftSqlType.string, requiredDuringInsert: true);
   final VerificationMeta _artistNameMeta = const VerificationMeta('artistName');
   @override
-  late final GeneratedColumn<String?> artistName = GeneratedColumn<String?>(
+  late final GeneratedColumn<String> artistName = GeneratedColumn<String>(
       'artist_name', aliasedName, false,
-      type: const StringType(), requiredDuringInsert: true);
+      type: DriftSqlType.string, requiredDuringInsert: true);
   final VerificationMeta _artistIdMeta = const VerificationMeta('artistId');
   @override
-  late final GeneratedColumn<String?> artistId = GeneratedColumn<String?>(
+  late final GeneratedColumn<String> artistId = GeneratedColumn<String>(
       'artist_id', aliasedName, true,
-      type: const StringType(),
+      type: DriftSqlType.string,
       requiredDuringInsert: false,
-      defaultConstraints: 'REFERENCES artist_table (id)');
+      defaultConstraints: 'REFERENCES "artist_table" ("id")');
   final VerificationMeta _coverUriMeta = const VerificationMeta('coverUri');
   @override
-  late final GeneratedColumnWithTypeConverter<Uri, String?> coverUri =
-      GeneratedColumn<String?>('cover_uri', aliasedName, true,
-              type: const StringType(), requiredDuringInsert: false)
-          .withConverter<Uri>($AlbumTableTable.$converter0);
+  late final GeneratedColumnWithTypeConverter<Uri?, String> coverUri =
+      GeneratedColumn<String>('cover_uri', aliasedName, true,
+              type: DriftSqlType.string, requiredDuringInsert: false)
+          .withConverter<Uri?>($AlbumTableTable.$converter0n);
   final VerificationMeta _coverUriRemoteMeta =
       const VerificationMeta('coverUriRemote');
   @override
-  late final GeneratedColumnWithTypeConverter<Uri, String?> coverUriRemote =
-      GeneratedColumn<String?>('cover_uri_remote', aliasedName, true,
-              type: const StringType(), requiredDuringInsert: false)
-          .withConverter<Uri>($AlbumTableTable.$converter1);
+  late final GeneratedColumnWithTypeConverter<Uri?, String> coverUriRemote =
+      GeneratedColumn<String>('cover_uri_remote', aliasedName, true,
+              type: DriftSqlType.string, requiredDuringInsert: false)
+          .withConverter<Uri?>($AlbumTableTable.$converter1n);
   final VerificationMeta _coverSourceMeta =
       const VerificationMeta('coverSource');
   @override
-  late final GeneratedColumn<String?> coverSource = GeneratedColumn<String?>(
+  late final GeneratedColumn<String> coverSource = GeneratedColumn<String>(
       'cover_source', aliasedName, true,
-      type: const StringType(), requiredDuringInsert: false);
+      type: DriftSqlType.string, requiredDuringInsert: false);
   final VerificationMeta _descriptionMeta =
       const VerificationMeta('description');
   @override
-  late final GeneratedColumn<String?> description = GeneratedColumn<String?>(
+  late final GeneratedColumn<String> description = GeneratedColumn<String>(
       'description', aliasedName, true,
-      type: const StringType(), requiredDuringInsert: false);
+      type: DriftSqlType.string, requiredDuringInsert: false);
   final VerificationMeta _descriptionSourceMeta =
       const VerificationMeta('descriptionSource');
   @override
-  late final GeneratedColumn<String?> descriptionSource =
-      GeneratedColumn<String?>('description_source', aliasedName, true,
-          type: const StringType(), requiredDuringInsert: false);
+  late final GeneratedColumn<String> descriptionSource =
+      GeneratedColumn<String>('description_source', aliasedName, true,
+          type: DriftSqlType.string, requiredDuringInsert: false);
   final VerificationMeta _trackCountMeta = const VerificationMeta('trackCount');
   @override
-  late final GeneratedColumn<int?> trackCount = GeneratedColumn<int?>(
+  late final GeneratedColumn<int> trackCount = GeneratedColumn<int>(
       'track_count', aliasedName, true,
-      type: const IntType(), requiredDuringInsert: false);
+      type: DriftSqlType.int, requiredDuringInsert: false);
   final VerificationMeta _yearMeta = const VerificationMeta('year');
   @override
-  late final GeneratedColumn<int?> year = GeneratedColumn<int?>(
+  late final GeneratedColumn<int> year = GeneratedColumn<int>(
       'year', aliasedName, true,
-      type: const IntType(), requiredDuringInsert: false);
+      type: DriftSqlType.int, requiredDuringInsert: false);
   final VerificationMeta _releaseDateMeta =
       const VerificationMeta('releaseDate');
   @override
-  late final GeneratedColumn<DateTime?> releaseDate =
-      GeneratedColumn<DateTime?>('release_date', aliasedName, true,
-          type: const IntType(), requiredDuringInsert: false);
+  late final GeneratedColumn<DateTime> releaseDate = GeneratedColumn<DateTime>(
+      'release_date', aliasedName, true,
+      type: DriftSqlType.dateTime, requiredDuringInsert: false);
   final VerificationMeta _spotifyIdMeta = const VerificationMeta('spotifyId');
   @override
-  late final GeneratedColumn<String?> spotifyId = GeneratedColumn<String?>(
+  late final GeneratedColumn<String> spotifyId = GeneratedColumn<String>(
       'spotify_id', aliasedName, true,
-      type: const StringType(), requiredDuringInsert: false);
+      type: DriftSqlType.string, requiredDuringInsert: false);
   final VerificationMeta _metadataSourceMeta =
       const VerificationMeta('metadataSource');
   @override
-  late final GeneratedColumn<String?> metadataSource = GeneratedColumn<String?>(
+  late final GeneratedColumn<String> metadataSource = GeneratedColumn<String>(
       'metadata_source', aliasedName, true,
-      type: const StringType(), requiredDuringInsert: false);
+      type: DriftSqlType.string, requiredDuringInsert: false);
   @override
   List<GeneratedColumn> get $columns => [
         id,
@@ -730,34 +736,36 @@ class $AlbumTableTable extends AlbumTable
   AlbumMetadata map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return AlbumMetadata(
-      id: const StringType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}id'])!,
-      artistName: const StringType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}artist_name'])!,
-      artistId: const StringType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}artist_id']),
-      name: const StringType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}name'])!,
-      coverUri: $AlbumTableTable.$converter0.mapToDart(const StringType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}cover_uri'])),
-      coverUriRemote: $AlbumTableTable.$converter1.mapToDart(const StringType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}cover_uri_remote'])),
-      coverSource: const StringType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}cover_source']),
-      description: const StringType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}description']),
-      descriptionSource: const StringType().mapFromDatabaseResponse(
-          data['${effectivePrefix}description_source']),
-      trackCount: const IntType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}track_count']),
-      year: const IntType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}year']),
-      releaseDate: const DateTimeType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}release_date']),
-      spotifyId: const StringType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}spotify_id']),
-      metadataSource: const StringType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}metadata_source']),
+      id: attachedDatabase.options.types
+          .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
+      artistName: attachedDatabase.options.types
+          .read(DriftSqlType.string, data['${effectivePrefix}artist_name'])!,
+      artistId: attachedDatabase.options.types
+          .read(DriftSqlType.string, data['${effectivePrefix}artist_id']),
+      name: attachedDatabase.options.types
+          .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
+      coverUri: $AlbumTableTable.$converter0n.fromSql(attachedDatabase
+          .options.types
+          .read(DriftSqlType.string, data['${effectivePrefix}cover_uri'])),
+      coverUriRemote: $AlbumTableTable.$converter1n.fromSql(
+          attachedDatabase.options.types.read(
+              DriftSqlType.string, data['${effectivePrefix}cover_uri_remote'])),
+      coverSource: attachedDatabase.options.types
+          .read(DriftSqlType.string, data['${effectivePrefix}cover_source']),
+      description: attachedDatabase.options.types
+          .read(DriftSqlType.string, data['${effectivePrefix}description']),
+      descriptionSource: attachedDatabase.options.types.read(
+          DriftSqlType.string, data['${effectivePrefix}description_source']),
+      trackCount: attachedDatabase.options.types
+          .read(DriftSqlType.int, data['${effectivePrefix}track_count']),
+      year: attachedDatabase.options.types
+          .read(DriftSqlType.int, data['${effectivePrefix}year']),
+      releaseDate: attachedDatabase.options.types
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}release_date']),
+      spotifyId: attachedDatabase.options.types
+          .read(DriftSqlType.string, data['${effectivePrefix}spotify_id']),
+      metadataSource: attachedDatabase.options.types
+          .read(DriftSqlType.string, data['${effectivePrefix}metadata_source']),
     );
   }
 
@@ -768,6 +776,10 @@ class $AlbumTableTable extends AlbumTable
 
   static TypeConverter<Uri, String> $converter0 = UriConverter();
   static TypeConverter<Uri, String> $converter1 = UriConverter();
+  static TypeConverter<Uri?, String?> $converter0n =
+      NullAwareTypeConverter.wrap($converter0);
+  static TypeConverter<Uri?, String?> $converter1n =
+      NullAwareTypeConverter.wrap($converter1);
 }
 
 class TrackTableCompanion extends UpdateCompanion<TrackMetadata> {
@@ -846,28 +858,28 @@ class TrackTableCompanion extends UpdateCompanion<TrackMetadata> {
   }) : uri = Value(uri);
   static Insertable<TrackMetadata> custom({
     Expression<String>? id,
-    Expression<String?>? title,
-    Expression<String?>? artistName,
-    Expression<String?>? trackArtistId,
-    Expression<String?>? albumArtistName,
-    Expression<String?>? albumArtistId,
-    Expression<String?>? albumName,
-    Expression<String?>? albumId,
+    Expression<String>? title,
+    Expression<String>? artistName,
+    Expression<String>? trackArtistId,
+    Expression<String>? albumArtistName,
+    Expression<String>? albumArtistId,
+    Expression<String>? albumName,
+    Expression<String>? albumId,
     Expression<int>? trackNo,
     Expression<int>? discNo,
-    Expression<String?>? description,
-    Expression<String?>? descriptionSource,
-    Expression<Uri>? uri,
-    Expression<Uri?>? coverUri,
-    Expression<Uri?>? coverUriRemote,
-    Expression<String?>? coverSource,
-    Expression<Duration?>? duration,
-    Expression<int?>? year,
-    Expression<DateTime?>? releaseDate,
+    Expression<String>? description,
+    Expression<String>? descriptionSource,
+    Expression<String>? uri,
+    Expression<String>? coverUri,
+    Expression<String>? coverUriRemote,
+    Expression<String>? coverSource,
+    Expression<int>? duration,
+    Expression<int>? year,
+    Expression<DateTime>? releaseDate,
     Expression<bool>? available,
-    Expression<String?>? spotifyId,
-    Expression<String?>? source,
-    Expression<String?>? metadataSource,
+    Expression<String>? spotifyId,
+    Expression<String>? source,
+    Expression<String>? metadataSource,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -954,25 +966,25 @@ class TrackTableCompanion extends UpdateCompanion<TrackMetadata> {
       map['id'] = Variable<String>(id.value);
     }
     if (title.present) {
-      map['title'] = Variable<String?>(title.value);
+      map['title'] = Variable<String>(title.value);
     }
     if (artistName.present) {
-      map['artist_name'] = Variable<String?>(artistName.value);
+      map['artist_name'] = Variable<String>(artistName.value);
     }
     if (trackArtistId.present) {
-      map['track_artist_id'] = Variable<String?>(trackArtistId.value);
+      map['track_artist_id'] = Variable<String>(trackArtistId.value);
     }
     if (albumArtistName.present) {
-      map['album_artist_name'] = Variable<String?>(albumArtistName.value);
+      map['album_artist_name'] = Variable<String>(albumArtistName.value);
     }
     if (albumArtistId.present) {
-      map['album_artist_id'] = Variable<String?>(albumArtistId.value);
+      map['album_artist_id'] = Variable<String>(albumArtistId.value);
     }
     if (albumName.present) {
-      map['album_name'] = Variable<String?>(albumName.value);
+      map['album_name'] = Variable<String>(albumName.value);
     }
     if (albumId.present) {
-      map['album_id'] = Variable<String?>(albumId.value);
+      map['album_id'] = Variable<String>(albumId.value);
     }
     if (trackNo.present) {
       map['track_no'] = Variable<int>(trackNo.value);
@@ -981,48 +993,48 @@ class TrackTableCompanion extends UpdateCompanion<TrackMetadata> {
       map['disc_no'] = Variable<int>(discNo.value);
     }
     if (description.present) {
-      map['description'] = Variable<String?>(description.value);
+      map['description'] = Variable<String>(description.value);
     }
     if (descriptionSource.present) {
-      map['description_source'] = Variable<String?>(descriptionSource.value);
+      map['description_source'] = Variable<String>(descriptionSource.value);
     }
     if (uri.present) {
       final converter = $TrackTableTable.$converter0;
-      map['uri'] = Variable<String>(converter.mapToSql(uri.value)!);
+      map['uri'] = Variable<String>(converter.toSql(uri.value));
     }
     if (coverUri.present) {
-      final converter = $TrackTableTable.$converter1;
-      map['cover_uri'] = Variable<String?>(converter.mapToSql(coverUri.value));
+      final converter = $TrackTableTable.$converter1n;
+      map['cover_uri'] = Variable<String>(converter.toSql(coverUri.value));
     }
     if (coverUriRemote.present) {
-      final converter = $TrackTableTable.$converter2;
+      final converter = $TrackTableTable.$converter2n;
       map['cover_uri_remote'] =
-          Variable<String?>(converter.mapToSql(coverUriRemote.value));
+          Variable<String>(converter.toSql(coverUriRemote.value));
     }
     if (coverSource.present) {
-      map['cover_source'] = Variable<String?>(coverSource.value);
+      map['cover_source'] = Variable<String>(coverSource.value);
     }
     if (duration.present) {
-      final converter = $TrackTableTable.$converter3;
-      map['duration'] = Variable<int?>(converter.mapToSql(duration.value));
+      final converter = $TrackTableTable.$converter3n;
+      map['duration'] = Variable<int>(converter.toSql(duration.value));
     }
     if (year.present) {
-      map['year'] = Variable<int?>(year.value);
+      map['year'] = Variable<int>(year.value);
     }
     if (releaseDate.present) {
-      map['release_date'] = Variable<DateTime?>(releaseDate.value);
+      map['release_date'] = Variable<DateTime>(releaseDate.value);
     }
     if (available.present) {
       map['available'] = Variable<bool>(available.value);
     }
     if (spotifyId.present) {
-      map['spotify_id'] = Variable<String?>(spotifyId.value);
+      map['spotify_id'] = Variable<String>(spotifyId.value);
     }
     if (source.present) {
-      map['source'] = Variable<String?>(source.value);
+      map['source'] = Variable<String>(source.value);
     }
     if (metadataSource.present) {
-      map['metadata_source'] = Variable<String?>(metadataSource.value);
+      map['metadata_source'] = Variable<String>(metadataSource.value);
     }
     return map;
   }
@@ -1066,149 +1078,149 @@ class $TrackTableTable extends TrackTable
   $TrackTableTable(this.attachedDatabase, [this._alias]);
   final VerificationMeta _idMeta = const VerificationMeta('id');
   @override
-  late final GeneratedColumn<String?> id = GeneratedColumn<String?>(
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
       'id', aliasedName, false,
       additionalChecks:
           GeneratedColumn.checkTextLength(minTextLength: 7, maxTextLength: 20),
-      type: const StringType(),
+      type: DriftSqlType.string,
       requiredDuringInsert: false,
       clientDefault: () => nanoid(13));
   final VerificationMeta _titleMeta = const VerificationMeta('title');
   @override
-  late final GeneratedColumn<String?> title = GeneratedColumn<String?>(
+  late final GeneratedColumn<String> title = GeneratedColumn<String>(
       'title', aliasedName, true,
-      type: const StringType(), requiredDuringInsert: false);
+      type: DriftSqlType.string, requiredDuringInsert: false);
   final VerificationMeta _artistNameMeta = const VerificationMeta('artistName');
   @override
-  late final GeneratedColumn<String?> artistName = GeneratedColumn<String?>(
+  late final GeneratedColumn<String> artistName = GeneratedColumn<String>(
       'artist_name', aliasedName, true,
-      type: const StringType(), requiredDuringInsert: false);
+      type: DriftSqlType.string, requiredDuringInsert: false);
   final VerificationMeta _trackArtistIdMeta =
       const VerificationMeta('trackArtistId');
   @override
-  late final GeneratedColumn<String?> trackArtistId = GeneratedColumn<String?>(
+  late final GeneratedColumn<String> trackArtistId = GeneratedColumn<String>(
       'track_artist_id', aliasedName, true,
-      type: const StringType(),
+      type: DriftSqlType.string,
       requiredDuringInsert: false,
-      defaultConstraints: 'REFERENCES artist_table (id)');
+      defaultConstraints: 'REFERENCES "artist_table" ("id")');
   final VerificationMeta _albumArtistNameMeta =
       const VerificationMeta('albumArtistName');
   @override
-  late final GeneratedColumn<String?> albumArtistName =
-      GeneratedColumn<String?>('album_artist_name', aliasedName, true,
-          type: const StringType(), requiredDuringInsert: false);
+  late final GeneratedColumn<String> albumArtistName = GeneratedColumn<String>(
+      'album_artist_name', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
   final VerificationMeta _albumArtistIdMeta =
       const VerificationMeta('albumArtistId');
   @override
-  late final GeneratedColumn<String?> albumArtistId = GeneratedColumn<String?>(
+  late final GeneratedColumn<String> albumArtistId = GeneratedColumn<String>(
       'album_artist_id', aliasedName, true,
-      type: const StringType(),
+      type: DriftSqlType.string,
       requiredDuringInsert: false,
-      defaultConstraints: 'REFERENCES artist_table (id)');
+      defaultConstraints: 'REFERENCES "artist_table" ("id")');
   final VerificationMeta _albumNameMeta = const VerificationMeta('albumName');
   @override
-  late final GeneratedColumn<String?> albumName = GeneratedColumn<String?>(
+  late final GeneratedColumn<String> albumName = GeneratedColumn<String>(
       'album_name', aliasedName, true,
-      type: const StringType(), requiredDuringInsert: false);
+      type: DriftSqlType.string, requiredDuringInsert: false);
   final VerificationMeta _albumIdMeta = const VerificationMeta('albumId');
   @override
-  late final GeneratedColumn<String?> albumId = GeneratedColumn<String?>(
+  late final GeneratedColumn<String> albumId = GeneratedColumn<String>(
       'album_id', aliasedName, true,
-      type: const StringType(),
+      type: DriftSqlType.string,
       requiredDuringInsert: false,
-      defaultConstraints: 'REFERENCES album_table (id)');
+      defaultConstraints: 'REFERENCES "album_table" ("id")');
   final VerificationMeta _trackNoMeta = const VerificationMeta('trackNo');
   @override
-  late final GeneratedColumn<int?> trackNo = GeneratedColumn<int?>(
+  late final GeneratedColumn<int> trackNo = GeneratedColumn<int>(
       'track_no', aliasedName, false,
-      type: const IntType(),
+      type: DriftSqlType.int,
       requiredDuringInsert: false,
       defaultValue: const Constant(0));
   final VerificationMeta _discNoMeta = const VerificationMeta('discNo');
   @override
-  late final GeneratedColumn<int?> discNo = GeneratedColumn<int?>(
+  late final GeneratedColumn<int> discNo = GeneratedColumn<int>(
       'disc_no', aliasedName, false,
-      type: const IntType(),
+      type: DriftSqlType.int,
       requiredDuringInsert: false,
       defaultValue: const Constant(0));
   final VerificationMeta _descriptionMeta =
       const VerificationMeta('description');
   @override
-  late final GeneratedColumn<String?> description = GeneratedColumn<String?>(
+  late final GeneratedColumn<String> description = GeneratedColumn<String>(
       'description', aliasedName, true,
-      type: const StringType(), requiredDuringInsert: false);
+      type: DriftSqlType.string, requiredDuringInsert: false);
   final VerificationMeta _descriptionSourceMeta =
       const VerificationMeta('descriptionSource');
   @override
-  late final GeneratedColumn<String?> descriptionSource =
-      GeneratedColumn<String?>('description_source', aliasedName, true,
-          type: const StringType(), requiredDuringInsert: false);
+  late final GeneratedColumn<String> descriptionSource =
+      GeneratedColumn<String>('description_source', aliasedName, true,
+          type: DriftSqlType.string, requiredDuringInsert: false);
   final VerificationMeta _uriMeta = const VerificationMeta('uri');
   @override
-  late final GeneratedColumnWithTypeConverter<Uri, String?> uri =
-      GeneratedColumn<String?>('uri', aliasedName, false,
-              type: const StringType(), requiredDuringInsert: true)
+  late final GeneratedColumnWithTypeConverter<Uri, String> uri =
+      GeneratedColumn<String>('uri', aliasedName, false,
+              type: DriftSqlType.string, requiredDuringInsert: true)
           .withConverter<Uri>($TrackTableTable.$converter0);
   final VerificationMeta _coverUriMeta = const VerificationMeta('coverUri');
   @override
-  late final GeneratedColumnWithTypeConverter<Uri, String?> coverUri =
-      GeneratedColumn<String?>('cover_uri', aliasedName, true,
-              type: const StringType(), requiredDuringInsert: false)
-          .withConverter<Uri>($TrackTableTable.$converter1);
+  late final GeneratedColumnWithTypeConverter<Uri?, String> coverUri =
+      GeneratedColumn<String>('cover_uri', aliasedName, true,
+              type: DriftSqlType.string, requiredDuringInsert: false)
+          .withConverter<Uri?>($TrackTableTable.$converter1n);
   final VerificationMeta _coverUriRemoteMeta =
       const VerificationMeta('coverUriRemote');
   @override
-  late final GeneratedColumnWithTypeConverter<Uri, String?> coverUriRemote =
-      GeneratedColumn<String?>('cover_uri_remote', aliasedName, true,
-              type: const StringType(), requiredDuringInsert: false)
-          .withConverter<Uri>($TrackTableTable.$converter2);
+  late final GeneratedColumnWithTypeConverter<Uri?, String> coverUriRemote =
+      GeneratedColumn<String>('cover_uri_remote', aliasedName, true,
+              type: DriftSqlType.string, requiredDuringInsert: false)
+          .withConverter<Uri?>($TrackTableTable.$converter2n);
   final VerificationMeta _coverSourceMeta =
       const VerificationMeta('coverSource');
   @override
-  late final GeneratedColumn<String?> coverSource = GeneratedColumn<String?>(
+  late final GeneratedColumn<String> coverSource = GeneratedColumn<String>(
       'cover_source', aliasedName, true,
-      type: const StringType(), requiredDuringInsert: false);
+      type: DriftSqlType.string, requiredDuringInsert: false);
   final VerificationMeta _durationMeta = const VerificationMeta('duration');
   @override
-  late final GeneratedColumnWithTypeConverter<Duration, int?> duration =
-      GeneratedColumn<int?>('duration', aliasedName, true,
-              type: const IntType(), requiredDuringInsert: false)
-          .withConverter<Duration>($TrackTableTable.$converter3);
+  late final GeneratedColumnWithTypeConverter<Duration?, int> duration =
+      GeneratedColumn<int>('duration', aliasedName, true,
+              type: DriftSqlType.int, requiredDuringInsert: false)
+          .withConverter<Duration?>($TrackTableTable.$converter3n);
   final VerificationMeta _yearMeta = const VerificationMeta('year');
   @override
-  late final GeneratedColumn<int?> year = GeneratedColumn<int?>(
+  late final GeneratedColumn<int> year = GeneratedColumn<int>(
       'year', aliasedName, true,
-      type: const IntType(), requiredDuringInsert: false);
+      type: DriftSqlType.int, requiredDuringInsert: false);
   final VerificationMeta _releaseDateMeta =
       const VerificationMeta('releaseDate');
   @override
-  late final GeneratedColumn<DateTime?> releaseDate =
-      GeneratedColumn<DateTime?>('release_date', aliasedName, true,
-          type: const IntType(), requiredDuringInsert: false);
+  late final GeneratedColumn<DateTime> releaseDate = GeneratedColumn<DateTime>(
+      'release_date', aliasedName, true,
+      type: DriftSqlType.dateTime, requiredDuringInsert: false);
   final VerificationMeta _availableMeta = const VerificationMeta('available');
   @override
-  late final GeneratedColumn<bool?> available = GeneratedColumn<bool?>(
+  late final GeneratedColumn<bool> available = GeneratedColumn<bool>(
       'available', aliasedName, false,
-      type: const BoolType(),
+      type: DriftSqlType.bool,
       requiredDuringInsert: false,
-      defaultConstraints: 'CHECK (available IN (0, 1))',
+      defaultConstraints: 'CHECK ("available" IN (0, 1))',
       defaultValue: const Constant(true));
   final VerificationMeta _spotifyIdMeta = const VerificationMeta('spotifyId');
   @override
-  late final GeneratedColumn<String?> spotifyId = GeneratedColumn<String?>(
+  late final GeneratedColumn<String> spotifyId = GeneratedColumn<String>(
       'spotify_id', aliasedName, true,
-      type: const StringType(), requiredDuringInsert: false);
+      type: DriftSqlType.string, requiredDuringInsert: false);
   final VerificationMeta _sourceMeta = const VerificationMeta('source');
   @override
-  late final GeneratedColumn<String?> source = GeneratedColumn<String?>(
+  late final GeneratedColumn<String> source = GeneratedColumn<String>(
       'source', aliasedName, true,
-      type: const StringType(), requiredDuringInsert: false);
+      type: DriftSqlType.string, requiredDuringInsert: false);
   final VerificationMeta _metadataSourceMeta =
       const VerificationMeta('metadataSource');
   @override
-  late final GeneratedColumn<String?> metadataSource = GeneratedColumn<String?>(
+  late final GeneratedColumn<String> metadataSource = GeneratedColumn<String>(
       'metadata_source', aliasedName, true,
-      type: const StringType(), requiredDuringInsert: false);
+      type: DriftSqlType.string, requiredDuringInsert: false);
   @override
   List<GeneratedColumn> get $columns => [
         id,
@@ -1350,52 +1362,55 @@ class $TrackTableTable extends TrackTable
   TrackMetadata map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return TrackMetadata(
-      id: const StringType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}id'])!,
-      title: const StringType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}title']),
-      artistName: const StringType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}artist_name']),
-      albumArtistName: const StringType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}album_artist_name']),
-      albumArtistId: const StringType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}album_artist_id']),
-      trackArtistId: const StringType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}track_artist_id']),
-      albumName: const StringType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}album_name']),
-      albumId: const StringType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}album_id']),
-      trackNo: const IntType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}track_no'])!,
-      discNo: const IntType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}disc_no'])!,
-      description: const StringType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}description']),
-      descriptionSource: const StringType().mapFromDatabaseResponse(
-          data['${effectivePrefix}description_source']),
-      uri: $TrackTableTable.$converter0.mapToDart(const StringType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}uri']))!,
-      coverUri: $TrackTableTable.$converter1.mapToDart(const StringType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}cover_uri'])),
-      coverUriRemote: $TrackTableTable.$converter2.mapToDart(const StringType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}cover_uri_remote'])),
-      coverSource: const StringType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}cover_source']),
-      duration: $TrackTableTable.$converter3.mapToDart(const IntType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}duration'])),
-      year: const IntType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}year']),
-      releaseDate: const DateTimeType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}release_date']),
-      available: const BoolType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}available'])!,
-      spotifyId: const StringType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}spotify_id']),
-      source: const StringType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}source']),
-      metadataSource: const StringType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}metadata_source']),
+      id: attachedDatabase.options.types
+          .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
+      title: attachedDatabase.options.types
+          .read(DriftSqlType.string, data['${effectivePrefix}title']),
+      artistName: attachedDatabase.options.types
+          .read(DriftSqlType.string, data['${effectivePrefix}artist_name']),
+      albumArtistName: attachedDatabase.options.types.read(
+          DriftSqlType.string, data['${effectivePrefix}album_artist_name']),
+      albumArtistId: attachedDatabase.options.types
+          .read(DriftSqlType.string, data['${effectivePrefix}album_artist_id']),
+      trackArtistId: attachedDatabase.options.types
+          .read(DriftSqlType.string, data['${effectivePrefix}track_artist_id']),
+      albumName: attachedDatabase.options.types
+          .read(DriftSqlType.string, data['${effectivePrefix}album_name']),
+      albumId: attachedDatabase.options.types
+          .read(DriftSqlType.string, data['${effectivePrefix}album_id']),
+      trackNo: attachedDatabase.options.types
+          .read(DriftSqlType.int, data['${effectivePrefix}track_no'])!,
+      discNo: attachedDatabase.options.types
+          .read(DriftSqlType.int, data['${effectivePrefix}disc_no'])!,
+      description: attachedDatabase.options.types
+          .read(DriftSqlType.string, data['${effectivePrefix}description']),
+      descriptionSource: attachedDatabase.options.types.read(
+          DriftSqlType.string, data['${effectivePrefix}description_source']),
+      uri: $TrackTableTable.$converter0.fromSql(attachedDatabase.options.types
+          .read(DriftSqlType.string, data['${effectivePrefix}uri'])!),
+      coverUri: $TrackTableTable.$converter1n.fromSql(attachedDatabase
+          .options.types
+          .read(DriftSqlType.string, data['${effectivePrefix}cover_uri'])),
+      coverUriRemote: $TrackTableTable.$converter2n.fromSql(
+          attachedDatabase.options.types.read(
+              DriftSqlType.string, data['${effectivePrefix}cover_uri_remote'])),
+      coverSource: attachedDatabase.options.types
+          .read(DriftSqlType.string, data['${effectivePrefix}cover_source']),
+      duration: $TrackTableTable.$converter3n.fromSql(attachedDatabase
+          .options.types
+          .read(DriftSqlType.int, data['${effectivePrefix}duration'])),
+      year: attachedDatabase.options.types
+          .read(DriftSqlType.int, data['${effectivePrefix}year']),
+      releaseDate: attachedDatabase.options.types
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}release_date']),
+      available: attachedDatabase.options.types
+          .read(DriftSqlType.bool, data['${effectivePrefix}available'])!,
+      spotifyId: attachedDatabase.options.types
+          .read(DriftSqlType.string, data['${effectivePrefix}spotify_id']),
+      source: attachedDatabase.options.types
+          .read(DriftSqlType.string, data['${effectivePrefix}source']),
+      metadataSource: attachedDatabase.options.types
+          .read(DriftSqlType.string, data['${effectivePrefix}metadata_source']),
     );
   }
 
@@ -1408,16 +1423,23 @@ class $TrackTableTable extends TrackTable
   static TypeConverter<Uri, String> $converter1 = UriConverter();
   static TypeConverter<Uri, String> $converter2 = UriConverter();
   static TypeConverter<Duration, int> $converter3 = DurationConverter();
+  static TypeConverter<Uri?, String?> $converter1n =
+      NullAwareTypeConverter.wrap($converter1);
+  static TypeConverter<Uri?, String?> $converter2n =
+      NullAwareTypeConverter.wrap($converter2);
+  static TypeConverter<Duration?, int?> $converter3n =
+      NullAwareTypeConverter.wrap($converter3);
 }
 
 abstract class _$BoDatabase extends GeneratedDatabase {
-  _$BoDatabase(QueryExecutor e) : super(SqlTypeSystem.defaultInstance, e);
+  _$BoDatabase(QueryExecutor e) : super(e);
   _$BoDatabase.connect(DatabaseConnection c) : super.connect(c);
   late final $ArtistTableTable artistTable = $ArtistTableTable(this);
   late final $AlbumTableTable albumTable = $AlbumTableTable(this);
   late final $TrackTableTable trackTable = $TrackTableTable(this);
   @override
-  Iterable<TableInfo> get allTables => allSchemaEntities.whereType<TableInfo>();
+  Iterable<TableInfo<Table, dynamic>> get allTables =>
+      allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities =>
       [artistTable, albumTable, trackTable];
