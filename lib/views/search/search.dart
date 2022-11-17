@@ -16,29 +16,42 @@ import '../../models/album_data.dart';
 import '../../models/search_result.dart';
 import '../../models/track_data.dart';
 
+const accuracyLimit = 0.5;
+const maxResultsLow = 30;
+const maxResultsHigh = 300;
 final searchEngine = FutureProvider.family<List<SearchResult>, String>((ref, query) async {
   final logger = appLogger.independentChild("searchEngine");
   logger.debug("Searching for: $query");
-  final tracksFuture = db.select(db.trackTable).get();
-  final albumsFuture = db.select(db.albumTable).get();
-  final artistsFuture = db.select(db.artistTable).get();
-  final theFutureIsNow = await Future.wait([tracksFuture, albumsFuture, artistsFuture]);
-  final List<TrackMetadata> tracks = theFutureIsNow[0] as dynamic;
-  final List<AlbumMetadata> albums = theFutureIsNow[1] as dynamic;
-  final List<ArtistMetadata> artists = theFutureIsNow[2] as dynamic;
-  const limit = 0.5;
-  final finder = Woozy<SearchResult>(limit: double.maxFinite.truncate());
-  //query = query.replaceAll(r' ?is:\w+', '');
   final typeFilter = query.split(" ").contains("is:track") ? "track"
-  : query.split(" ").contains("is:song") ? "track"
-  : query.split(" ").contains("is:album") ? "album"
-  : query.split(" ").contains("is:artist") ? "artist"
-  : null;
-  query = query.replaceAll(RegExp(r'\s?is\:\w+'), '');
-  if ((typeFilter??"track") == "track") for (var element in tracks) {if (element.title != null) finder.addEntry(element.title!, value: SearchResult.track(element));}
-  if ((typeFilter??"album") == "album") for (var element in albums) {finder.addEntry(element.name, value: SearchResult.album(element));}
-  if ((typeFilter??"artist") == "artist") for (var element in artists) {finder.addEntry(element.name, value: SearchResult.artist(element));}
-  return finder.search(query).map((e) => e.value!.withAccuracy(e.score)).takeWhile((value) => value.accuracy >= limit).toList();
+    : query.split(" ").contains("is:song") ? "track"
+    : query.split(" ").contains("is:album") ? "album"
+    : query.split(" ").contains("is:artist") ? "artist"
+    : null;
+  final finder = Woozy<SearchResult>(limit: double.maxFinite.truncate());
+  var pureQuery = (query.split(" ")..removeWhere((element) => element.startsWith("is:"))).join(" ");
+  var lastTrack = 0;
+  var lastAlbum = 0;
+  var lastArtist = 0;
+  do {
+    final tracksFuture = (typeFilter == null || typeFilter == "track") ? (db.select(db.trackTable)..limit(20, offset: lastTrack)).get() : Future<List<TrackMetadata>>.value([]);
+    final albumsFuture = (typeFilter == null || typeFilter == "album") ? (db.select(db.albumTable)..limit(20, offset: lastAlbum)).get() : Future<List<AlbumMetadata>>.value([]);
+    final artistsFuture = (typeFilter == null || typeFilter == "artist") ? (db.select(db.artistTable)..limit(20, offset: lastArtist)).get() : Future<List<ArtistMetadata>>.value([]);
+    final theFutureIsNow = await Future.wait([tracksFuture, albumsFuture, artistsFuture]);
+    final List<TrackMetadata> tracks = theFutureIsNow[0] as dynamic;
+    final List<AlbumMetadata> albums = theFutureIsNow[1] as dynamic;
+    final List<ArtistMetadata> artists = theFutureIsNow[2] as dynamic;
+    //query = query.replaceAll(r' ?is:\w+', '');
+    if ((typeFilter??"track") == "track") for (var element in tracks) {if (element.title != null) finder.addEntry(element.title!, value: SearchResult.track(element));}
+    if ((typeFilter??"album") == "album") for (var element in albums) {finder.addEntry(element.name, value: SearchResult.album(element));}
+    if ((typeFilter??"artist") == "artist") for (var element in artists) {finder.addEntry(element.name, value: SearchResult.artist(element));}
+    logger.verbose("Results received: ${tracks.length} tracks, ${albums.length} albums, ${artists.length} artists");
+    if (tracks.isEmpty && albums.isEmpty && artists.isEmpty) break;
+    lastTrack += (theFutureIsNow[0].length).clamp(0, 30).truncate();
+    lastAlbum += (theFutureIsNow[1].length).clamp(0, 30).truncate();
+    lastArtist += (theFutureIsNow[2].length).clamp(0, 30).truncate();
+    logger.verbose("Getting more results...");
+  } while (finder.search(pureQuery).map((e) => e.value!.withAccuracy(e.score)).takeWhile((value) => value.accuracy >= accuracyLimit).length < (typeFilter == null ? maxResultsLow : maxResultsHigh));
+  return finder.search(pureQuery).map((e) => e.value!.withAccuracy(e.score)).takeWhile((value) => value.accuracy >= accuracyLimit).toList();
 });
 
 /// This widget should be rendered in the Home view,
