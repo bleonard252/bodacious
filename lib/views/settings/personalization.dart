@@ -13,14 +13,15 @@ class _PersonalizationSettingsViewState extends State<PersonalizationSettingsVie
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 1,
+      length: 2,
       child: Scaffold(
         appBar: AppBar(
           title: const Text("Personalization", style: TextStyle(color: Colors.green)),
           backgroundColor: Colors.transparent,
           elevation: 0,
           bottom: const TabBar(tabs: [
-            Tab(child: Text("Now Playing"))
+            Tab(child: Text("Now Playing")),
+            Tab(child: Text("Library"))
           ]),
         ),
         body: TabBarView(
@@ -34,6 +35,18 @@ class _PersonalizationSettingsViewState extends State<PersonalizationSettingsVie
                   value: config.wideCompactNowPlaying,
                   onChanged: (value) async {
                     setState(() => config.wideCompactNowPlaying = value);
+                  },
+                ),
+              ],
+            ),
+            ListView(
+              children: [
+                SwitchListTile(
+                  title: const Text("List album artists only"),
+                  subtitle: const Text("Only show artists with their own music in the artist list."),
+                  value: config.onlyAlbumArtists,
+                  onChanged: (value) async {
+                    setState(() => config.onlyAlbumArtists = value);
                   },
                 ),
               ],

@@ -1,4 +1,5 @@
 
+import 'package:bodacious/drift/album_data.dart';
 import 'package:bodacious/main.dart';
 import 'package:bodacious/models/artist_data.dart';
 import 'package:bodacious/widgets/item/artist.dart';
@@ -13,8 +14,12 @@ class ArtistLibraryList extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    //final Expression<bool?> Function(AlbumTable tbl) _onlyAlbumArtistsFilter = config.onlyAlbumArtists ? (tbl) => tbl.albumCount.isBiggerThanValue(0) : (tbl) => tbl.albumCount.isNotNull() | tbl.albumCount.isNull();
     return StreamBuilder<int>(
-      stream: (db.selectOnly(db.artistTable)..addColumns([db.artistTable.id])).watch().map(((value) => value.length)),
+      stream: (db.selectOnly(db.artistTable)
+        ..where(config.onlyAlbumArtists ? db.artistTable.albumCount.isBiggerThanValue(0) : db.artistTable.albumCount.isNotNull() | db.artistTable.albumCount.isNull())
+        ..addColumns([db.artistTable.id])
+      ).watch().map(((value) => value.length)),
       builder: (context, snapshot) {
         return CustomScrollView(
           slivers: [
@@ -39,6 +44,7 @@ class ArtistLibraryList extends ConsumerWidget {
                     ..orderBy([
                       (tbl) => OrderingTerm.asc(tbl.name)
                     ])
+                    ..where(config.onlyAlbumArtists ? (tbl) => tbl.albumCount.isBiggerThanValue(0) : (tbl) => tbl.albumCount.isNotNull() | tbl.albumCount.isNull())
                     ..limit(1, offset: index)
                   ).getSingle(),
                   builder: (context, snapshot) {

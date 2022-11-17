@@ -41,6 +41,10 @@ class Config {
   /// Should always be set with [lastFmToken].
   String? get lastFmUsername => _prefs.getString("lastfm:username");
   set lastFmUsername(String? to) => to == null ? _prefs.remove("lastfm:username") : _prefs.setString("lastfm:username", to);
+
+  /// Whether to only show artists with their own music in the artist list.
+  bool get onlyAlbumArtists => _prefs.getBool("only-album-artists") ?? false;
+  set onlyAlbumArtists(bool to) => _prefs.setBool("only-album-artists", to);
 }
 
 class ROConfig implements Config {
@@ -62,6 +66,8 @@ class ROConfig implements Config {
   final bool lastFmScrobbling;
   @override
   final bool spotifyIntegration;
+  @override
+  final bool onlyAlbumArtists;
 
   @override
   SharedPreferences get _prefs => throw UnsupportedError("Not necessary");
@@ -75,7 +81,8 @@ class ROConfig implements Config {
     lastFmIntegration = config.lastFmIntegration,
     spotifyIntegration = config.spotifyIntegration,
     lastFmToken = config.lastFmToken,
-    lastFmUsername = config.lastFmUsername;
+    lastFmUsername = config.lastFmUsername,
+    onlyAlbumArtists = config.onlyAlbumArtists;
 
   @override
   noSuchMethod(Invocation invocation) {
