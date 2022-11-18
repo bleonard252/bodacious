@@ -224,16 +224,45 @@ class PlaylistDetailsViewState extends State<PlaylistDetailsView> {
               ),
               FutureBuilder<List<TrackMetadata>>(
                 future: db.tryGetPlaylistTracksById(playlist.id),
-                builder: (context, snapshot) => SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      final track = snapshot.data?[index] ?? TrackMetadata(uri: Uri(), title: "Loading...");
-                      return SizedBox(
-                        height: 72.0,
-                        child: Consumer(
-                          builder: (context, ref, _) {
-                            return SongWidget(
+                builder: (context, snapshot) => SliverReorderableList(
+                  onReorder: (oldIndex, newIndex) async {
+                    if (oldIndex == newIndex) return;
+                    final List<TrackMetadata> tracks = snapshot.data ?? [];
+                    final TrackMetadata track = tracks.removeAt(oldIndex);
+                    if (newIndex > oldIndex) newIndex--;
+                    tracks.insert(newIndex, track);
+                    appLogger.info("Reordering playlist ${playlist.id} item from $oldIndex to $newIndex");
+                    // updatePlaylistTracks(playlist.id, tracks);
+                    final trackList = await db.tryGetPlaylistEntriesById(playlist.id);
+                    await db.transaction(() async {
+                      for (int i = 0; i < tracks.length; i++) {
+                        final entry = trackList.firstWhere((element) => element.track == tracks[i].id);
+                        await (db.update(db.playlistEntries)
+                          ..where((tbl) => tbl.playlist.equals(playlist.id) & tbl.track.equals(tracks[i].id) & tbl.id.equals(entry.id))
+                        ).write(PlaylistEntriesCompanion(
+                          index: Value(i)
+                        ));
+                        trackList.remove(entry);
+                      }
+                    });
+                    print(await (db.select(db.playlistEntries)
+                      ..where((tbl) => tbl.playlist.equals(playlist.id))
+                    ).get());
+                    setState(() {});
+                  },
+                  itemBuilder: (context, index) {
+                    final track = snapshot.data?[index] ?? TrackMetadata(uri: Uri(), title: "Loading...");
+                    return SizedBox(
+                      key: Key(track.id),
+                      height: 72.0,
+                      child: Consumer(
+                        builder: (context, ref, _) {
+                          return ReorderableDelayedDragStartListener(
+                            index: index,
+                            child: SongWidget(
                               track,
+                              reorderable: true,
+                              queueIndex: index,
                               showTrackNo: true,
                               selected: ref.watch(nowPlayingProvider).value?.uri == track.uri,
                               onTap: track.uri == Uri() ? null : () async {
@@ -242,13 +271,13 @@ class PlaylistDetailsViewState extends State<PlaylistDetailsView> {
                                 await player.updateQueue(tracks.map((e) => e.asMediaItem()).toList(), index);
                                 await player.play();
                               },
-                            );
-                          }
-                        ),
-                      );
-                    },
-                    childCount: snapshot.data?.length ?? 0
-                  )
+                            ),
+                          );
+                        }
+                      ),
+                    );
+                  },
+                  itemCount: snapshot.data?.length ?? 0
                 )
               )
             ]

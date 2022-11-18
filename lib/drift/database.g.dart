@@ -1703,18 +1703,21 @@ class $PlaylistTableTable extends PlaylistTable
 }
 
 class PlaylistEntry extends DataClass implements Insertable<PlaylistEntry> {
+  final String id;
   final String playlist;
   final String track;
   final DateTime added;
   final int? index;
   const PlaylistEntry(
-      {required this.playlist,
+      {required this.id,
+      required this.playlist,
       required this.track,
       required this.added,
       this.index});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
     map['playlist'] = Variable<String>(playlist);
     map['track'] = Variable<String>(track);
     map['added'] = Variable<DateTime>(added);
@@ -1726,6 +1729,7 @@ class PlaylistEntry extends DataClass implements Insertable<PlaylistEntry> {
 
   PlaylistEntriesCompanion toCompanion(bool nullToAbsent) {
     return PlaylistEntriesCompanion(
+      id: Value(id),
       playlist: Value(playlist),
       track: Value(track),
       added: Value(added),
@@ -1738,6 +1742,7 @@ class PlaylistEntry extends DataClass implements Insertable<PlaylistEntry> {
       {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return PlaylistEntry(
+      id: serializer.fromJson<String>(json['id']),
       playlist: serializer.fromJson<String>(json['playlist']),
       track: serializer.fromJson<String>(json['track']),
       added: serializer.fromJson<DateTime>(json['added']),
@@ -1748,6 +1753,7 @@ class PlaylistEntry extends DataClass implements Insertable<PlaylistEntry> {
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
       'playlist': serializer.toJson<String>(playlist),
       'track': serializer.toJson<String>(track),
       'added': serializer.toJson<DateTime>(added),
@@ -1756,11 +1762,13 @@ class PlaylistEntry extends DataClass implements Insertable<PlaylistEntry> {
   }
 
   PlaylistEntry copyWith(
-          {String? playlist,
+          {String? id,
+          String? playlist,
           String? track,
           DateTime? added,
           Value<int?> index = const Value.absent()}) =>
       PlaylistEntry(
+        id: id ?? this.id,
         playlist: playlist ?? this.playlist,
         track: track ?? this.track,
         added: added ?? this.added,
@@ -1769,6 +1777,7 @@ class PlaylistEntry extends DataClass implements Insertable<PlaylistEntry> {
   @override
   String toString() {
     return (StringBuffer('PlaylistEntry(')
+          ..write('id: $id, ')
           ..write('playlist: $playlist, ')
           ..write('track: $track, ')
           ..write('added: $added, ')
@@ -1778,11 +1787,12 @@ class PlaylistEntry extends DataClass implements Insertable<PlaylistEntry> {
   }
 
   @override
-  int get hashCode => Object.hash(playlist, track, added, index);
+  int get hashCode => Object.hash(id, playlist, track, added, index);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is PlaylistEntry &&
+          other.id == this.id &&
           other.playlist == this.playlist &&
           other.track == this.track &&
           other.added == this.added &&
@@ -1790,17 +1800,20 @@ class PlaylistEntry extends DataClass implements Insertable<PlaylistEntry> {
 }
 
 class PlaylistEntriesCompanion extends UpdateCompanion<PlaylistEntry> {
+  final Value<String> id;
   final Value<String> playlist;
   final Value<String> track;
   final Value<DateTime> added;
   final Value<int?> index;
   const PlaylistEntriesCompanion({
+    this.id = const Value.absent(),
     this.playlist = const Value.absent(),
     this.track = const Value.absent(),
     this.added = const Value.absent(),
     this.index = const Value.absent(),
   });
   PlaylistEntriesCompanion.insert({
+    this.id = const Value.absent(),
     required String playlist,
     required String track,
     this.added = const Value.absent(),
@@ -1808,12 +1821,14 @@ class PlaylistEntriesCompanion extends UpdateCompanion<PlaylistEntry> {
   })  : playlist = Value(playlist),
         track = Value(track);
   static Insertable<PlaylistEntry> custom({
+    Expression<String>? id,
     Expression<String>? playlist,
     Expression<String>? track,
     Expression<DateTime>? added,
     Expression<int>? index,
   }) {
     return RawValuesInsertable({
+      if (id != null) 'id': id,
       if (playlist != null) 'playlist': playlist,
       if (track != null) 'track': track,
       if (added != null) 'added': added,
@@ -1822,11 +1837,13 @@ class PlaylistEntriesCompanion extends UpdateCompanion<PlaylistEntry> {
   }
 
   PlaylistEntriesCompanion copyWith(
-      {Value<String>? playlist,
+      {Value<String>? id,
+      Value<String>? playlist,
       Value<String>? track,
       Value<DateTime>? added,
       Value<int?>? index}) {
     return PlaylistEntriesCompanion(
+      id: id ?? this.id,
       playlist: playlist ?? this.playlist,
       track: track ?? this.track,
       added: added ?? this.added,
@@ -1837,6 +1854,9 @@ class PlaylistEntriesCompanion extends UpdateCompanion<PlaylistEntry> {
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
     if (playlist.present) {
       map['playlist'] = Variable<String>(playlist.value);
     }
@@ -1855,6 +1875,7 @@ class PlaylistEntriesCompanion extends UpdateCompanion<PlaylistEntry> {
   @override
   String toString() {
     return (StringBuffer('PlaylistEntriesCompanion(')
+          ..write('id: $id, ')
           ..write('playlist: $playlist, ')
           ..write('track: $track, ')
           ..write('added: $added, ')
@@ -1870,6 +1891,15 @@ class $PlaylistEntriesTable extends PlaylistEntries
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
   $PlaylistEntriesTable(this.attachedDatabase, [this._alias]);
+  final VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+      'id', aliasedName, false,
+      additionalChecks:
+          GeneratedColumn.checkTextLength(minTextLength: 7, maxTextLength: 20),
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      clientDefault: () => nanoid(14));
   final VerificationMeta _playlistMeta = const VerificationMeta('playlist');
   @override
   late final GeneratedColumn<String> playlist = GeneratedColumn<String>(
@@ -1899,7 +1929,7 @@ class $PlaylistEntriesTable extends PlaylistEntries
       requiredDuringInsert: false,
       defaultValue: const Constant(0));
   @override
-  List<GeneratedColumn> get $columns => [playlist, track, added, index];
+  List<GeneratedColumn> get $columns => [id, playlist, track, added, index];
   @override
   String get aliasedName => _alias ?? 'playlist_entries';
   @override
@@ -1909,6 +1939,9 @@ class $PlaylistEntriesTable extends PlaylistEntries
       {bool isInserting = false}) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
     if (data.containsKey('playlist')) {
       context.handle(_playlistMeta,
           playlist.isAcceptableOrUnknown(data['playlist']!, _playlistMeta));
@@ -1933,11 +1966,13 @@ class $PlaylistEntriesTable extends PlaylistEntries
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => <GeneratedColumn>{};
+  Set<GeneratedColumn> get $primaryKey => {id};
   @override
   PlaylistEntry map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return PlaylistEntry(
+      id: attachedDatabase.options.types
+          .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
       playlist: attachedDatabase.options.types
           .read(DriftSqlType.string, data['${effectivePrefix}playlist'])!,
       track: attachedDatabase.options.types

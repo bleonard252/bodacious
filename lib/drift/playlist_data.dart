@@ -20,6 +20,9 @@ class PlaylistTable extends Table {
 
 @DataClassName('PlaylistEntry')
 class PlaylistEntries extends Table {
+  @override
+  get primaryKey => {id};
+  TextColumn get id => text().withLength(max: 20, min: 7).clientDefault(() => nanoid(14))();
   TextColumn get playlist => text().references(PlaylistTable, #id)();
   TextColumn get track => text().references(TrackTable, #id)();
   DateTimeColumn get added => dateTime().clientDefault(() => DateTime.now())();

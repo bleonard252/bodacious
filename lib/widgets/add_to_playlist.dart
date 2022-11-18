@@ -56,10 +56,12 @@ class AddToPlaylistDialog extends StatelessWidget {
                     onTap: () async {
                       final playlistId = await showDialog<String?>(
                         context: context,
-                        builder: (context) => CreatePlaylistDialog()
+                        builder: (context) => const CreatePlaylistDialog()
                       );
-                      if (playlistId != null) await addToPlaylist(playlistId);
-                      Navigator.of(context).pop();
+                      if (playlistId != null) {
+                        await addToPlaylist(playlistId);
+                        Navigator.of(context).pop();
+                      }
                     }
                   )
                 ]))
@@ -81,7 +83,7 @@ class AddToPlaylistDialog extends StatelessWidget {
 }
 
 class CreatePlaylistDialog extends StatefulWidget {
-  CreatePlaylistDialog({super.key});
+  const CreatePlaylistDialog({super.key});
 
   @override
   State<CreatePlaylistDialog> createState() => _CreatePlaylistDialogState();
@@ -134,10 +136,12 @@ class _CreatePlaylistDialogState extends State<CreatePlaylistDialog> {
     );
   }
 
-  createPlaylist() async {
-    db.into(db.playlistTable).insert(PlaylistTableCompanion(
+  Future<String> createPlaylist() async {
+    final newEntry = await db.into(db.playlistTable).insertReturning(PlaylistTableCompanion(
       name: Value(_controller.text),
       createdAt: Value(DateTime.now()),
     ));
+    playlistId = newEntry.id;
+    return newEntry.id;
   }
 }

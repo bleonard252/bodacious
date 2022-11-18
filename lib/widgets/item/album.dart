@@ -99,6 +99,8 @@ class AlbumWidget extends ConsumerWidget {
                       final tracks = await db.tryGetAlbumTracks(album.name, by: album.artistName);
                       final x = (q?.position ?? player.currentIndex ?? 0);
                       player.insertQueueItems(x+1, tracks.map((e) => e.asMediaItem()).toList());
+                      ref.refresh(nowPlayingProvider);
+                      ref.refresh(queueProvider);
                       // for (int i = 0; i < tracks.length; i++) {
                       //   player.insertQueueItem(x+i+1, tracks[i].asMediaItem());
                       // }
@@ -106,6 +108,8 @@ class AlbumWidget extends ConsumerWidget {
                     case "queue":
                       final tracks = await db.tryGetAlbumTracks(album.name, by: album.artistName);
                       player.addQueueItems(tracks.map((e) => e.asMediaItem()).toList());
+                      ref.refresh(nowPlayingProvider);
+                      ref.refresh(queueProvider);
                       // for (int i = 0; i < tracks.length; i++) {
                       //   player.addQueueItem(tracks[i].asMediaItem());
                       // }

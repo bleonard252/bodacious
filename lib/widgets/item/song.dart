@@ -19,6 +19,7 @@ class SongWidget extends ConsumerWidget {
   /// Good for artist pages.
   final bool useAlbumName;
   final bool showVariations;
+  final bool reorderable;
   final int? queueIndex;
   const SongWidget(this.track, {
     Key? key,
@@ -28,6 +29,7 @@ class SongWidget extends ConsumerWidget {
     this.inQueue = false,
     this.useAlbumName = false,
     this.showVariations = false,
+    this.reorderable = false,
     this.queueIndex
   }) : super(key: key);
 
@@ -44,37 +46,10 @@ class SongWidget extends ConsumerWidget {
             leading: SizedBox(
               width: 48,
               height: 48,
-              child: Stack(
-                fit: StackFit.expand,
-                children: [
-                  Positioned.fill(
-                    child: Container(
-                      foregroundDecoration: track.available ? null : BoxDecoration(
-                        color: Colors.black.withAlpha(127),
-                        backgroundBlendMode: BlendMode.srcOver
-                      ),
-                      child: track.coverBytes != null || track.coverUri?.scheme == "file" ? Image(
-                      image: (track.coverUri?.scheme == "file" ? FileImage(File.fromUri(track.coverUri!))
-                        : NetworkImage(track.coverUri.toString())) as ImageProvider,
-                      width: 48,
-                      height: 48,
-                      color: track.available ? null : Colors.black,
-                      colorBlendMode: track.available ? BlendMode.srcIn : BlendMode.saturation,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, e, s) => const CoverPlaceholder(size: 48, iconSize: 24),
-                    ) : const CoverPlaceholder(size: 48, iconSize: 24),
-                    ),
-                  ),
-                  if (selected) ...[
-                    Positioned.fill(child: Container(color: Colors.black54)),
-                    Positioned.fill(child: Center(child: Icon(MdiIcons.equalizer, color: Theme.of(context).colorScheme.primary))),
-                  ]
-                  else if (showTrackNo && track.trackNo != null && track.trackNo != 0) ...[
-                    Positioned.fill(child: Container(color: Colors.black54)),
-                    Positioned.fill(child: Center(child: Text(track.trackNo!.toString().padLeft(2, '0')))),
-                  ],
-                ]
-              ),
+              child: reorderable ? ReorderableDragStartListener(
+                child: buildImage(context),
+                index: queueIndex!,
+              ) : buildImage(context)
             ),
             title: Text(track.title ?? (track.uri.pathSegments.isEmpty ? "Unknown track" : track.uri.pathSegments.last)),
             subtitle: !track.available ? const Text("Track unavailable") : 
@@ -126,10 +101,14 @@ class SongWidget extends ConsumerWidget {
                         case "playnext":
                           final q = ref.read(queueProvider).value;
                           player.insertQueueItem((q?.position ?? 0)+1, track.asMediaItem());
+                          ref.refresh(nowPlayingProvider);
+                          ref.refresh(queueProvider);
                           //ref.invalidate(queueProvider);
                           break;
                         case "queue":
                           player.addQueueItem(track.asMediaItem());
+                          ref.refresh(nowPlayingProvider);
+                          ref.refresh(queueProvider);
                           //ref.invalidate(queueProvider);
                           break;
                         case "addplaylist":
@@ -150,6 +129,40 @@ class SongWidget extends ConsumerWidget {
           ),
         ],
       ),
+    );
+  }
+
+  buildImage(BuildContext context) {
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        Positioned.fill(
+          child: Container(
+            foregroundDecoration: track.available ? null : BoxDecoration(
+              color: Colors.black.withAlpha(127),
+              backgroundBlendMode: BlendMode.srcOver
+            ),
+            child: track.coverBytes != null || track.coverUri?.scheme == "file" ? Image(
+            image: (track.coverUri?.scheme == "file" ? FileImage(File.fromUri(track.coverUri!))
+              : NetworkImage(track.coverUri.toString())) as ImageProvider,
+            width: 48,
+            height: 48,
+            color: track.available ? null : Colors.black,
+            colorBlendMode: track.available ? BlendMode.srcIn : BlendMode.saturation,
+            fit: BoxFit.cover,
+            errorBuilder: (context, e, s) => const CoverPlaceholder(size: 48, iconSize: 24),
+          ) : const CoverPlaceholder(size: 48, iconSize: 24),
+          ),
+        ),
+        if (selected) ...[
+          Positioned.fill(child: Container(color: Colors.black54)),
+          Positioned.fill(child: Center(child: Icon(MdiIcons.equalizer, color: Theme.of(context).colorScheme.primary))),
+        ]
+        else if (showTrackNo && track.trackNo != null && track.trackNo != 0) ...[
+          Positioned.fill(child: Container(color: Colors.black54)),
+          Positioned.fill(child: Center(child: Text(track.trackNo!.toString().padLeft(2, '0')))),
+        ],
+      ]
     );
   }
 }

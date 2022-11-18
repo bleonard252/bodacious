@@ -27,7 +27,7 @@ class BoDatabase extends _$BoDatabase {
 
   // you should bump this number whenever you change or add a table definition
   @override
-  int get schemaVersion => 10;
+  int get schemaVersion => 11;
 
   Future<TrackMetadata?> tryGetTrackFromUri(Uri uri) {
     return (
@@ -57,22 +57,21 @@ class BoDatabase extends _$BoDatabase {
       ])
     ).get();
   }
-  Future<List<TrackMetadata>> tryGetPlaylistTracksById(String playlistId) async {
-    final trackList = (await (
+  Future<List<PlaylistEntry>> tryGetPlaylistEntriesById(String playlistId) {
+    return (
       select(playlistEntries)
       ..where((tbl) => tbl.playlist.equals(playlistId))
       ..orderBy([
-        //(tbl) => OrderingTerm.desc(tbl.added),
         (tbl) => OrderingTerm.asc(tbl.index),
       ])
-    ).get()).map((e) => e.track).toList();
-    return (
-      select(trackTable)
-      ..where((tbl) => tbl.id.isIn(trackList))
-      ..orderBy([
-        (tbl) => OrderingTerm.asc(Variable(trackList.indexWhere((element) => tbl.id.equals(element) == const Constant(true)))),
-      ])
     ).get();
+  }
+  Future<List<TrackMetadata>> tryGetPlaylistTracksById(String playlistId) async {
+    final trackList = (await tryGetPlaylistEntriesById(playlistId)).map((e) => e.track).toList();
+    return [
+      for (final trackId in trackList)
+        await tryGetTrackById(trackId),
+    ].whereType<TrackMetadata>().toList();
   }
 
   Future<String?> tryGetAlbumId(String albumName, {required String by}) {
@@ -131,7 +130,10 @@ class BoDatabase extends _$BoDatabase {
         m.drop(trackTable);
         m.drop(artistTable);
       }
-      if (from <= 9 || to == 10) {
+      if (from == 10 && to == 11) {
+        m.drop(playlistEntries);
+        m.create(playlistEntries);
+      } else if (from <= 9 || to == 11) {
         m.create(playlistTable);
         m.create(playlistEntries);
       }
