@@ -85,7 +85,7 @@ class NowPlayingSidebar extends ConsumerWidget {
 
   Widget buildTrackInfo(BuildContext context) {
     return InkWell(
-      onTap: () => OuterFrame.goRouter.push("/now_playing"),
+      onTap: () => OuterFrame.goRouter.location != "/now_playing" ? OuterFrame.goRouter.push("/now_playing") : null,
       child: Consumer(
         builder: (context, ref, child) {
           final meta = ref.watch(nowPlayingProvider).asData?.value ?? TrackMetadata.empty();
