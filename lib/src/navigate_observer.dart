@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/widgets.dart';
+import 'package:go_router/go_router.dart';
 
 class NavigationNotifier extends NavigatorObserver {
   final StreamController<int> _stream = StreamController();
@@ -34,4 +35,8 @@ class NavigationNotifier extends NavigatorObserver {
   void pageChanged() {
     _stream.add(0);
   }
+}
+
+extension GoRouterCanPop on GoRouter {
+  bool canPop() => (Uri.parse(location).pathSegments.isNotEmpty) || (navigator?.canPop() ?? false);
 }
