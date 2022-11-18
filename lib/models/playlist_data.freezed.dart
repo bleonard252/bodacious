@@ -31,15 +31,23 @@ mixin _$PlaylistMetadata {
   /// * no icon in the playlist view, AND
   /// * the first entry as the playlist icon in the list
   Uri? get coverUri => throw _privateConstructorUsedError;
+
+  /// The source of the cover. Likely "manual" or "album".
+  /// Not used for any special purpose.
+  String? get coverSource => throw _privateConstructorUsedError;
+
+  /// User-defined description of the playlist.
   String? get description => throw _privateConstructorUsedError;
 
+  /// The number of tracks in the playlist.
+  int? get trackCount => throw _privateConstructorUsedError;
+
   /// The URI to the XSPF file for this playlist.
-  Uri get uri => throw _privateConstructorUsedError;
-
-  /// The URI of each track in the playlist, in order, as strings.
-  /// Likely to be exactly how the <location/> contents appear.
-  List<String> get trackList => throw _privateConstructorUsedError;
-
+  @JsonKey(ignore: true)
+  Uri? get uri =>
+      throw _privateConstructorUsedError; // /// The URI of each track in the playlist, in order, as strings.
+// /// Likely to be exactly how the <location/> contents appear.
+// @Default([]) List<String> trackList,
   /// Attach the XML document to the object to easily get additional metadata
   /// from the file itself.
   @JsonKey(ignore: true)
@@ -67,9 +75,10 @@ abstract class $PlaylistMetadataCopyWith<$Res> {
       {String id,
       String name,
       Uri? coverUri,
+      String? coverSource,
       String? description,
-      Uri uri,
-      List<String> trackList,
+      int? trackCount,
+      @JsonKey(ignore: true) Uri? uri,
       @JsonKey(ignore: true) XmlDocument? document,
       DateTime? createdAt,
       int? index});
@@ -91,9 +100,10 @@ class _$PlaylistMetadataCopyWithImpl<$Res, $Val extends PlaylistMetadata>
     Object? id = null,
     Object? name = null,
     Object? coverUri = freezed,
+    Object? coverSource = freezed,
     Object? description = freezed,
-    Object? uri = null,
-    Object? trackList = null,
+    Object? trackCount = freezed,
+    Object? uri = freezed,
     Object? document = freezed,
     Object? createdAt = freezed,
     Object? index = freezed,
@@ -111,18 +121,22 @@ class _$PlaylistMetadataCopyWithImpl<$Res, $Val extends PlaylistMetadata>
           ? _value.coverUri
           : coverUri // ignore: cast_nullable_to_non_nullable
               as Uri?,
+      coverSource: freezed == coverSource
+          ? _value.coverSource
+          : coverSource // ignore: cast_nullable_to_non_nullable
+              as String?,
       description: freezed == description
           ? _value.description
           : description // ignore: cast_nullable_to_non_nullable
               as String?,
-      uri: null == uri
+      trackCount: freezed == trackCount
+          ? _value.trackCount
+          : trackCount // ignore: cast_nullable_to_non_nullable
+              as int?,
+      uri: freezed == uri
           ? _value.uri
           : uri // ignore: cast_nullable_to_non_nullable
-              as Uri,
-      trackList: null == trackList
-          ? _value.trackList
-          : trackList // ignore: cast_nullable_to_non_nullable
-              as List<String>,
+              as Uri?,
       document: freezed == document
           ? _value.document
           : document // ignore: cast_nullable_to_non_nullable
@@ -151,9 +165,10 @@ abstract class _$$_PlaylistMetadataCopyWith<$Res>
       {String id,
       String name,
       Uri? coverUri,
+      String? coverSource,
       String? description,
-      Uri uri,
-      List<String> trackList,
+      int? trackCount,
+      @JsonKey(ignore: true) Uri? uri,
       @JsonKey(ignore: true) XmlDocument? document,
       DateTime? createdAt,
       int? index});
@@ -173,9 +188,10 @@ class __$$_PlaylistMetadataCopyWithImpl<$Res>
     Object? id = null,
     Object? name = null,
     Object? coverUri = freezed,
+    Object? coverSource = freezed,
     Object? description = freezed,
-    Object? uri = null,
-    Object? trackList = null,
+    Object? trackCount = freezed,
+    Object? uri = freezed,
     Object? document = freezed,
     Object? createdAt = freezed,
     Object? index = freezed,
@@ -193,18 +209,22 @@ class __$$_PlaylistMetadataCopyWithImpl<$Res>
           ? _value.coverUri
           : coverUri // ignore: cast_nullable_to_non_nullable
               as Uri?,
+      coverSource: freezed == coverSource
+          ? _value.coverSource
+          : coverSource // ignore: cast_nullable_to_non_nullable
+              as String?,
       description: freezed == description
           ? _value.description
           : description // ignore: cast_nullable_to_non_nullable
               as String?,
-      uri: null == uri
+      trackCount: freezed == trackCount
+          ? _value.trackCount
+          : trackCount // ignore: cast_nullable_to_non_nullable
+              as int?,
+      uri: freezed == uri
           ? _value.uri
           : uri // ignore: cast_nullable_to_non_nullable
-              as Uri,
-      trackList: null == trackList
-          ? _value._trackList
-          : trackList // ignore: cast_nullable_to_non_nullable
-              as List<String>,
+              as Uri?,
       document: freezed == document
           ? _value.document
           : document // ignore: cast_nullable_to_non_nullable
@@ -229,14 +249,14 @@ class _$_PlaylistMetadata extends _PlaylistMetadata
       {this.id = "",
       required this.name,
       this.coverUri,
+      this.coverSource,
       this.description,
-      required this.uri,
-      final List<String> trackList = const [],
+      this.trackCount,
+      @JsonKey(ignore: true) this.uri,
       @JsonKey(ignore: true) this.document,
       this.createdAt,
       this.index})
-      : _trackList = trackList,
-        super._();
+      : super._();
 
   factory _$_PlaylistMetadata.fromJson(Map<String, dynamic> json) =>
       _$$_PlaylistMetadataFromJson(json);
@@ -256,26 +276,27 @@ class _$_PlaylistMetadata extends _PlaylistMetadata
   /// * the first entry as the playlist icon in the list
   @override
   final Uri? coverUri;
+
+  /// The source of the cover. Likely "manual" or "album".
+  /// Not used for any special purpose.
+  @override
+  final String? coverSource;
+
+  /// User-defined description of the playlist.
   @override
   final String? description;
 
+  /// The number of tracks in the playlist.
+  @override
+  final int? trackCount;
+
   /// The URI to the XSPF file for this playlist.
   @override
-  final Uri uri;
-
-  /// The URI of each track in the playlist, in order, as strings.
-  /// Likely to be exactly how the <location/> contents appear.
-  final List<String> _trackList;
-
-  /// The URI of each track in the playlist, in order, as strings.
-  /// Likely to be exactly how the <location/> contents appear.
-  @override
-  @JsonKey()
-  List<String> get trackList {
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_trackList);
-  }
-
+  @JsonKey(ignore: true)
+  final Uri? uri;
+// /// The URI of each track in the playlist, in order, as strings.
+// /// Likely to be exactly how the <location/> contents appear.
+// @Default([]) List<String> trackList,
   /// Attach the XML document to the object to easily get additional metadata
   /// from the file itself.
   @override
@@ -292,7 +313,7 @@ class _$_PlaylistMetadata extends _PlaylistMetadata
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'PlaylistMetadata(id: $id, name: $name, coverUri: $coverUri, description: $description, uri: $uri, trackList: $trackList, document: $document, createdAt: $createdAt, index: $index)';
+    return 'PlaylistMetadata(id: $id, name: $name, coverUri: $coverUri, coverSource: $coverSource, description: $description, trackCount: $trackCount, uri: $uri, document: $document, createdAt: $createdAt, index: $index)';
   }
 
   @override
@@ -303,9 +324,10 @@ class _$_PlaylistMetadata extends _PlaylistMetadata
       ..add(DiagnosticsProperty('id', id))
       ..add(DiagnosticsProperty('name', name))
       ..add(DiagnosticsProperty('coverUri', coverUri))
+      ..add(DiagnosticsProperty('coverSource', coverSource))
       ..add(DiagnosticsProperty('description', description))
+      ..add(DiagnosticsProperty('trackCount', trackCount))
       ..add(DiagnosticsProperty('uri', uri))
-      ..add(DiagnosticsProperty('trackList', trackList))
       ..add(DiagnosticsProperty('document', document))
       ..add(DiagnosticsProperty('createdAt', createdAt))
       ..add(DiagnosticsProperty('index', index));
@@ -320,11 +342,13 @@ class _$_PlaylistMetadata extends _PlaylistMetadata
             (identical(other.name, name) || other.name == name) &&
             (identical(other.coverUri, coverUri) ||
                 other.coverUri == coverUri) &&
+            (identical(other.coverSource, coverSource) ||
+                other.coverSource == coverSource) &&
             (identical(other.description, description) ||
                 other.description == description) &&
+            (identical(other.trackCount, trackCount) ||
+                other.trackCount == trackCount) &&
             (identical(other.uri, uri) || other.uri == uri) &&
-            const DeepCollectionEquality()
-                .equals(other._trackList, _trackList) &&
             (identical(other.document, document) ||
                 other.document == document) &&
             (identical(other.createdAt, createdAt) ||
@@ -334,17 +358,8 @@ class _$_PlaylistMetadata extends _PlaylistMetadata
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      id,
-      name,
-      coverUri,
-      description,
-      uri,
-      const DeepCollectionEquality().hash(_trackList),
-      document,
-      createdAt,
-      index);
+  int get hashCode => Object.hash(runtimeType, id, name, coverUri, coverSource,
+      description, trackCount, uri, document, createdAt, index);
 
   @JsonKey(ignore: true)
   @override
@@ -365,9 +380,10 @@ abstract class _PlaylistMetadata extends PlaylistMetadata {
       {final String id,
       required final String name,
       final Uri? coverUri,
+      final String? coverSource,
       final String? description,
-      required final Uri uri,
-      final List<String> trackList,
+      final int? trackCount,
+      @JsonKey(ignore: true) final Uri? uri,
       @JsonKey(ignore: true) final XmlDocument? document,
       final DateTime? createdAt,
       final int? index}) = _$_PlaylistMetadata;
@@ -392,18 +408,26 @@ abstract class _PlaylistMetadata extends PlaylistMetadata {
   /// * the first entry as the playlist icon in the list
   Uri? get coverUri;
   @override
+
+  /// The source of the cover. Likely "manual" or "album".
+  /// Not used for any special purpose.
+  String? get coverSource;
+  @override
+
+  /// User-defined description of the playlist.
   String? get description;
   @override
 
+  /// The number of tracks in the playlist.
+  int? get trackCount;
+  @override
+
   /// The URI to the XSPF file for this playlist.
-  Uri get uri;
-  @override
-
-  /// The URI of each track in the playlist, in order, as strings.
-  /// Likely to be exactly how the <location/> contents appear.
-  List<String> get trackList;
-  @override
-
+  @JsonKey(ignore: true)
+  Uri? get uri;
+  @override // /// The URI of each track in the playlist, in order, as strings.
+// /// Likely to be exactly how the <location/> contents appear.
+// @Default([]) List<String> trackList,
   /// Attach the XML document to the object to easily get additional metadata
   /// from the file itself.
   @JsonKey(ignore: true)

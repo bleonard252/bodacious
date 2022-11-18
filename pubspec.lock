@@ -485,16 +485,18 @@ packages:
   just_audio:
     dependency: "direct main"
     description:
-      name: just_audio
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.9.30"
+      path: just_audio
+      ref: minor
+      resolved-ref: "9526090986af4fd9f193862052c317fd8faa67da"
+      url: "https://github.com/ryanheise/just_audio"
+    source: git
+    version: "0.9.31"
   just_audio_mpv:
     dependency: "direct main"
     description:
-      name: just_audio_mpv
-      url: "https://pub.dartlang.org"
-    source: hosted
+      path: "../just_audio_mpv"
+      relative: true
+    source: path
     version: "0.1.6"
   just_audio_platform_interface:
     dependency: transitive

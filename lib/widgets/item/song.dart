@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:bodacious/main.dart';
 import 'package:bodacious/models/track_data.dart';
+import 'package:bodacious/widgets/add_to_playlist.dart';
 import 'package:bodacious/widgets/cover_placeholder.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -108,6 +109,10 @@ class SongWidget extends ConsumerWidget {
                         child: Text("Add to Queue"),
                         value: "queue",
                       ),
+                      const PopupMenuItem(
+                        child: Text("Add to Playlist..."),
+                        value: "addplaylist",
+                      ),
                       if (inQueue && queueIndex != null) const PopupMenuItem(
                         child: Text("Remove from Queue"),
                         value: "removequeue",
@@ -126,6 +131,9 @@ class SongWidget extends ConsumerWidget {
                         case "queue":
                           player.addQueueItem(track.asMediaItem());
                           //ref.invalidate(queueProvider);
+                          break;
+                        case "addplaylist":
+                          showDialog(context: context, builder: (context) => AddToPlaylistDialog(trackId: track.id));
                           break;
                         case "removequeue":
                           if (queueIndex == null) break;

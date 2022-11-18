@@ -2,10 +2,12 @@ import 'dart:io';
 
 import 'package:bodacious/drift/album_data.dart';
 import 'package:bodacious/drift/artist_data.dart';
+import 'package:bodacious/drift/playlist_data.dart';
 import 'package:bodacious/drift/track_data.dart';
 import 'package:bodacious/models/album_data.dart';
 import 'package:bodacious/models/artist_data.dart';
 import 'package:bodacious/models/track_data.dart';
+import 'package:bodacious/models/playlist_data.dart';
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:nanoid/non_secure.dart';
@@ -14,7 +16,7 @@ import 'package:path/path.dart' as p;
 
 part 'database.g.dart';
 
-@DriftDatabase(tables: [AlbumTable, ArtistTable, TrackTable])
+@DriftDatabase(tables: [AlbumTable, ArtistTable, TrackTable, PlaylistTable, PlaylistEntries])
 class BoDatabase extends _$BoDatabase {
   // we tell the database where to store the data with this constructor
   BoDatabase() : super(_openConnection());
@@ -25,7 +27,7 @@ class BoDatabase extends _$BoDatabase {
 
   // you should bump this number whenever you change or add a table definition
   @override
-  int get schemaVersion => 9;
+  int get schemaVersion => 10;
 
   Future<TrackMetadata?> tryGetTrackFromUri(Uri uri) {
     return (
@@ -52,6 +54,23 @@ class BoDatabase extends _$BoDatabase {
       ..orderBy([
         (tbl) => OrderingTerm.asc(tbl.discNo),
         (tbl) => OrderingTerm.asc(tbl.trackNo),
+      ])
+    ).get();
+  }
+  Future<List<TrackMetadata>> tryGetPlaylistTracksById(String playlistId) async {
+    final trackList = (await (
+      select(playlistEntries)
+      ..where((tbl) => tbl.playlist.equals(playlistId))
+      ..orderBy([
+        //(tbl) => OrderingTerm.desc(tbl.added),
+        (tbl) => OrderingTerm.asc(tbl.index),
+      ])
+    ).get()).map((e) => e.track).toList();
+    return (
+      select(trackTable)
+      ..where((tbl) => tbl.id.isIn(trackList))
+      ..orderBy([
+        (tbl) => OrderingTerm.asc(Variable(trackList.indexWhere((element) => tbl.id.equals(element) == const Constant(true)))),
       ])
     ).get();
   }
@@ -89,6 +108,12 @@ class BoDatabase extends _$BoDatabase {
       ..where((tbl) => tbl.id.equals(id))
     ).getSingleOrNull();
   }
+  Future<PlaylistMetadata?> tryGetPlaylistById(String id) {
+    return (
+      select(playlistTable)
+      ..where((tbl) => tbl.id.equals(id))
+    ).getSingleOrNull();
+  }
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -97,7 +122,7 @@ class BoDatabase extends _$BoDatabase {
     },
     onUpgrade: (m, from, to) async {
       if (from > to) throw UnsupportedError("Downgrades are not supported");
-      if (to == 9) {
+      if (from <= 8) {
         // This is gonna hurt, at least for the cached stuff,
         // just a little bit.
         // Apparently the migrator doesn't support changing the
@@ -105,6 +130,10 @@ class BoDatabase extends _$BoDatabase {
         m.drop(albumTable);
         m.drop(trackTable);
         m.drop(artistTable);
+      }
+      if (from <= 9 || to == 10) {
+        m.create(playlistTable);
+        m.create(playlistEntries);
       }
     },
   );
