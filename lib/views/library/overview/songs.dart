@@ -2,9 +2,10 @@
 import 'package:bodacious/main.dart';
 import 'package:bodacious/models/track_data.dart';
 import 'package:bodacious/widgets/item/song.dart';
-import 'package:drift/drift.dart';
+import 'package:drift/drift.dart' hide Column;
 import "package:flutter/material.dart";
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 
 class SongLibraryList extends ConsumerWidget {
@@ -17,7 +18,43 @@ class SongLibraryList extends ConsumerWidget {
       builder: (context, snapshot) {
         return CustomScrollView(
           slivers: [
-            if (!snapshot.hasData) SliverToBoxAdapter(child: Container())
+            if (snapshot.hasError) SliverFillRemaining(child: Center(
+              child: Column(
+                children: [
+                  const Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Icon(MdiIcons.alertCircle, color: Colors.red),
+                  ),
+                  Text(snapshot.error.toString(), textAlign: TextAlign.center, style: const TextStyle(color: Colors.red))
+                ]
+              )
+            ))
+            else if (!snapshot.hasData) SliverToBoxAdapter(child: Container())
+            else if (snapshot.data == 0) SliverFillRemaining(
+              child: Center(
+                child: Material(
+                  type: MaterialType.card,
+                  color: Colors.black54,
+                  borderRadius: BorderRadius.circular(8),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Icon(MdiIcons.ghost, color: Colors.lightBlue),
+                        ),
+                        ConstrainedBox(
+                          constraints: const BoxConstraints(maxWidth: 300),
+                          child: const Text("No songs found. Add a music folder in Settings > Library.", textAlign: TextAlign.center)
+                        )
+                      ]
+                    ),
+                  )
+                )
+              )
+            )
             else SliverList(
               //itemExtent: 72.0,
               delegate: SliverChildBuilderDelegate(
@@ -41,26 +78,6 @@ class SongLibraryList extends ConsumerWidget {
                         await player.play();
                       },
                     );
-                    // return SizedBox(
-                    //   height: 72.0,
-                    //   child: ListTile(
-                    //     leading: track.coverBytes != null || track.coverUri?.scheme == "file" ? Image(
-                    //       image: (track.coverUri?.scheme == "file" ? FileImage(File.fromUri(track.coverUri!))
-                    //         : NetworkImage(track.coverUri.toString())) as ImageProvider,
-                    //       width: 48,
-                    //       height: 48,
-                    //       fit: BoxFit.cover,
-                    //       errorBuilder: (context, e, s) => const CoverPlaceholder(size: 48, iconSize: 24),
-                    //     ) : const CoverPlaceholder(size: 48, iconSize: 24),
-                    //     title: Text(track.title ?? (track.uri.pathSegments.isEmpty ? "Unknown track" : track.uri.pathSegments.last)),
-                    //     subtitle: track.artistName?.isEmpty == false ? Text(track.artistName!) : null,
-                    //     onTap: () {
-                    //       player.prepareFromTrackMetadata(track);
-                    //       //ref.read(nowPlayingProvider.notifier).changeTrack(track);
-                    //       player.play();
-                    //     },
-                    //   ),
-                    // );
                   },
                 ),
                 childCount: snapshot.data ?? 0

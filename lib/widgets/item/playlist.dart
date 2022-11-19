@@ -75,6 +75,10 @@ class PlaylistWidget extends ConsumerWidget {
                     child: Text("Add all to Queue"),
                     value: "queue",
                   ),
+                  const PopupMenuItem(
+                    child: Text("Delete playlist", style: TextStyle(color: Colors.red)),
+                    value: "delete",
+                  ),
                 ]).then((value) async {
                   switch (value) {
                     case "playnext":
@@ -113,6 +117,27 @@ class PlaylistWidget extends ConsumerWidget {
                       // for (int i = 0; i < tracks.length; i++) {
                       //   player.addQueueItem(tracks[i].asMediaItem());
                       // }
+                      break;
+                    case "delete":
+                      final result = await showDialog<bool>(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: const Text("Delete playlist"),
+                          content: const Text("Are you sure you want to delete this playlist? "
+                          "Songs will not be deleted, but the playlist will be removed."),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.of(context).pop(false),
+                              child: const Text("Cancel"),
+                            ),
+                            TextButton(
+                              onPressed: () => Navigator.of(context).pop(true),
+                              child: const Text("Delete"),
+                            ),
+                          ],
+                        ),
+                      );
+                      if (result == true) await db.deletePlaylistById(playlist.id);
                       break;
                     default:
                   }

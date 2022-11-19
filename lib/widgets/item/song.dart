@@ -4,6 +4,7 @@ import 'package:bodacious/main.dart';
 import 'package:bodacious/models/track_data.dart';
 import 'package:bodacious/widgets/add_to_playlist.dart';
 import 'package:bodacious/widgets/cover_placeholder.dart';
+import 'package:drift/drift.dart' hide Column;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -15,22 +16,26 @@ class SongWidget extends ConsumerWidget {
   final bool selected;
   /// This changes the [selected] appearance.
   final bool inQueue;
+  final String? inPlaylist;
   final bool showTrackNo;
   /// Good for artist pages.
   final bool useAlbumName;
   final bool showVariations;
   final bool reorderable;
   final int? queueIndex;
+  final Function()? onDeleted;
   const SongWidget(this.track, {
     Key? key,
     this.onTap,
     this.showTrackNo = false,
     this.selected = false,
     this.inQueue = false,
+    this.inPlaylist,
     this.useAlbumName = false,
     this.showVariations = false,
     this.reorderable = false,
-    this.queueIndex
+    this.queueIndex,
+    this.onDeleted
   }) : super(key: key);
 
   @override
@@ -84,6 +89,10 @@ class SongWidget extends ConsumerWidget {
                         child: Text("Add to Queue"),
                         value: "queue",
                       ),
+                      if (inPlaylist != null) const PopupMenuItem(
+                        child: Text("Remove from playlist"),
+                        value: "removeplaylist",
+                      ),
                       const PopupMenuItem(
                         child: Text("Add to Playlist..."),
                         value: "addplaylist",
@@ -92,7 +101,7 @@ class SongWidget extends ConsumerWidget {
                         child: Text("Remove from Queue"),
                         value: "removequeue",
                       )
-                    ]).then((value) {
+                    ]).then((value) async {
                       switch (value) {
                         case "trackinfo":
                           //ref.read(trackInfoDialogProvider).show(track);
@@ -112,7 +121,11 @@ class SongWidget extends ConsumerWidget {
                           //ref.invalidate(queueProvider);
                           break;
                         case "addplaylist":
-                          showDialog(context: context, builder: (context) => AddToPlaylistDialog(trackId: track.id));
+                          showDialog(context: context, builder: (context) => AddToPlaylistDialog(id: track.id));
+                          break;
+                        case "removeplaylist":
+                          await (db.delete(db.playlistEntries)..where((tbl) => tbl.playlist.equals(inPlaylist!) & tbl.track.equals(track.id))).go();
+                          onDeleted?.call();
                           break;
                         case "removequeue":
                           if (queueIndex == null) break;

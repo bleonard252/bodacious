@@ -7,8 +7,9 @@ import 'package:flutter/material.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 class AddToPlaylistDialog extends StatelessWidget {
-  final String trackId;
-  const AddToPlaylistDialog({super.key, required this.trackId});
+  final String id;
+  final bool isAlbum;
+  const AddToPlaylistDialog({super.key, required this.id, this.isAlbum = false});
 
   @override
   Widget build(BuildContext context) {
@@ -73,12 +74,34 @@ class AddToPlaylistDialog extends StatelessWidget {
     );
   }
   
-  addToPlaylist(String playlistId) {
-    return db.into(db.playlistEntries).insert(PlaylistEntriesCompanion(
-      playlist: Value(playlistId),
-      track: Value(trackId),
-      added: Value(DateTime.now())
-    ));
+  addToPlaylist(String playlistId) async {
+    final length = (await (db.select(db.playlistEntries)..where((tbl) => tbl.playlist.equals(playlistId))).get()).length;
+    if (!isAlbum) {
+      return db.transaction(() async {
+        await db.into(db.playlistEntries).insert(PlaylistEntriesCompanion(
+          playlist: Value(playlistId),
+          track: Value(id),
+          added: Value(DateTime.now()),
+          index: Value(length)
+        ));
+        await (db.update(db.playlistTable)..whereSamePrimaryKey(PlaylistMetadata(id: playlistId, name: ''))).write(PlaylistTableCompanion(
+          trackCount: Value(length + 1)
+        ));
+      });
+    } else {
+      final tracks = await db.tryGetAlbumTracksById(id);
+      final now = DateTime.now();
+      return db.transaction(() async {
+        for (int i = 0; i < tracks.length; i++) {
+          await db.into(db.playlistEntries).insert(PlaylistEntriesCompanion(
+            playlist: Value(playlistId),
+            track: Value(tracks[i].id),
+            added: Value(now),
+            index: Value(length + i)
+          ));
+        }
+      });
+    }
   }
 }
 

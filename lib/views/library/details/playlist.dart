@@ -33,6 +33,7 @@ class PlaylistDetailsWrapper extends StatelessWidget {
         color: Colors.black,
         child: Center(
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
               const Padding(
                 padding: EdgeInsets.all(8.0),
@@ -47,6 +48,7 @@ class PlaylistDetailsWrapper extends StatelessWidget {
         color: Colors.black,
         child: Center(
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: const [
               Padding(
                 padding: EdgeInsets.all(8.0),
@@ -263,8 +265,10 @@ class PlaylistDetailsViewState extends State<PlaylistDetailsView> {
                               track,
                               reorderable: true,
                               queueIndex: index,
-                              showTrackNo: true,
+                              inPlaylist: playlist.id,
+                              showTrackNo: false,
                               selected: ref.watch(nowPlayingProvider).value?.uri == track.uri,
+                              onDeleted: () => setState(() {}),
                               onTap: track.uri == Uri() ? null : () async {
                                 player.stop();
                                 final tracks = await db.tryGetPlaylistTracksById(playlist.id);

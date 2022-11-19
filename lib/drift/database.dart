@@ -57,6 +57,16 @@ class BoDatabase extends _$BoDatabase {
       ])
     ).get();
   }
+  Future<List<TrackMetadata>> tryGetAlbumTracksById(String albumId) {
+    return (
+      select(trackTable)
+      ..where((tbl) => tbl.albumId.equals(albumId))
+      ..orderBy([
+        (tbl) => OrderingTerm.asc(tbl.discNo),
+        (tbl) => OrderingTerm.asc(tbl.trackNo),
+      ])
+    ).get();
+  }
   Future<List<PlaylistEntry>> tryGetPlaylistEntriesById(String playlistId) {
     return (
       select(playlistEntries)
@@ -112,6 +122,13 @@ class BoDatabase extends _$BoDatabase {
       select(playlistTable)
       ..where((tbl) => tbl.id.equals(id))
     ).getSingleOrNull();
+  }
+
+  Future<void> deletePlaylistById(String id) {
+    return transaction(() async {
+      await (delete(playlistEntries)..where((tbl) => tbl.playlist.equals(id))).go();
+      await (delete(playlistTable)..where((tbl) => tbl.id.equals(id))).go();
+    });
   }
 
   @override

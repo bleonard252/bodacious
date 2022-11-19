@@ -9,6 +9,7 @@ import 'package:go_router/go_router.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 import '../../main.dart';
+import '../add_to_playlist.dart';
 import '../cover_placeholder.dart';
 
 class AlbumWidget extends ConsumerWidget {
@@ -75,6 +76,10 @@ class AlbumWidget extends ConsumerWidget {
                     child: Text("Add all to Queue"),
                     value: "queue",
                   ),
+                  const PopupMenuItem(
+                    child: Text("Add all to playlist..."),
+                    value: "addplaylist",
+                  ),
                 ]).then((value) async {
                   switch (value) {
                     case "playnext":
@@ -113,6 +118,9 @@ class AlbumWidget extends ConsumerWidget {
                       // for (int i = 0; i < tracks.length; i++) {
                       //   player.addQueueItem(tracks[i].asMediaItem());
                       // }
+                      break;
+                    case "addplaylist":
+                      await showDialog(context: context, builder: (context) => AddToPlaylistDialog(id: album.id, isAlbum: true));
                       break;
                     default:
                   }

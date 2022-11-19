@@ -33,6 +33,7 @@ class TrackDetailsWrapper extends StatelessWidget {
         color: Colors.black,
         child: Center(
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
               const Padding(
                 padding: EdgeInsets.all(8.0),
@@ -47,6 +48,7 @@ class TrackDetailsWrapper extends StatelessWidget {
         color: Colors.black,
         child: Center(
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: const [
               Padding(
                 padding: EdgeInsets.all(8.0),
