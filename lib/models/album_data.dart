@@ -6,7 +6,6 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'album_data.freezed.dart';
 part 'album_data.g.dart';
 
-
 @freezed
 class AlbumMetadata with _$AlbumMetadata implements Insertable<AlbumMetadata> {
   const AlbumMetadata._();

@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:bodacious/models/album_data.dart';
+import 'package:bodacious/models/playlist_data.dart';
 import 'package:bodacious/models/track_data.dart';
 import 'package:bodacious/widgets/frame_size.dart';
 import 'package:flutter/material.dart';
@@ -9,32 +9,31 @@ import 'package:go_router/go_router.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 import '../../main.dart';
-import '../add_to_playlist.dart';
 import '../cover_placeholder.dart';
 
-class AlbumWidget extends ConsumerWidget {
-  final AlbumMetadata album;
+class PlaylistWidget extends ConsumerWidget {
+  final PlaylistMetadata playlist;
   final Function()? onTap;
-  final bool hideArtist;
+  final bool hideCounter;
   final InlineSpan? subtitle;
-  const AlbumWidget(this.album, {
+  const PlaylistWidget(this.playlist, {
     Key? key,
     this.onTap,
-    this.hideArtist = false,
+    this.hideCounter = false,
     this.subtitle
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final logger = appLogger.independentChild("AlbumWidget");
+    final logger = appLogger.independentChild("PlaylistWidget");
     final _subtitle = buildChildren();
     return SizedBox(
       height: _subtitle.isEmpty ? 64.0 : 80.0,
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        leading: album.coverUri?.scheme == "file" ? Image(
-          image: (album.coverUri?.scheme == "file" ? FileImage(File.fromUri(album.coverUri!))
-            : NetworkImage(album.coverUri.toString())) as ImageProvider,
+        leading: playlist.coverUri?.scheme == "file" ? Image(
+          image: (playlist.coverUri?.scheme == "file" ? FileImage(File.fromUri(playlist.coverUri!))
+            : NetworkImage(playlist.coverUri.toString())) as ImageProvider,
           width: 48,
           height: 48,
           fit: BoxFit.cover,
@@ -42,15 +41,15 @@ class AlbumWidget extends ConsumerWidget {
         ) : const CoverPlaceholder(size: 48, iconSize: 24),
         title: Text.rich(TextSpan(children: [
           WidgetSpan(
-            child: Icon(MdiIcons.album, size: Theme.of(context).textTheme.subtitle1?.fontSize),
+            child: Icon(MdiIcons.playlistMusic, size: Theme.of(context).textTheme.subtitle1?.fontSize),
             alignment: PlaceholderAlignment.middle
           ),
           const WidgetSpan(child: SizedBox(width: 6)),
-          TextSpan(text: album.name)
+          TextSpan(text: playlist.name)
         ])),
         subtitle: _subtitle.isEmpty ? null : Text.rich(TextSpan(children: _subtitle)),
         onTap: onTap ?? () async {
-          context.go("/library/${album.artistId}/${album.id}", extra: album);
+          context.go("/library/pl/${playlist.id}", extra: playlist);
         },
         trailing: Builder(
           builder: (context) {
@@ -77,8 +76,8 @@ class AlbumWidget extends ConsumerWidget {
                     value: "queue",
                   ),
                   const PopupMenuItem(
-                    child: Text("Add all to playlist..."),
-                    value: "addplaylist",
+                    child: Text("Delete playlist", style: TextStyle(color: Colors.red)),
+                    value: "delete",
                   ),
                 ]).then((value) async {
                   switch (value) {
@@ -95,13 +94,13 @@ class AlbumWidget extends ConsumerWidget {
                           return Queue<TrackMetadata>(entries: [], position: 0);
                         });
                       } else if (player.queue.value.isEmpty) {
-                        logger.debug("Nothing is playing, playing now: ${album.name}", error: q);
-                        final tracks = await db.tryGetAlbumTracks(album.name, by: album.artistName);
+                        logger.debug("Nothing is playing, playing now: ${playlist.name}", error: q);
+                        final tracks = await db.tryGetPlaylistTracksById(playlist.id);
                         player.addQueueItems(tracks.map((e) => e.asMediaItem()).toList());
                         break;
                       }
-                      logger.debug("Playing all next: ${album.name}", error: q);
-                      final tracks = await db.tryGetAlbumTracks(album.name, by: album.artistName);
+                      logger.debug("Playing all next: ${playlist.name}", error: q);
+                      final tracks = await db.tryGetPlaylistTracksById(playlist.id);
                       final x = (q?.position ?? player.currentIndex ?? 0);
                       player.insertQueueItems(x+1, tracks.map((e) => e.asMediaItem()).toList());
                       ref.refresh(nowPlayingProvider);
@@ -111,7 +110,7 @@ class AlbumWidget extends ConsumerWidget {
                       // }
                       break;
                     case "queue":
-                      final tracks = await db.tryGetAlbumTracks(album.name, by: album.artistName);
+                      final tracks = await db.tryGetPlaylistTracksById(playlist.id);
                       player.addQueueItems(tracks.map((e) => e.asMediaItem()).toList());
                       ref.refresh(nowPlayingProvider);
                       ref.refresh(queueProvider);
@@ -119,8 +118,26 @@ class AlbumWidget extends ConsumerWidget {
                       //   player.addQueueItem(tracks[i].asMediaItem());
                       // }
                       break;
-                    case "addplaylist":
-                      await showDialog(context: context, builder: (context) => AddToPlaylistDialog(id: album.id, isAlbum: true));
+                    case "delete":
+                      final result = await showDialog<bool>(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: const Text("Delete playlist"),
+                          content: const Text("Are you sure you want to delete this playlist? "
+                          "Songs will not be deleted, but the playlist will be removed."),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.of(context).pop(false),
+                              child: const Text("Cancel"),
+                            ),
+                            TextButton(
+                              onPressed: () => Navigator.of(context).pop(true),
+                              child: const Text("Delete"),
+                            ),
+                          ],
+                        ),
+                      );
+                      if (result == true) await db.deletePlaylistById(playlist.id);
                       break;
                     default:
                   }
@@ -138,7 +155,7 @@ class AlbumWidget extends ConsumerWidget {
       if (subtitle != null) subtitle!,
       // const WidgetSpan(child: Icon(MdiIcons.spotify)),
       // const WidgetSpan(child: SizedBox(width: 6)),
-      if (!hideArtist) TextSpan(text: album.artistName),
+      if (!hideCounter) TextSpan(text: "${playlist.trackCount} songs"),
       //if (album.year != null) TextSpan(text: album.year.toString())
     ];
   }

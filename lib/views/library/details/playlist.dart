@@ -1,9 +1,11 @@
 import 'dart:io';
 
 import 'package:audio_service/audio_service.dart';
+import 'package:bodacious/drift/database.dart';
 import 'package:bodacious/main.dart';
 import 'package:bodacious/models/album_data.dart';
 import 'package:bodacious/models/artist_data.dart';
+import 'package:bodacious/models/playlist_data.dart';
 import 'package:bodacious/models/track_data.dart';
 import 'package:bodacious/widgets/cover_placeholder.dart';
 import 'package:bodacious/widgets/frame_size.dart';
@@ -14,16 +16,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
-class AlbumDetailsWrapper extends StatelessWidget {
+class PlaylistDetailsWrapper extends StatelessWidget {
   final String id;
   final dynamic data;
-  const AlbumDetailsWrapper({ Key? key, this.data, required this.id }) : super(key: key);
+  const PlaylistDetailsWrapper({ Key? key, this.data, required this.id }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<AlbumMetadata?>(
-      initialData: data is AlbumMetadata ? data : null,
-      future: data is AlbumMetadata ? null : (db.select(db.albumTable)
+    return FutureBuilder<PlaylistMetadata?>(
+      initialData: data is PlaylistMetadata ? data : null,
+      future: data is PlaylistMetadata ? null : (db.select(db.playlistTable)
       ..where((tbl) => tbl.id.equals(id))
       ).getSingleOrNull(),
       builder: (context, snapshot) =>
@@ -41,7 +43,7 @@ class AlbumDetailsWrapper extends StatelessWidget {
             ]
           )
         ),
-      ) : snapshot.hasData ? AlbumDetailsView(album: snapshot.data!)
+      ) : snapshot.hasData ? PlaylistDetailsView(playlist: snapshot.data!)
       : snapshot.connectionState == ConnectionState.done ? Material(
         color: Colors.black,
         child: Center(
@@ -52,7 +54,7 @@ class AlbumDetailsWrapper extends StatelessWidget {
                 padding: EdgeInsets.all(8.0),
                 child: Icon(MdiIcons.ghost, color: Colors.blue),
               ),
-              Text("No album found", textAlign: TextAlign.center, style: TextStyle(color: Colors.blue))
+              Text("No playlist found", textAlign: TextAlign.center, style: TextStyle(color: Colors.blue))
             ]
           )
         )
@@ -64,15 +66,15 @@ class AlbumDetailsWrapper extends StatelessWidget {
   }
 }
 
-class AlbumDetailsView extends StatefulWidget {
-  final AlbumMetadata album;
-  const AlbumDetailsView({ Key? key, required this.album }) : super(key: key);
+class PlaylistDetailsView extends StatefulWidget {
+  final PlaylistMetadata playlist;
+  const PlaylistDetailsView({ Key? key, required this.playlist }) : super(key: key);
 
   @override
-  State<AlbumDetailsView> createState() => AlbumDetailsViewState();
+  State<PlaylistDetailsView> createState() => PlaylistDetailsViewState();
 }
 
-class AlbumDetailsViewState extends State<AlbumDetailsView> {
+class PlaylistDetailsViewState extends State<PlaylistDetailsView> {
   final ScrollController controller = ScrollController();
 
   @override
@@ -94,17 +96,17 @@ class AlbumDetailsViewState extends State<AlbumDetailsView> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<AlbumMetadata?>(
-      future: db.tryGetAlbum(widget.album.name, by: widget.album.artistName),
-      initialData: widget.album,
+    return FutureBuilder<PlaylistMetadata?>(
+      future: db.tryGetPlaylistById(widget.playlist.id),
+      initialData: widget.playlist,
       builder: (context, snapshot) {
-        final AlbumMetadata album = snapshot.data ?? widget.album;
+        final PlaylistMetadata playlist = snapshot.data ?? widget.playlist;
         return Scaffold(
           appBar: AppBar(
             elevation: 0,
             scrolledUnderElevation: 0,
             backgroundColor: Theme.of(context).scaffoldBackgroundColor.withOpacity(0.5),
-            title: (controller.positions.isNotEmpty && controller.offset >= 256) ? Text(widget.album.name) : null,
+            title: (controller.positions.isNotEmpty && controller.offset >= 256) ? Text(widget.playlist.name) : null,
           ),
           extendBody: true,
           extendBodyBehindAppBar: true,
@@ -130,11 +132,11 @@ class AlbumDetailsViewState extends State<AlbumDetailsView> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   mainAxisSize: MainAxisSize.max,
                   children: [
-                    if (album.coverUri?.scheme == "file") Padding(
+                    if (playlist.coverUri?.scheme == "file") Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Image(
-                        image: (album.coverUri?.scheme == "file" ? FileImage(File.fromUri(album.coverUri!))
-                          : NetworkImage(album.coverUri.toString())) as ImageProvider,
+                        image: (playlist.coverUri?.scheme == "file" ? FileImage(File.fromUri(playlist.coverUri!))
+                          : NetworkImage(playlist.coverUri.toString())) as ImageProvider,
                         width: 196, height: 196,
                         fit: BoxFit.fitHeight,
                         errorBuilder: (context, e, s) => const CoverPlaceholder(size: 196),
@@ -152,17 +154,12 @@ class AlbumDetailsViewState extends State<AlbumDetailsView> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              album.name, 
+                              playlist.name,
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                               style: Theme.of(context).textTheme.headline4,
                             ),
-                            Text(album.artistName, 
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: Theme.of(context).textTheme.headline6
-                            ),
-                            playButtons(album)
+                            playButtons(playlist)
                           ],
                         ),
                       ),
@@ -176,11 +173,11 @@ class AlbumDetailsViewState extends State<AlbumDetailsView> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    if (album.coverUri?.scheme == "file") Padding(
+                    if (playlist.coverUri?.scheme == "file") Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Image(
-                        image: (album.coverUri?.scheme == "file" ? FileImage(File.fromUri(album.coverUri!))
-                          : NetworkImage(album.coverUri.toString())) as ImageProvider,
+                        image: (playlist.coverUri?.scheme == "file" ? FileImage(File.fromUri(playlist.coverUri!))
+                          : NetworkImage(playlist.coverUri.toString())) as ImageProvider,
                         width: 196, height: 196,
                         fit: BoxFit.fitHeight,
                         errorBuilder: (context, e, s) => const CoverPlaceholder(size: 196),
@@ -191,43 +188,32 @@ class AlbumDetailsViewState extends State<AlbumDetailsView> {
                       child: CoverPlaceholder(size: 196),
                     ),
                     Text(
-                      album.name, 
+                      playlist.name, 
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: Theme.of(context).textTheme.headline5,
                       textAlign: TextAlign.center,
                     ),
-                    Text(album.artistName, 
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: Theme.of(context).textTheme.headline6,
-                      textAlign: TextAlign.center,
-                    ),
-                    playButtons(album)
+                    playButtons(playlist)
                   ]
                 ),
               )),
-              FutureBuilder<ArtistMetadata?>(
-                future: db.tryGetArtist(album.artistName),
-                builder: (context, snapshot) => snapshot.hasData ? SliverToBoxAdapter(child: ArtistWidget(
-                  snapshot.data!,
-                  hideDetails: true,
-                  subtitle: const TextSpan(text: "Album artist"),
-                )) 
-                : SliverToBoxAdapter(child: Container())
-              ),
-              if (album.year != null || album.trackCount != null) SliverToBoxAdapter(
+              if (playlist.createdAt != null || playlist.trackCount != null) SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
                     child: Text.rich(TextSpan(children: [
                       TextSpan(text: "Details", style: Theme.of(context).textTheme.headline6),
-                      if (album.year != null) TextSpan(children: [
-                        const TextSpan(text: "\nYear: ", style: TextStyle(fontWeight: FontWeight.bold)),
-                        TextSpan(text: album.year.toString())
+                      if (playlist.createdAt != null) TextSpan(children: [
+                        const TextSpan(text: "\nCreated on ", style: TextStyle(fontWeight: FontWeight.bold)),
+                        TextSpan(text: playlist.createdAt!.year.toString()),
+                        const TextSpan(text: "/"),
+                        TextSpan(text: playlist.createdAt!.month.toString()),
+                        const TextSpan(text: "/"),
+                        TextSpan(text: playlist.createdAt!.day.toString())
                       ]),
-                      if (album.trackCount != null) TextSpan(children: [
+                      if (playlist.trackCount != null) TextSpan(children: [
                         const TextSpan(text: "\nNumber of tracks: ", style: TextStyle(fontWeight: FontWeight.bold)),
-                        TextSpan(text: album.trackCount.toString())
+                        TextSpan(text: playlist.trackCount.toString())
                       ]),
                     ]))
                 ),
@@ -239,38 +225,63 @@ class AlbumDetailsViewState extends State<AlbumDetailsView> {
                 ),
               ),
               FutureBuilder<List<TrackMetadata>>(
-                future: (
-                  db.select(db.trackTable)
-                  ..where((tbl) => tbl.artistName.equals(album.artistName) & tbl.albumName.equals(album.name))
-                  ..orderBy([
-                    (tbl) => OrderingTerm.asc(tbl.discNo),
-                    (tbl) => OrderingTerm.asc(tbl.trackNo),
-                  ])
-                ).get(),
-                builder: (context, snapshot) => SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      final track = snapshot.data?[index] ?? TrackMetadata(uri: Uri(), title: "Loading...");
-                      return SizedBox(
-                        height: 72.0,
-                        child: Consumer(
-                          builder: (context, ref, _) {
-                            return SongWidget(
+                future: db.tryGetPlaylistTracksById(playlist.id),
+                builder: (context, snapshot) => SliverReorderableList(
+                  onReorder: (oldIndex, newIndex) async {
+                    if (oldIndex == newIndex) return;
+                    final List<TrackMetadata> tracks = snapshot.data ?? [];
+                    final TrackMetadata track = tracks.removeAt(oldIndex);
+                    if (newIndex > oldIndex) newIndex--;
+                    tracks.insert(newIndex, track);
+                    appLogger.info("Reordering playlist ${playlist.id} item from $oldIndex to $newIndex");
+                    // updatePlaylistTracks(playlist.id, tracks);
+                    final trackList = await db.tryGetPlaylistEntriesById(playlist.id);
+                    await db.transaction(() async {
+                      for (int i = 0; i < tracks.length; i++) {
+                        final entry = trackList.firstWhere((element) => element.track == tracks[i].id);
+                        await (db.update(db.playlistEntries)
+                          ..where((tbl) => tbl.playlist.equals(playlist.id) & tbl.track.equals(tracks[i].id) & tbl.id.equals(entry.id))
+                        ).write(PlaylistEntriesCompanion(
+                          index: Value(i)
+                        ));
+                        trackList.remove(entry);
+                      }
+                    });
+                    print(await (db.select(db.playlistEntries)
+                      ..where((tbl) => tbl.playlist.equals(playlist.id))
+                    ).get());
+                    setState(() {});
+                  },
+                  itemBuilder: (context, index) {
+                    final track = snapshot.data?[index] ?? TrackMetadata(uri: Uri(), title: "Loading...");
+                    return SizedBox(
+                      key: Key(track.id),
+                      height: 72.0,
+                      child: Consumer(
+                        builder: (context, ref, _) {
+                          return ReorderableDelayedDragStartListener(
+                            index: index,
+                            child: SongWidget(
                               track,
-                              showTrackNo: true,
+                              reorderable: true,
+                              queueIndex: index,
+                              inPlaylist: playlist.id,
+                              showTrackNo: false,
                               selected: ref.watch(nowPlayingProvider).value?.uri == track.uri,
+                              onDeleted: () => setState(() {}),
                               onTap: track.uri == Uri() ? null : () async {
                                 player.stop();
-                                await player.updateQueue(snapshot.data!.map((e) => e.asMediaItem()).toList(), index);
+                                final tracks = await db.tryGetPlaylistTracksById(playlist.id);
+                                await player.updateQueue(tracks.map((e) => e.asMediaItem()).toList(), index);
                                 await player.play();
                               },
-                            );
-                          }
-                        ),
-                      );
-                    },
-                    childCount: snapshot.data?.length ?? 0
-                  )
+                            ),
+                          );
+                        }
+                      ),
+                    );
+                  },
+                  itemCount: snapshot.data?.length ?? 0
                 )
               )
             ]
@@ -280,7 +291,7 @@ class AlbumDetailsViewState extends State<AlbumDetailsView> {
     );
   }
 
-  playButtons([AlbumMetadata? album]) => Builder(
+  playButtons([PlaylistMetadata? playlist]) => Builder(
     builder: ((context) => Padding(
       padding: const EdgeInsets.all(8.0),
       child: Row(
@@ -289,7 +300,7 @@ class AlbumDetailsViewState extends State<AlbumDetailsView> {
         children: [
           TextButton(onPressed: () async {
             // Play All
-            final traxx = await db.tryGetAlbumTracks((album ?? widget.album).name, by: (album ?? widget.album).artistName);
+            final traxx = await db.tryGetPlaylistTracksById((playlist ?? widget.playlist).id);
             await player.stop();
             await player.updateQueue(traxx.map((p0) => p0.asMediaItem()).toList(), 0);
             await player.play();
@@ -300,7 +311,7 @@ class AlbumDetailsViewState extends State<AlbumDetailsView> {
           const SizedBox(width: 16),
           FloatingActionButton.extended(
             onPressed: () async {
-              final traxx = await db.tryGetAlbumTracks((album ?? widget.album).name, by: (album ?? widget.album).artistName);
+              final traxx = await db.tryGetPlaylistTracksById((playlist ?? widget.playlist).id);
               await player.stop();
               await player.updateQueue(traxx.map((p0) => p0.asMediaItem()).toList(), 0);
               await player.setShuffleMode(AudioServiceShuffleMode.all);

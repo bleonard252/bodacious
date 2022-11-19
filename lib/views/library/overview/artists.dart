@@ -25,6 +25,7 @@ class ArtistLibraryList extends ConsumerWidget {
           slivers: [
             if (snapshot.hasError) SliverFillRemaining(child: Center(
               child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   const Padding(
                     padding: EdgeInsets.all(8.0),
@@ -35,6 +36,31 @@ class ArtistLibraryList extends ConsumerWidget {
               )
             ))
             else if (!snapshot.hasData) const SliverFillRemaining(child: Center(child: CircularProgressIndicator(value: null)))
+            else if (snapshot.data == 0) SliverFillRemaining(
+              child: Center(
+                child: Material(
+                  type: MaterialType.card,
+                  color: Colors.black54,
+                  borderRadius: BorderRadius.circular(8),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Icon(MdiIcons.ghost, color: Colors.lightBlue),
+                        ),
+                        ConstrainedBox(
+                          constraints: const BoxConstraints(maxWidth: 300),
+                          child: const Text("No artists found. Add a music folder in Settings > Library.", textAlign: TextAlign.center)
+                        )
+                      ]
+                    ),
+                  )
+                )
+              )
+            )
             else SliverList(
               //itemExtent: 72.0,
               delegate: SliverChildBuilderDelegate(

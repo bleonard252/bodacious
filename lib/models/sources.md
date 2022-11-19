@@ -17,3 +17,4 @@ Known sources:
 * `genius`: A field is sourced from Genius.  NOT applicable to Audio `source`.
 * `youtube`: A field or track is sourced from Genius. For Audio `source`, this means the track is to be played on Spotify using its `uri`. Applicable to all fields.
 * `album` (Same as album): A field is sourced from its album. This is the track's assigned `album`, and so it's only applicable to `coverSource` and `releaseDateSource` on tracks with albums.
+* `playlist`: A track or field is sourced from a playlist.
