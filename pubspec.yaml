@@ -7,7 +7,7 @@ publish_to: 'none'
 
 # Increment the build number (after +) by at least one for every release.
 # Follow semver.
-version: 0.8.1+8
+version: 0.9.0+9
 
 environment:
   sdk: ">=2.17.0-150.0.dev <3.0.0"
@@ -73,8 +73,6 @@ dependencies:
 
 dependency_overrides:
   xml: ^5.1.2
-  just_audio_mpv:
-    path: ../just_audio_mpv
 
 dev_dependencies:
   flutter_test:
