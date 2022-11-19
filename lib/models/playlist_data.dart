@@ -49,7 +49,7 @@ class PlaylistMetadata with _$PlaylistMetadata implements Insertable<PlaylistMet
     return PlaylistTableCompanion(
       id: Value(id),
       name: Value(name),
-      coverUri: Value.ofNullable(coverUri),
+      coverUri: Value(coverUri),
       coverSource: Value(coverSource),
       description: Value(description),
       trackCount: Value(trackCount),
