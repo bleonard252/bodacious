@@ -1,0 +1,9 @@
+{
+  // Remove comments, fill in the values, rename to .env.json
+  // Remove any keys you do not have or want to use in your build.
+  "SPOTIFY_API_KEY": "",  // Used to look up some metadata from Spotify.
+  "SPOTIFY_SECRET": "",
+  "LASTFM_API_KEY": "",   // Used to look up some metadata from Last.fm.
+  "LASTFM_SECRET": "",
+  "DISCORD_APP_ID": ""    // Used for Discord Rich Presence.
+}

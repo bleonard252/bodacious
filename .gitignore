@@ -50,3 +50,4 @@ app.*.map.json
 
 .fvm/flutter_sdk
 appimage-build
+.env.json
