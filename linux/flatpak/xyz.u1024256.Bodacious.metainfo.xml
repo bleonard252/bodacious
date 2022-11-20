@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component type="desktop-application">
-  <id>xyz.u1024256.bodacious</id>
+  <id>xyz.u1024256.Bodacious</id>
 
-  <url type="bugtracker">https://github.com/bleonard252/bodacious/issues/new</url>
-  <url type="vcs-browser">https://github.com/bleonard252/bodacious/</url>
-  
+  <!-- <url type="bugtracker">https://github.com/bleonard252/bodacious/issues</url>
+  <url type="vcs-browser">https://github.com/bleonard252/bodacious/</url> -->
+
   <name>Bodacious</name>
   <summary>Listen to your music, your way</summary>
   
@@ -16,7 +16,7 @@
     <control>keyboard</control>
     <control>touch</control>
   </supports>
-  
+
   <description>
     <p>
       Bodacious is a multi-platform music player for playing your local files first and foremost. Its design is inspired by Spotify, it&apos;s built with Flutter, and it&apos;s open source, which means if you think Bodacious is missing a feature, you can add it yourself!
@@ -34,12 +34,14 @@
       <li>Most* of your basic features (apparently equalizers are essential now?)</li>
     </ul>
   </description>
-  
-  <launchable type="desktop-id">xyz.u1024256.bodacious.desktop</launchable>
 
-  <content_rating>none</content_rating>
+  <launchable type="desktop-id">xyz.u1024256.Bodacious.desktop</launchable>
+
+  <content_rating type="oars-1.0"></content_rating>
 
   <releases>
+    <release version="0.10.0" date="2022-11-24" />
+    <release version="0.9.0" date="2022-11-18" />
     <release version="0.8.0" date="2022-10-26" />
   </releases>
 </component>

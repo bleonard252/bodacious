@@ -50,4 +50,6 @@ app.*.map.json
 
 .fvm/flutter_sdk
 appimage-build
+.flatpak-builder
+linux/flatpak/ephemeral/
 .env.json

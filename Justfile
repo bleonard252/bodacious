@@ -3,13 +3,16 @@ set positional-arguments
 
 # Make sure everything necessary is installed
 preflight:
-  which flutter # if you don't have it: https://fvm.app/docs/getting_started/installation
-  which appimage-builder # if you don't have it, run: pip install appimage-builder
+  which flutter # if you don’t have it: https://fvm.app/docs/getting_started/installation
+  which appimage-builder # if you don’t have it, run: pip install appimage-builder
+  which flatpak-builder # if you don’t have it, run: sudo apt install flatpak-builder (or equivalent)
 
 # Build the app in debug mode
 build *TARGETS='appbundle': _generate _prerelversion
   for target in {{TARGETS}}; do flutter build $target --debug --dart-define-from-file=.env.json; done
-release-appimage:
+
+# Prepare for appimage and flatpak builds
+_prerelease-appimage:
   #!/usr/bin/env bash
   set -eux
   rm -rf AppDir | true
@@ -17,19 +20,34 @@ release-appimage:
   mkdir -p AppDir/usr/share/icons/hicolor/{128x128,1024x1024,64x64}
   cp -r build/linux/x64/release/bundle/. AppDir/
   #cp assets/brand/ic_circle.png AppDir/usr/share/icons/hicolor/128x128/xyz.u1024256.bodacious.png
+  echo "If convert isn’t found, install it with: sudo apt install imagemagick (or equivalent)"
   convert assets/brand/ic_circle.png -resize 128x128 AppDir/usr/share/icons/hicolor/128x128/xyz.u1024256.bodacious.png
   convert assets/brand/ic_circle.png -resize 1024x1024 AppDir/usr/share/icons/hicolor/1024x1024/xyz.u1024256.bodacious.png
   cp assets/brand/ic_foreground_small.png AppDir/usr/share/icons/hicolor/64x64/xyz.u1024256.bodacious.png
+release-appimage: _prerelease-appimage
+  #!/usr/bin/env bash
+  set -eux
   mkdir -p build/linux/x64/release/appimage/
   echo If this is not found, run: sudo pip install appimage-builder
   appimage-builder --skip-test
-  @rm bodacious-x86_64.AppImage
+  rm bodacious-x86_64.AppImage
   echo AppImage released to build/linux/x64/release/appimage/bodacious-x86_64.AppImage
+release-flatpak: _prerelease-appimage
+  #!/usr/bin/env bash
+  set -eux
+  rm -rf build/linux/x64/release/flatpak/ build/intermediates/flatpak/ linux/flatpak/ephemeral | true
+  mkdir -p build/linux/x64/release/flatpak/ build/intermediates/flatpak/ build/intermediates/flatpak-repo/ linux/flatpak/ephemeral
+  cp AppDir/usr/share/icons/hicolor/128x128/xyz.u1024256.bodacious.png linux/flatpak/ephemeral/icon.png
+  tar -C build/linux/x64/release/bundle -cvf linux/flatpak/ephemeral/Bodacious-Linux-Portable.tar.gz .
+  echo If this is not found, run: sudo apt install flatpak-builder
+  flatpak-builder --force-clean --repo build/intermediates/flatpak-repo/ build/intermediates/flatpak/ linux/flatpak/xyz.u1024256.Bodacious.yaml
+  flatpak build-bundle build/intermediates/flatpak-repo/ build/linux/x64/release/flatpak/xyz.u1024256.Bodacious.flatpak xyz.u1024256.Bodacious
+  rm -r linux/flatpak/ephemeral
+  echo Flatpak released to build/linux/x64/release/flatpak/xyz.u1024256.Bodacious.flatpak
 # Build the app in release mode
 release *TARGETS: test-all prebuild
   for target in {{TARGETS}}; do flutter build $target --release --dart-define-from-file=.env.json; done
-  # if you didn't, you should run `just version release` instead
-  @#' for the syntax highlighter to be happy
+  # if you didn’t, you should run `just version release` instead
 # Run pre-build checks
 prebuild: _generate _check
   @# flutter pub run flutter_launcher_icons:main
@@ -48,8 +66,7 @@ _run:
 # Release the app with standard flavor
 release-standard *TARGETS='apk': test-all prebuild
   for target in {{TARGETS}}; do flutter build $target --release --flavor=standard --dart-define-from-file=.env.json; done
-  # if you didn't, you should run `just version release` instead
-  @#' for the syntax highlighter to be happy
+  # if you didn’t, you should run `just version release` instead
 
 _generate:
   flutter pub run build_runner build --delete-conflicting-outputs

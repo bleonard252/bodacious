@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Bodacious
+Exec=bodacious
+StartupWMClass=bodacious
+Icon=xyz.u1024256.Bodacious
+Type=Application
+Terminal=false
+Categories=AudioVideo;Audio;
+Comment=
