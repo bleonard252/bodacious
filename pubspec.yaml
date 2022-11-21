@@ -53,7 +53,10 @@ dependencies:
   dio: ^4.0.6
 
   # Library & Metadata Deps
-  file_picker: ^4.5.1 # for picking directories (and files in early versions)
+  file_picker: #^4.5.1 # for picking directories (and files in early versions)
+    git:
+      url: https://github.com/bleonard252/flutter_file_picker
+      ref: feature/flatpak-on-v4 # v5 is not supported due to ffi version constraints
   id3tag: ^0.2.0
   integer: ^2.0.1
   flac_metadata: #^1.0.4

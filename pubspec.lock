@@ -220,6 +220,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.2.4"
+  dbus:
+    dependency: transitive
+    description:
+      name: dbus
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.7.4"
   dio:
     dependency: "direct main"
     description:
@@ -272,9 +279,11 @@ packages:
   file_picker:
     dependency: "direct main"
     description:
-      name: file_picker
-      url: "https://pub.dartlang.org"
-    source: hosted
+      path: "."
+      ref: "feature/flatpak-on-v4"
+      resolved-ref: "51a62597195ed4cb527ac04076a62df6b4665924"
+      url: "https://github.com/bleonard252/flutter_file_picker"
+    source: git
     version: "4.6.1"
   fixnum:
     dependency: transitive

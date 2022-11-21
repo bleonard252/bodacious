@@ -11,6 +11,10 @@ finish-args:
   - --device=dri
   - --socket=pulseaudio
   - --share=network
+  - --filesystem=xdg-run/pipewire-0:ro
+  # mpris
+  - --own-name=org.mpris.MediaPlayer2.bodacious.*
+  - --talk-name=org.gnome.SessionManager
 modules:
   - name: libass
     # mpv won't build without this
