@@ -5,6 +5,7 @@ import 'package:bodacious/main.dart';
 import 'package:bodacious/models/album_data.dart';
 import 'package:bodacious/models/artist_data.dart';
 import 'package:bodacious/models/track_data.dart';
+import 'package:bodacious/views/library/edit/cover.dart';
 import 'package:bodacious/widgets/cover_placeholder.dart';
 import 'package:bodacious/widgets/frame_size.dart';
 import 'package:bodacious/widgets/item/artist.dart';
@@ -105,6 +106,21 @@ class AlbumDetailsViewState extends State<AlbumDetailsView> {
             scrolledUnderElevation: 0,
             backgroundColor: Theme.of(context).scaffoldBackgroundColor.withOpacity(0.5),
             title: (controller.positions.isNotEmpty && controller.offset >= 256) ? Text(widget.album.name) : null,
+            actions: [
+              IconButton(
+                icon: const Icon(MdiIcons.pencil),
+                tooltip: "Edit",
+                onPressed: () async {
+                  final tracks = (await db.tryGetAlbumTracksById(album.id)).map((e) => e.id).toList();
+                  showDialog(context: context, builder: (context) => CoverEditorDialog(
+                    type: BoType.album, id: album.id,
+                    coverUri: album.coverUri,
+                    trackIds: tracks,
+                    albumIds: [album.id],
+                  ));
+                }
+              ),
+            ],
           ),
           extendBody: true,
           extendBodyBehindAppBar: true,

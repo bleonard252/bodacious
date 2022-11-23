@@ -4,12 +4,11 @@ import 'package:audio_service/audio_service.dart';
 import 'package:bodacious/drift/database.dart';
 import 'package:bodacious/main.dart';
 import 'package:bodacious/models/album_data.dart';
-import 'package:bodacious/models/artist_data.dart';
 import 'package:bodacious/models/playlist_data.dart';
 import 'package:bodacious/models/track_data.dart';
+import 'package:bodacious/views/library/edit/cover.dart';
 import 'package:bodacious/widgets/cover_placeholder.dart';
 import 'package:bodacious/widgets/frame_size.dart';
-import 'package:bodacious/widgets/item/artist.dart';
 import 'package:bodacious/widgets/item/song.dart';
 import 'package:drift/drift.dart' hide Column, Table;
 import 'package:flutter/material.dart';
@@ -107,6 +106,26 @@ class PlaylistDetailsViewState extends State<PlaylistDetailsView> {
             scrolledUnderElevation: 0,
             backgroundColor: Theme.of(context).scaffoldBackgroundColor.withOpacity(0.5),
             title: (controller.positions.isNotEmpty && controller.offset >= 256) ? Text(widget.playlist.name) : null,
+            actions: [
+              IconButton(
+                icon: const Icon(MdiIcons.pencil),
+                tooltip: "Edit",
+                onPressed: () async {
+                  final tracks = (await db.tryGetPlaylistEntriesById(playlist.id)).map((e) => e.track).toList();
+                  final albums = <String>[];
+                  for (final track in tracks) {
+                    final _track = await db.tryGetTrackById(track);
+                    if (_track?.albumId != null) albums.add(_track!.albumId!);
+                  }
+                  showDialog(context: context, builder: (context) => CoverEditorDialog(
+                    type: BoType.playlist, id: playlist.id,
+                    coverUri: playlist.coverUri,
+                    trackIds: tracks,
+                    albumIds: albums,
+                  ));
+                }
+              ),
+            ],
           ),
           extendBody: true,
           extendBodyBehindAppBar: true,
@@ -233,7 +252,7 @@ class PlaylistDetailsViewState extends State<PlaylistDetailsView> {
                     final TrackMetadata track = tracks.removeAt(oldIndex);
                     if (newIndex > oldIndex) newIndex--;
                     tracks.insert(newIndex, track);
-                    appLogger.info("Reordering playlist ${playlist.id} item from $oldIndex to $newIndex");
+                    appLogger.verbose("Reordering playlist ${playlist.id} item from $oldIndex to $newIndex");
                     // updatePlaylistTracks(playlist.id, tracks);
                     final trackList = await db.tryGetPlaylistEntriesById(playlist.id);
                     await db.transaction(() async {
@@ -247,9 +266,9 @@ class PlaylistDetailsViewState extends State<PlaylistDetailsView> {
                         trackList.remove(entry);
                       }
                     });
-                    print(await (db.select(db.playlistEntries)
-                      ..where((tbl) => tbl.playlist.equals(playlist.id))
-                    ).get());
+                    // print(await (db.select(db.playlistEntries)
+                    //   ..where((tbl) => tbl.playlist.equals(playlist.id))
+                    // ).get());
                     setState(() {});
                   },
                   itemBuilder: (context, index) {

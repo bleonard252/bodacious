@@ -408,7 +408,7 @@ class _IndexerIsolate {
       const smlx = {"small": 1, "medium": 2, "large": 3, "extralarge": 4, "mega": 5, "": 6};
       await db.transaction<void>(() async {
         if (apiKeys.lastfmApiKey != null && config.lastFmIntegration) {
-          final lastfm = LastFMUnauthorized(apiKeys.lastfmApiKey!, null, "Bodacious/0.5.0 <https://github.com/bleonard252/bodacious>");
+          final lastfm = LastFMUnauthorized(apiKeys.lastfmApiKey!, null, "Bodacious/v0.10.0 <https://github.com/bleonard252/bodacious>");
 
           final _albums = await (db.albumTable.selectOnly()
             ..addColumns([db.albumTable.name, db.albumTable.artistName, db.albumTable.coverUri, db.albumTable.coverUriRemote])
