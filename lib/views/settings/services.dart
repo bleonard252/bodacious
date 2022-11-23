@@ -101,6 +101,22 @@ class _OnlineServicesSettingsViewState extends State<OnlineServicesSettingsView>
         ),
         const Divider(),
       ],
+      if (apiKeys.hasAny) ...[
+        // Wikipedia
+        ListTile(
+          leading: const Icon(SimpleIcons.wikipedia),
+          title: Text("Wikipedia", style: Theme.of(context).textTheme.headline6),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 12.0),
+        ),
+        SwitchListTile(
+          title: const Text("Use Wikipedia for library information"),
+          subtitle: const Text("When this is on, Bodacious can check Wikipedia and Wikimedia Commons when editing the library."),
+          value: config.wikipediaIntegration,
+          onChanged: (value) async {
+            setState(() => config.wikipediaIntegration = value);
+          },
+        ),
+      ],
       // DISCORD SECTION
       if ((Platform.isLinux || Platform.isWindows) && apiKeys.discordAppId != null) ...[
         ListTile(

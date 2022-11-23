@@ -4,6 +4,7 @@ import 'package:bodacious/main.dart';
 import 'package:bodacious/models/album_data.dart';
 import 'package:bodacious/models/artist_data.dart';
 import 'package:bodacious/models/track_data.dart';
+import 'package:bodacious/views/library/edit/cover.dart';
 import 'package:bodacious/widgets/cover_placeholder.dart';
 import 'package:bodacious/widgets/frame_size.dart';
 import 'package:bodacious/widgets/item/album.dart';
@@ -104,6 +105,27 @@ class ArtistDetailsViewState extends State<ArtistDetailsView> {
             scrolledUnderElevation: 0,
             backgroundColor: Theme.of(context).scaffoldBackgroundColor.withOpacity(0.5),
             title: (controller.positions.isNotEmpty && controller.offset >= 256) ? Text(widget.artist.name) : null,
+            actions: [
+              IconButton(
+                icon: const Icon(MdiIcons.pencil),
+                tooltip: "Edit",
+                onPressed: () async {
+                  final albums = (await (db.select(db.albumTable)
+                  //..addColumns([db.albumTable.coverUri, db.albumTable.artistName, db.albumTable.releaseDate, db.albumTable.year])
+                  ..where((tbl) => tbl.artistId.equals(artist.id) | tbl.artistName.equals(artist.name))
+                  ..orderBy([
+                    (tbl) => OrderingTerm.desc(tbl.releaseDate, nulls: NullsOrder.last),
+                    (tbl) => OrderingTerm.desc(tbl.year, nulls: NullsOrder.last),
+                  ])).get()).map((e) => e.id).toList();
+                  showDialog(context: context, builder: (context) => CoverEditorDialog(
+                    type: BoType.artist, id: artist.id,
+                    coverUri: artist.coverUri,
+                    albumIds: albums,
+                    artistIds: [artist.id],
+                  ));
+                }
+              ),
+            ],
           ),
           extendBody: true,
           extendBodyBehindAppBar: true,

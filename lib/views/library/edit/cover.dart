@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:bodacious/main.dart';
 import 'package:bodacious/src/online/lastfm.dart';
+import 'package:dio/dio.dart';
 import 'package:drift/drift.dart' hide Column;
 import 'package:flinq/flinq.dart';
 import 'package:flutter/material.dart';
@@ -164,9 +165,21 @@ class CoverEditorDialog extends StatefulWidget {
           final spotify = SpotifyApi(spcred);
 
           final response = await spotify.artists.get(artist.spotifyId!);
-          if (response.images?.firstOrNull?.url != null) covers.add(Uri.parse(response.images!.first.url!));
+          if (response.images?.firstOrNull?.url != null) {
+            for (var element in response.images!) {
+              covers.add(Uri.parse(element.url!));
+            }
+          }
         }
-        // TODO: Wikipedia
+        if (config.wikipediaIntegration) {
+          var client = Dio();
+          final response = await client.get("https://commons.wikimedia.org/w/api.php?action=query&format=json&prop=&list=categorymembers&titles=&formatversion=2&cmtitle=Category%3A${Uri.encodeQueryComponent(artist.name)}&cmtype=file");
+          if (response.statusCode == 200) {
+            response.data["query"]["categorymembers"].forEach((element) {
+              covers.add(Uri.parse("https://commons.wikimedia.org/wiki/Special:Redirect/file/${element["title"]}"));
+            });
+          }
+        }
         return covers;
       case BoType.track:
         //return await getCoverFromTracks([id]);
@@ -388,7 +401,9 @@ class _CoverEditorDialogState extends State<CoverEditorDialog> {
                 Text("From albums", style: Theme.of(context).textTheme.headlineSmall),
                 if (snapshot.hasData) SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
+                  clipBehavior: Clip.none,
                   child: Row(
+                    mainAxisSize: MainAxisSize.max,
                     children: snapshot.data?.map((e) => buildOption(e)).toList() ?? [],
                   ),
                 )
@@ -493,7 +508,7 @@ class _CoverEditorDialogState extends State<CoverEditorDialog> {
   }
 
   Future<void> applyCover(BuildContext context) async {
-    //...
+    //
     Navigator.pop(context);
   }
 }

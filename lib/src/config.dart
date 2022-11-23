@@ -35,6 +35,9 @@ class Config {
   bool get spotifyIntegration => _prefs.getBool("spotify:integrate") ?? false;
   set spotifyIntegration(bool to) => _prefs.setBool("spotify:integrate", to);
 
+  bool get wikipediaIntegration => _prefs.getBool("wikipedia:integrate") ?? false;
+  set wikipediaIntegration(bool to) => _prefs.setBool("wikipedia:integrate", to);
+
   String? get lastFmToken => _prefs.getString("token:lastfm");
   set lastFmToken(String? to) => to == null ? _prefs.remove("token:lastfm") : _prefs.setString("token:lastfm", to);
   /// The username of the user on Last.fm.
@@ -63,6 +66,8 @@ class ROConfig implements Config {
   @override
   final bool lastFmIntegration;
   @override
+  final bool wikipediaIntegration;
+  @override
   final bool lastFmScrobbling;
   @override
   final bool spotifyIntegration;
@@ -80,6 +85,7 @@ class ROConfig implements Config {
     lastFmScrobbling = config.lastFmScrobbling,
     lastFmIntegration = config.lastFmIntegration,
     spotifyIntegration = config.spotifyIntegration,
+    wikipediaIntegration = config.wikipediaIntegration,
     lastFmToken = config.lastFmToken,
     lastFmUsername = config.lastFmUsername,
     onlyAlbumArtists = config.onlyAlbumArtists;
@@ -107,4 +113,5 @@ class APIKeys {
       return value;
     }
   }
+  bool get hasAny => discordAppId != null || lastfmApiKey != null || lastfmSecret != null || spotifyClientId != null || spotifySecret != null;
 }
