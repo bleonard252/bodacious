@@ -156,7 +156,7 @@ class PlaylistDetailsViewState extends State<PlaylistDetailsView> {
                       child: Image(
                         image: (playlist.coverUri?.scheme == "file" ? FileImage(File.fromUri(playlist.coverUri!))
                           : NetworkImage(playlist.coverUri.toString())) as ImageProvider,
-                        width: 196, height: 196,
+                        height: 196,
                         fit: BoxFit.fitHeight,
                         errorBuilder: (context, e, s) => const CoverPlaceholder(size: 196),
                       ),
@@ -197,7 +197,7 @@ class PlaylistDetailsViewState extends State<PlaylistDetailsView> {
                       child: Image(
                         image: (playlist.coverUri?.scheme == "file" ? FileImage(File.fromUri(playlist.coverUri!))
                           : NetworkImage(playlist.coverUri.toString())) as ImageProvider,
-                        width: 196, height: 196,
+                        height: 196,
                         fit: BoxFit.fitHeight,
                         errorBuilder: (context, e, s) => const CoverPlaceholder(size: 196),
                       ),

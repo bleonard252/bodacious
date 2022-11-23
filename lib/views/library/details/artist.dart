@@ -182,7 +182,7 @@ class ArtistDetailsViewState extends State<ArtistDetailsView> {
                         child: Image(
                           image: (artist.coverUri?.scheme == "file" ? FileImage(File.fromUri(artist.coverUri!))
                             : NetworkImage(artist.coverUri.toString())) as ImageProvider,
-                          width: 196, height: 196,
+                          height: 196,
                           fit: BoxFit.fitHeight,
                           errorBuilder: (context, e, s) => const CoverPlaceholder(size: 196),
                         ),
@@ -250,10 +250,10 @@ class ArtistDetailsViewState extends State<ArtistDetailsView> {
                       child: ClipOval(child: (artist.coverUri?.scheme == "file") ? Image(
                         image: (artist.coverUri?.scheme == "file" ? FileImage(File.fromUri(artist.coverUri!))
                           : NetworkImage(artist.coverUri.toString())) as ImageProvider,
-                        width: 196, height: 196,
+                        height: 196,
                         fit: BoxFit.fitHeight,
                         errorBuilder: (context, e, s) => const CoverPlaceholder(size: 196),
-                      ) :FutureBuilder<AlbumMetadata?>(
+                      ) : FutureBuilder<AlbumMetadata?>(
                         future: (
                           db.select(db.albumTable)
                           //..addColumns([db.albumTable.coverUri, db.albumTable.artistName, db.albumTable.releaseDate, db.albumTable.year])

@@ -31,14 +31,17 @@ class PlaylistWidget extends ConsumerWidget {
       height: _subtitle.isEmpty ? 64.0 : 80.0,
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        leading: playlist.coverUri?.scheme == "file" ? Image(
-          image: (playlist.coverUri?.scheme == "file" ? FileImage(File.fromUri(playlist.coverUri!))
-            : NetworkImage(playlist.coverUri.toString())) as ImageProvider,
-          width: 48,
-          height: 48,
-          fit: BoxFit.cover,
-          errorBuilder: (context, e, s) => const CoverPlaceholder(size: 48, iconSize: 24),
-        ) : const CoverPlaceholder(size: 48, iconSize: 24),
+        leading: ClipRRect(
+          borderRadius: BorderRadius.circular(4),
+          child: playlist.coverUri?.scheme == "file" ? Image(
+            image: (playlist.coverUri?.scheme == "file" ? FileImage(File.fromUri(playlist.coverUri!))
+              : NetworkImage(playlist.coverUri.toString())) as ImageProvider,
+            width: 48,
+            height: 48,
+            fit: BoxFit.cover,
+            errorBuilder: (context, e, s) => const CoverPlaceholder(size: 48, iconSize: 24),
+          ) : const CoverPlaceholder(size: 48, iconSize: 24)
+        ),
         title: Text.rich(TextSpan(children: [
           WidgetSpan(
             child: Icon(MdiIcons.playlistMusic, size: Theme.of(context).textTheme.subtitle1?.fontSize),

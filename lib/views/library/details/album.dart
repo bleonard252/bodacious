@@ -151,7 +151,7 @@ class AlbumDetailsViewState extends State<AlbumDetailsView> {
                       child: Image(
                         image: (album.coverUri?.scheme == "file" ? FileImage(File.fromUri(album.coverUri!))
                           : NetworkImage(album.coverUri.toString())) as ImageProvider,
-                        width: 196, height: 196,
+                        height: 196,
                         fit: BoxFit.fitHeight,
                         errorBuilder: (context, e, s) => const CoverPlaceholder(size: 196),
                       ),
@@ -197,7 +197,7 @@ class AlbumDetailsViewState extends State<AlbumDetailsView> {
                       child: Image(
                         image: (album.coverUri?.scheme == "file" ? FileImage(File.fromUri(album.coverUri!))
                           : NetworkImage(album.coverUri.toString())) as ImageProvider,
-                        width: 196, height: 196,
+                        height: 196,
                         fit: BoxFit.fitHeight,
                         errorBuilder: (context, e, s) => const CoverPlaceholder(size: 196),
                       ),

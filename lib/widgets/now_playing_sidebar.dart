@@ -101,15 +101,18 @@ class NowPlayingSidebar extends ConsumerWidget {
             children: [
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: meta.coverBytes != null || meta.coverUri?.scheme == "file" ? Image(
-                  image: (meta.coverBytes != null ? MemoryImage(Uint8List.fromList(meta.coverBytes!))
-                    : meta.coverUri?.scheme == "file" ? FileImage(File.fromUri(meta.coverUri!))
-                    : NetworkImage(meta.coverUri.toString())) as ImageProvider,
-                  width: 64,
-                  height: 64,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, e, s) => const CoverPlaceholder(size: 64, iconSize: 36),
-                ) : const CoverPlaceholder(size: 64, iconSize: 36),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(4),
+                  child: meta.coverBytes != null || meta.coverUri?.scheme == "file" ? Image(
+                    image: (meta.coverBytes != null ? MemoryImage(Uint8List.fromList(meta.coverBytes!))
+                      : meta.coverUri?.scheme == "file" ? FileImage(File.fromUri(meta.coverUri!))
+                      : NetworkImage(meta.coverUri.toString())) as ImageProvider,
+                    width: 64,
+                    height: 64,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, e, s) => const CoverPlaceholder(size: 64, iconSize: 36),
+                  ) : const CoverPlaceholder(size: 64, iconSize: 36)
+                ),
               ),
               Expanded(
                 child: Padding(

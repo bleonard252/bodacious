@@ -32,14 +32,16 @@ class AlbumWidget extends ConsumerWidget {
       height: _subtitle.isEmpty ? 64.0 : 80.0,
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        leading: album.coverUri?.scheme == "file" ? Image(
-          image: (album.coverUri?.scheme == "file" ? FileImage(File.fromUri(album.coverUri!))
-            : NetworkImage(album.coverUri.toString())) as ImageProvider,
-          width: 48,
-          height: 48,
-          fit: BoxFit.cover,
-          errorBuilder: (context, e, s) => const CoverPlaceholder(size: 48, iconSize: 24),
-        ) : const CoverPlaceholder(size: 48, iconSize: 24),
+        leading: ClipRRect(
+          borderRadius: BorderRadius.circular(4),
+          child: album.coverUri?.scheme == "file" ? Image(
+            image: (album.coverUri?.scheme == "file" ? FileImage(File.fromUri(album.coverUri!))
+              : NetworkImage(album.coverUri.toString())) as ImageProvider,
+            width: 48,
+            height: 48,
+            fit: BoxFit.cover,
+            errorBuilder: (context, e, s) => const CoverPlaceholder(size: 48, iconSize: 24),
+          ) : const CoverPlaceholder(size: 48, iconSize: 24)),
         title: Text.rich(TextSpan(children: [
           WidgetSpan(
             child: Icon(MdiIcons.album, size: Theme.of(context).textTheme.subtitle1?.fontSize),

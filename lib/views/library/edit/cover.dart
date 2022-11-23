@@ -329,12 +329,12 @@ class _CoverEditorDialogState extends State<CoverEditorDialog> {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: ClipRRect(
-        borderRadius: widget.type == BoType.artist ? BorderRadius.circular(196) : BorderRadius.zero,
+        borderRadius: widget.type == BoType.artist ? BorderRadius.circular(196) : BorderRadius.circular(12),
         child: Image(
           image: (selectedCover!.scheme == "file" ? FileImage(File.fromUri(selectedCover!))
             : NetworkImage(selectedCover.toString())) as ImageProvider,
           width: 196, height: 196,
-          fit: BoxFit.fitHeight,
+          fit: BoxFit.cover,
           errorBuilder: (context, e, s) => const CoverPlaceholder(size: 196),
         ),
       )
@@ -358,7 +358,7 @@ class _CoverEditorDialogState extends State<CoverEditorDialog> {
                       image: (coverUri.scheme == "file" ? FileImage(File.fromUri(coverUri))
                         : NetworkImage(coverUri.toString())) as ImageProvider,
                       width: 48, height: 48,
-                      fit: BoxFit.fitHeight,
+                      fit: BoxFit.cover,
                       errorBuilder: (context, e, s) => const CoverPlaceholder(size: 48),
                     ),
                   ),

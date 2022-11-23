@@ -146,36 +146,39 @@ class SongWidget extends ConsumerWidget {
   }
 
   buildImage(BuildContext context) {
-    return Stack(
-      fit: StackFit.expand,
-      children: [
-        Positioned.fill(
-          child: Container(
-            foregroundDecoration: track.available ? null : BoxDecoration(
-              color: Colors.black.withAlpha(127),
-              backgroundBlendMode: BlendMode.srcOver
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(4),
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          Positioned.fill(
+            child: Container(
+              foregroundDecoration: track.available ? null : BoxDecoration(
+                color: Colors.black.withAlpha(127),
+                backgroundBlendMode: BlendMode.srcOver
+              ),
+              child: track.coverBytes != null || track.coverUri?.scheme == "file" ? Image(
+                  image: (track.coverUri?.scheme == "file" ? FileImage(File.fromUri(track.coverUri!))
+                    : NetworkImage(track.coverUri.toString())) as ImageProvider,
+                  width: 48,
+                  height: 48,
+                  color: track.available ? null : Colors.black,
+                  colorBlendMode: track.available ? BlendMode.srcIn : BlendMode.saturation,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, e, s) => const CoverPlaceholder(size: 48, iconSize: 24),
+                ) : const CoverPlaceholder(size: 48, iconSize: 24),
             ),
-            child: track.coverBytes != null || track.coverUri?.scheme == "file" ? Image(
-            image: (track.coverUri?.scheme == "file" ? FileImage(File.fromUri(track.coverUri!))
-              : NetworkImage(track.coverUri.toString())) as ImageProvider,
-            width: 48,
-            height: 48,
-            color: track.available ? null : Colors.black,
-            colorBlendMode: track.available ? BlendMode.srcIn : BlendMode.saturation,
-            fit: BoxFit.cover,
-            errorBuilder: (context, e, s) => const CoverPlaceholder(size: 48, iconSize: 24),
-          ) : const CoverPlaceholder(size: 48, iconSize: 24),
           ),
-        ),
-        if (selected) ...[
-          Positioned.fill(child: Container(color: Colors.black54)),
-          Positioned.fill(child: Center(child: Icon(MdiIcons.equalizer, color: Theme.of(context).colorScheme.primary))),
+          if (selected) ...[
+            Positioned.fill(child: Container(color: Colors.black54)),
+            Positioned.fill(child: Center(child: Icon(MdiIcons.equalizer, color: Theme.of(context).colorScheme.secondary))),
+          ]
+          else if (showTrackNo && track.trackNo != null && track.trackNo != 0) ...[
+            Positioned.fill(child: Container(color: Colors.black54)),
+            Positioned.fill(child: Center(child: Text(track.trackNo!.toString().padLeft(2, '0')))),
+          ],
         ]
-        else if (showTrackNo && track.trackNo != null && track.trackNo != 0) ...[
-          Positioned.fill(child: Container(color: Colors.black54)),
-          Positioned.fill(child: Center(child: Text(track.trackNo!.toString().padLeft(2, '0')))),
-        ],
-      ]
+      )
     );
   }
 }
