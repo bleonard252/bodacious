@@ -5,11 +5,13 @@ import 'package:bodacious/main.dart';
 import 'package:bodacious/models/album_data.dart';
 import 'package:bodacious/models/artist_data.dart';
 import 'package:bodacious/models/track_data.dart';
+import 'package:bodacious/views/library/edit/cover.dart';
 import 'package:bodacious/widgets/cover_placeholder.dart';
 import 'package:bodacious/widgets/frame_size.dart';
 import 'package:bodacious/widgets/item/artist.dart';
 import 'package:bodacious/widgets/item/song.dart';
 import 'package:drift/drift.dart' hide Column, Table;
+import 'package:flinq/flinq.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
@@ -113,6 +115,23 @@ class TrackDetailsViewState extends State<TrackDetailsView> {
                 scrolledUnderElevation: 0,
                 backgroundColor: Theme.of(context).scaffoldBackgroundColor.withOpacity(0.5),
                 title: (controller.positions.isNotEmpty && controller.offset >= 256) ? Text(widget.track.title ?? widget.track.uri.pathSegments.last) : null,
+                actions: [
+                  IconButton(
+                    icon: const Icon(MdiIcons.pencil),
+                    tooltip: "Edit",
+                    onPressed: () async {
+                      showDialog(context: context, builder: (context) => CoverEditorDialog(
+                        type: BoType.track, id: track.id,
+                        coverUri: track.coverUri,
+                        albumIds: [if (track.albumId != null) track.albumId!],
+                        artistIds: [
+                          if (track.albumArtistId != null) track.albumArtistId!,
+                          if (track.trackArtistId != null) track.trackArtistId!
+                        ],
+                      ));
+                    }
+                  ),
+                ],
               ),
               extendBody: true,
               extendBodyBehindAppBar: true,

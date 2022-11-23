@@ -1,15 +1,22 @@
 // stateful dialog widget with landscape and portrait versions
 
+import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 
+import 'package:bodacious/drift/database.dart';
 import 'package:bodacious/main.dart';
 import 'package:bodacious/src/online/lastfm.dart';
 import 'package:dio/dio.dart';
 import 'package:drift/drift.dart' hide Column;
+import 'package:file_picker/file_picker.dart';
 import 'package:flinq/flinq.dart';
 import 'package:flutter/material.dart';
 import 'package:fuzzywuzzy/fuzzywuzzy.dart';
 import 'package:lastfm/lastfm.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:nanoid/non_secure.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:simple_icons/simple_icons.dart';
 import 'package:spotify/spotify.dart' hide Image;
 import 'package:xml/xml.dart';
@@ -390,22 +397,17 @@ class _CoverEditorDialogState extends State<CoverEditorDialog> {
         ),
       );
     }
-    Widget buildAlbumsList() {
+    Widget buildList({required String header, required Future<List<Uri>> future, bool artist = false}) {
       return FutureBuilder<List<Uri>>(
-        future: CoverEditorDialog.getCoverFromAlbums(widget.albumIds),
+        future: future,
         builder: (context, snapshot) {
           return SliverToBoxAdapter(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: snapshot.hasData && snapshot.data!.isEmpty ? [] : <Widget>[
-                Text("From albums", style: Theme.of(context).textTheme.headlineSmall),
-                if (snapshot.hasData) SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  clipBehavior: Clip.none,
-                  child: Row(
-                    mainAxisSize: MainAxisSize.max,
-                    children: snapshot.data?.map((e) => buildOption(e)).toList() ?? [],
-                  ),
+                Text(header, style: Theme.of(context).textTheme.titleMedium),
+                if (snapshot.hasData) Wrap(
+                  children: snapshot.data?.map((e) => buildOption(e, artist)).toList() ?? [],
                 )
                 else if (snapshot.hasError) Text(snapshot.error.toString(), style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.red))
                 else const LinearProgressIndicator(),
@@ -416,56 +418,34 @@ class _CoverEditorDialogState extends State<CoverEditorDialog> {
         }
       );
     }
-    Widget buildTracksList() {
-      return FutureBuilder<List<Uri>>(
-        future: CoverEditorDialog.getCoverFromTracks(widget.trackIds),
-        builder: (context, snapshot) {
-          return SliverToBoxAdapter(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: snapshot.hasData && snapshot.data!.isEmpty ? [] : <Widget>[
-                Text("From tracks", style: Theme.of(context).textTheme.headlineSmall),
-                if (snapshot.hasData) SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: snapshot.data?.map((e) => buildOption(e)).toList() ?? [],
-                  ),
-                )
-                else if (snapshot.hasError) Text(snapshot.error.toString(), style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.red))
-                else const LinearProgressIndicator(),
-                const Divider(),
-              ],
-            ),
-          );
-        }
-      );
-    }
-    Widget buildArtistsList() {
-      return FutureBuilder<List<Uri>>(
-        future: CoverEditorDialog.getCoverFromArtists(widget.artistIds),
-        builder: (context, snapshot) {
-          return SliverToBoxAdapter(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: snapshot.hasData && snapshot.data!.isEmpty ? [] : <Widget>[
-                Text("From artists", style: Theme.of(context).textTheme.headlineSmall),
-                if (snapshot.hasData) SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: snapshot.data?.map((e) => buildOption(e, true)).toList() ?? [],
-                  ),
-                )
-                else if (snapshot.hasError) Text(snapshot.error.toString(), style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.red))
-                else const LinearProgressIndicator(),
-                const Divider(),
-              ],
-            ),
-          );
-        }
-      );
-    }
+    Widget buildAlbumsList() => buildList(
+      header: "From albums",
+      future: CoverEditorDialog.getCoverFromAlbums(widget.albumIds)
+    );
+    Widget buildArtistsList() => buildList(
+      header: "From artists",
+      future: CoverEditorDialog.getCoverFromArtists(widget.artistIds),
+      artist: true,
+    );
+    Widget buildTracksList() => buildList(
+      header: "From songs",
+      future: CoverEditorDialog.getCoverFromTracks(widget.trackIds)
+    );
     return CustomScrollView(
       slivers: <Widget>[
+        SliverList(delegate: SliverChildListDelegate.fixed([
+          ListTile(
+            title: const Text("Select custom cover"),
+            leading: const Icon(MdiIcons.image),
+            onTap: () async {
+              final file = await FilePicker.platform.pickFiles(type: FileType.image, allowMultiple: false);
+              if (file != null && file.files.singleOrNull != null) {
+                final newFile = await _saveImage(file.files.single.readStream ?? File(file.files.single.path!).openRead());
+                setState(() => selectedCover = Uri.file(file.files.singleOrNull!.path ?? "Test"));
+              }
+            },
+          )
+        ])),
         // cover image picker
         if (widget.type == BoType.album) ...[
           buildAlbumsList(),
@@ -481,35 +461,67 @@ class _CoverEditorDialogState extends State<CoverEditorDialog> {
           buildTracksList(),
         ],
         // online covers
-        FutureBuilder<List<Uri>>(
+        buildList(
+          header: "From the Internet",
           future: CoverEditorDialog.getCoverFromNetwork(widget.type, widget.id),
-          builder: (context, snapshot) {
-            return SliverToBoxAdapter(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: snapshot.hasData && snapshot.data!.isEmpty ? [] : <Widget>[
-                  if (snapshot.hasData) Text("From the Internet", style: Theme.of(context).textTheme.headlineSmall),
-                  if (snapshot.hasData) SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: snapshot.data?.map((e) => buildOption(e)).toList() ?? [],
-                    ),
-                  )
-                  else if (snapshot.hasError) Text(snapshot.error.toString(), style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.red))
-                  else const LinearProgressIndicator(),
-                  const Divider(),
-                ],
-              ),
-            );
-          }
+          artist: widget.type == BoType.artist,
         )
       ],
     );
   }
 
   Future<void> applyCover(BuildContext context) async {
-    //
+    Uri? localCover = selectedCover;
+    if (selectedCover == null) {
+      Navigator.pop(context);
+      return;
+    }
+    if (selectedCover!.hasScheme && selectedCover!.scheme != "file") {
+      final _dir = (await getApplicationDocumentsDirectory()).absolute.path+"/album_covers";
+      final file = File(_dir+"/"+(Random().nextDouble()*1e50).truncate().toRadixString(16)+"_"+(selectedCover!.remoteSource?.name ?? "custom")+".jpg");
+      await Dio().download(selectedCover.toString(), file.absolute.uri.toFilePath());
+
+      localCover = file.absolute.uri;
+    }
+    switch (widget.type) {
+      case BoType.album:
+        await (db.update(db.albumTable)..where((tbl) => tbl.id.equals(widget.id))).write(AlbumTableCompanion(
+          coverUri: Value(localCover),
+          coverUriRemote: Value(selectedCover)
+        ));
+        break;
+      case BoType.artist:
+        await (db.update(db.artistTable)..where((tbl) => tbl.id.equals(widget.id))).write(ArtistTableCompanion(
+          coverUri: Value(localCover),
+          coverUriRemote: Value(selectedCover)
+        ));
+        break;
+      case BoType.track:
+        await (db.update(db.trackTable)..where((tbl) => tbl.id.equals(widget.id))).write(TrackTableCompanion(
+          coverUri: Value(localCover),
+          coverUriRemote: Value(selectedCover)
+        ));
+        break;
+      case BoType.playlist:
+        await (db.update(db.playlistTable)..where((tbl) => tbl.id.equals(widget.id))).write(PlaylistTableCompanion(
+          coverUri: Value(localCover)
+        ));
+        break;
+      default:
+        throw Exception("Unknown type");
+    }
     Navigator.pop(context);
+  }
+
+  Future<Uri> _saveImage(Stream<List<int>> original) async {
+    final _dir = (await getApplicationDocumentsDirectory()).absolute.path+"/album_covers";
+    final file = File(_dir+"/"+nanoid(36)+"_custom.jpg");
+    await file.create(recursive: true);
+    final sink = file.openWrite();
+    await sink.addStream(original);
+    await sink.flush();
+    await sink.close();
+    return file.absolute.uri;
   }
 }
 
