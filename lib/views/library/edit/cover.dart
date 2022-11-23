@@ -182,7 +182,8 @@ class CoverEditorDialog extends StatefulWidget {
           var client = Dio();
           final response = await client.get("https://commons.wikimedia.org/w/api.php?action=query&format=json&prop=&list=categorymembers&titles=&formatversion=2&cmtitle=Category%3A${Uri.encodeQueryComponent(artist.name)}&cmtype=file");
           if (response.statusCode == 200) {
-            response.data["query"]["categorymembers"].forEach((element) {
+            final data = response.data is Map ? response.data : jsonDecode(response.data);
+            data["query"]["categorymembers"].forEach((element) {
               covers.add(Uri.parse("https://commons.wikimedia.org/wiki/Special:Redirect/file/${element["title"]}"));
             });
           }
@@ -542,6 +543,7 @@ extension on Uri {
     "lastfm-img2-ak.mirrors.tds.net": RemoteCoverSource.lastfm,
     "api-img.discogs.com": RemoteCoverSource.discogs,
     "upload.wikimedia.org": RemoteCoverSource.wikipedia,
+    "commons.wikimedia.org": RemoteCoverSource.wikipedia,
     "en.wikipedia.org": RemoteCoverSource.wikipedia,
     "images.genius.com": RemoteCoverSource.genius,
   }[host];
