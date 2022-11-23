@@ -3,8 +3,10 @@ import 'dart:async';
 
 import 'package:bodacious/main.dart';
 import 'package:bodacious/models/artist_data.dart';
+import 'package:bodacious/models/playlist_data.dart';
 import 'package:bodacious/widgets/item/album.dart';
 import 'package:bodacious/widgets/item/artist.dart';
+import 'package:bodacious/widgets/item/playlist.dart';
 import 'package:bodacious/widgets/item/song.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -26,29 +28,35 @@ final searchEngine = FutureProvider.family<List<SearchResult>, String>((ref, que
     : query.split(" ").contains("is:song") ? "track"
     : query.split(" ").contains("is:album") ? "album"
     : query.split(" ").contains("is:artist") ? "artist"
+    : query.split(" ").contains("is:playlist") ? "playlist"
     : null;
   final finder = Woozy<SearchResult>(limit: double.maxFinite.truncate());
   var pureQuery = (query.split(" ")..removeWhere((element) => element.startsWith("is:"))).join(" ");
   var lastTrack = 0;
   var lastAlbum = 0;
   var lastArtist = 0;
+  var lastPlaylist = 0;
   do {
     final tracksFuture = (typeFilter == null || typeFilter == "track") ? (db.select(db.trackTable)..limit(20, offset: lastTrack)).get() : Future<List<TrackMetadata>>.value([]);
-    final albumsFuture = (typeFilter == null || typeFilter == "album") ? (db.select(db.albumTable)..limit(20, offset: lastAlbum)).get() : Future<List<AlbumMetadata>>.value([]);
-    final artistsFuture = (typeFilter == null || typeFilter == "artist") ? (db.select(db.artistTable)..limit(20, offset: lastArtist)).get() : Future<List<ArtistMetadata>>.value([]);
-    final theFutureIsNow = await Future.wait([tracksFuture, albumsFuture, artistsFuture]);
+    final albumsFuture = (typeFilter == null || typeFilter == "album") ? (db.select(db.albumTable)..limit(15, offset: lastAlbum)).get() : Future<List<AlbumMetadata>>.value([]);
+    final artistsFuture = (typeFilter == null || typeFilter == "artist") ? (db.select(db.artistTable)..limit(15, offset: lastArtist)).get() : Future<List<ArtistMetadata>>.value([]);
+    final playlistsFuture = (typeFilter == null || typeFilter == "playlist") ? (db.select(db.playlistTable)..limit(5, offset: lastPlaylist)).get() : Future<List<PlaylistMetadata>>.value([]);
+    final theFutureIsNow = await Future.wait([tracksFuture, albumsFuture, artistsFuture, playlistsFuture]);
     final List<TrackMetadata> tracks = theFutureIsNow[0] as dynamic;
     final List<AlbumMetadata> albums = theFutureIsNow[1] as dynamic;
     final List<ArtistMetadata> artists = theFutureIsNow[2] as dynamic;
+    final List<PlaylistMetadata> playlists = theFutureIsNow[3] as dynamic;
     //query = query.replaceAll(r' ?is:\w+', '');
     if ((typeFilter??"track") == "track") for (var element in tracks) {if (element.title != null) finder.addEntry(element.title!, value: SearchResult.track(element));}
     if ((typeFilter??"album") == "album") for (var element in albums) {finder.addEntry(element.name, value: SearchResult.album(element));}
     if ((typeFilter??"artist") == "artist") for (var element in artists) {finder.addEntry(element.name, value: SearchResult.artist(element));}
+    if ((typeFilter??"playlist") == "playlist") for (var element in playlists) {finder.addEntry(element.name, value: SearchResult.playlist(element));}
     logger.verbose("Results received: ${tracks.length} tracks, ${albums.length} albums, ${artists.length} artists");
     if (tracks.isEmpty && albums.isEmpty && artists.isEmpty) break;
     lastTrack += (theFutureIsNow[0].length).clamp(0, 30).truncate();
     lastAlbum += (theFutureIsNow[1].length).clamp(0, 30).truncate();
     lastArtist += (theFutureIsNow[2].length).clamp(0, 30).truncate();
+    lastPlaylist += (theFutureIsNow[3].length).clamp(0, 30).truncate();
     logger.verbose("Getting more results...");
   } while (finder.search(pureQuery).map((e) => e.value!.withAccuracy(e.score)).takeWhile((value) => value.accuracy >= accuracyLimit).length < (typeFilter == null ? maxResultsLow : maxResultsHigh));
   return finder.search(pureQuery).map((e) => e.value!.withAccuracy(e.score)).takeWhile((value) => value.accuracy >= accuracyLimit).toList();
@@ -75,6 +83,7 @@ class SearchResultsView extends ConsumerWidget {
     : query.split(" ").contains("is:song") ? "track"
     : query.split(" ").contains("is:album") ? "album"
     : query.split(" ").contains("is:artist") ? "artist"
+    : query.split(" ").contains("is:playlist") ? "playlist"
     : null;
     return typeFilter;
   }
@@ -153,6 +162,8 @@ class SearchResultsView extends ConsumerWidget {
                       return AlbumWidget(result.get());
                     } else if (result.isArtist) {
                       return ArtistWidget(result.get());
+                    } else if (result.isPlaylist) {
+                      return PlaylistWidget(result.get());
                     } else {
                       return Container(
                         padding: const EdgeInsets.all(8),
@@ -215,6 +226,49 @@ class SearchResultsView extends ConsumerWidget {
                 TextButton(onPressed: () => reSearch(query+" is:track"), child: const Padding(
                   padding: EdgeInsets.all(4.0),
                   child: Text("See all tracks"),
+                ))
+              ],
+            ),
+          )),
+
+          // playlists
+          if ((getFilter() == "playlist" || !isFiltered()) && (results.valueOrNull ?? []).any((element) => element.isPlaylist)) SliverToBoxAdapter(child: Padding(
+            padding: const EdgeInsets.all(16.0) + const EdgeInsets.only(top: 32),
+            child: Text("Playlists", style: Theme.of(context).textTheme.headline5),
+          )),
+          Builder(
+            builder: (context) {
+              late final Iterable<SearchResult> list;
+              if (isFiltered(to: "playlist")) {
+                list = (results.valueOrNull ?? []).where((element) => element.isPlaylist);
+              } else {
+                list = (results.valueOrNull ?? []).where((element) => element.isPlaylist).take(5);
+              }
+              return SliverList(
+                delegate: SliverChildBuilderDelegate((context, index) {
+                  final result = list.elementAt(index);
+                  if (result.isPlaylist) {
+                    return PlaylistWidget(result.get());
+                  } else {
+                    return Container(
+                      padding: const EdgeInsets.all(8),
+                      constraints: const BoxConstraints.expand(height: 64),
+                      color: Colors.red,
+                      child: const Text("Type does not match", style: TextStyle(color: Colors.white)),
+                    );
+                  }
+                }, childCount: list.length)
+              );
+            }
+          ),
+          if (!isFiltered() && (results.valueOrNull ?? []).where((element) => element.isPlaylist).length > 5) SliverToBoxAdapter(child: Container(
+            constraints: const BoxConstraints.expand(height: 48),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                TextButton(onPressed: () => reSearch(query+" is:playlist"), child: const Padding(
+                  padding: EdgeInsets.all(4.0),
+                  child: Text("See all playlists"),
                 ))
               ],
             ),
